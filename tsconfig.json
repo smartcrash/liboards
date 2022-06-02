@@ -15,6 +15,12 @@
     "emitDecoratorMetadata": true, /* Emit design-type metadata for decorated declarations in source files. */
     "sourceMap": true, /* Create source map files for emitted JavaScript files. */
   },
+  // By default, ts-node will perform type-checking every time you run tests.
+  // However, type-checking is usually slow, and you can turn it off by adding
+  // the following configuration block.
+  "ts-node": {
+    "transpileOnly": true
+  },
   /* Visit https://aka.ms/tsconfig to read more about this file */
   /* Projects */
   // "incremental": true,                              /* Save .tsbuildinfo files to allow for incremental compilation of projects. */

@@ -5,11 +5,11 @@ import express from 'express';
 import http from 'http';
 import "reflect-metadata";
 import { buildSchema } from 'type-graphql';
+import { PORT } from './constants';
 
-async function createApolloServer({ port = 4000 }: { port?: number } = {}) {
+async function createServer() {
   const app = express();
   const httpServer = http.createServer(app);
-
 
   const schema = await buildSchema({
     resolvers: [__dirname + "/resolver/*.resolver.ts"],
@@ -21,16 +21,13 @@ async function createApolloServer({ port = 4000 }: { port?: number } = {}) {
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
-  await server.start();
+  await server.start()
 
   server.applyMiddleware({ app });
 
-  await new Promise<void>(resolve => httpServer.listen(port, resolve));
+  await new Promise<void>(resolve => httpServer.listen(PORT, resolve));
 
-  return {
-    server,
-    url: `http://localhost:${port}${server.graphqlPath}`
-  }
+  return server
 }
 
-export { createApolloServer }
+export { createServer }
