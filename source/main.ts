@@ -1,12 +1,13 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
+import { isDev } from "./constants";
 import { User } from "./entity/User";
 
 const AppDataSource = new DataSource({
   type: "sqlite",
   database: "database.sqlite",
-  synchronize: true,
-  logging: false,
+  synchronize: false,
+  logging: isDev,
   entities: ["source/entity/**/*.ts"],
   migrations: ["source/migration/**/*.ts"],
   subscribers: ["source/subscriber/**/*.ts"],
