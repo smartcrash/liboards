@@ -1,15 +1,16 @@
 
 import { DataSource } from "typeorm";
-import { isDev } from "./constants";
+import { NODE_ENV } from "./constants";
+import { User } from "./entity";
 
 export const dataSource = new DataSource({
   type: "sqlite",
   database: "database.sqlite",
-  logging: isDev,
+  logging: false,
   synchronize: false,
-  dropSchema: isDev,
+  dropSchema: NODE_ENV === 'development',
   migrationsRun: true,
-  entities: ["source/entity/**/*.ts"],
+  entities: [User],
   migrations: ["source/migration/**/*.ts"],
   subscribers: ["source/subscriber/**/*.ts"],
 })
