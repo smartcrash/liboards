@@ -1,17 +1,6 @@
 import "reflect-metadata";
-import { DataSource } from "typeorm";
-import { isDev } from "./constants";
+import { AppDataSource } from "./DataSource";
 import { User } from "./entity/User";
-
-const AppDataSource = new DataSource({
-  type: "sqlite",
-  database: "database.sqlite",
-  synchronize: false,
-  logging: isDev,
-  entities: ["source/entity/**/*.ts"],
-  migrations: ["source/migration/**/*.ts"],
-  subscribers: ["source/subscriber/**/*.ts"],
-})
 
 AppDataSource.initialize().then(async (dataSource) => {
   console.log("Inserting a new user into the database...");
