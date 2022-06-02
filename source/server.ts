@@ -13,6 +13,7 @@ async function createApolloServer({ port = 4000 }: { port?: number } = {}) {
 
   const schema = await buildSchema({
     resolvers: [__dirname + "/resolver/*.resolver.ts"],
+    dateScalarMode: 'isoDate',
   })
 
   const server = new ApolloServer({
