@@ -14,6 +14,7 @@ async function createServer() {
   const schema = await buildSchema({
     resolvers: [__dirname + "/resolver/*.resolver.ts"],
     dateScalarMode: 'isoDate',
+    validate: false
   })
 
   const server = new ApolloServer({
