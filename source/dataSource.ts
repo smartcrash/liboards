@@ -2,7 +2,7 @@
 import { DataSource } from "typeorm";
 import { isDev } from "./constants";
 
-export const AppDataSource = new DataSource({
+export const dataSource = new DataSource({
   type: "sqlite",
   database: "database.sqlite",
   logging: isDev,
