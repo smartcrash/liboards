@@ -1,4 +1,4 @@
-import { hash, verify } from 'argon2';
+import { verify } from 'argon2';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import { User } from "../entity";
 import { TContext } from '../types';
@@ -41,9 +41,9 @@ export class AuthenticationResolver {
 
     user.username = username
     user.email = email
-    user.password = await hash(password)
+    user.password = password
 
-    await dataSource.getRepository(User).save(user, { reload: true })
+    await dataSource.getRepository(User).save(user)
 
     req.session.userId = user.id
 
