@@ -26,13 +26,14 @@ configure({
     files: ['source/**/*.test.ts'],
     plugins: [expect(), runFailedTests(), apiClient(`http://localhost:${PORT}/graphql`)],
     reporters: [specReporter()],
+    forceExit: true,
     importer: (filePath) => import(filePath),
     configureSuite(suite) {
       suite.setup(async () => {
         await dataSource.initialize()
         const server = await createServer()
 
-        return () => [server.stop(), dataSource.destroy()]
+        return () => server.stop()
       })
     }
   },
