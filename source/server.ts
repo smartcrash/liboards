@@ -1,14 +1,15 @@
 
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
+import sqlite from "better-sqlite3";
+import createSqliteStore from 'better-sqlite3-session-store';
+import cors from 'cors';
 import express from 'express';
+import session from "express-session";
 import http from 'http';
 import "reflect-metadata";
 import { buildSchema } from 'type-graphql';
 import { NODE_ENV, PORT } from './constants';
-import sqlite from "better-sqlite3";
-import session from "express-session"
-import createSqliteStore from 'better-sqlite3-session-store'
 import { dataSource } from './dataSource';
 import { TContext } from './types';
 
@@ -17,6 +18,11 @@ async function createServer() {
   const httpServer = http.createServer(app);
   const SqliteStore = createSqliteStore(session)
   const db = new sqlite("sessions.db", {});
+
+  app.use(cors({
+    origin: ['https://studio.apollographql.com'],
+    credentials: true,
+  }))
 
   app.use(
     session({
@@ -51,11 +57,12 @@ async function createServer() {
 
   await server.start()
 
-  server.applyMiddleware({ app });
+  server.applyMiddleware({ app, cors: false });
 
   await new Promise<void>(resolve => httpServer.listen(PORT, resolve));
 
   return server
 }
 
-export { createServer }
+export { createServer };
+
