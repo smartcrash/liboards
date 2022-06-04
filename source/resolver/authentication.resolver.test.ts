@@ -48,6 +48,44 @@ test.group('createUser', () => {
     expect(response.cookie('sid').value).not.toHaveLength(0)
   })
 
+  test('should validate values', async ({ expect, client }) => {
+    const username = 'al'
+    const email = 'not an email'
+    const password = '123'
+
+    const queryData = {
+      query: `
+        mutation($username: String!, $email: String!, $password: String!) {
+          createUser(username: $username, email: $email, password: $password) {
+            errors { field, message }
+            user {
+              id
+              username
+              email
+            }
+          }
+        }
+      `,
+      variables: {
+        username,
+        email,
+        password,
+      }
+    };
+
+    const response = await client.post('/').json(queryData)
+
+    const { data } = response.body()
+
+    expect(data.createUser.user).toBeNull()
+
+    expect(data.createUser.errors).toBeDefined()
+    expect(data.createUser.errors).toHaveLength(3)
+    expect(data.createUser.errors).toContainEqual({ field: 'username', message: 'The username must contain at least 4 characters.' })
+    expect(data.createUser.errors).toContainEqual({ field: 'email', message: 'Invalid email.' })
+    expect(data.createUser.errors).toContainEqual({ field: 'password', message: 'The password must contain at least 4 characters.' })
+  })
+
   test('should prevent duplicate `username` and `email`', async ({ expect, client }) => {
     const username = faker.internet.userName()
     const email = faker.internet.exampleEmail()

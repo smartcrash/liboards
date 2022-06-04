@@ -1,5 +1,6 @@
 import { verify } from 'argon2';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-graphql";
+import { z, ZodError } from 'zod';
 import { User } from "../entity";
 import { TContext } from '../types';
 
@@ -38,12 +39,27 @@ export class AuthenticationResolver {
     const repository = dataSource.getRepository(User)
     const errors: FieldError[] = []
 
-    // TODO: Test this
+    try {
+      await z.object({
+        username: z.string().min(4, 'The username must contain at least 4 characters.'),
+        email: z.string().email('Invalid email.'),
+        password: z.string().min(4, 'The password must contain at least 4 characters.')
+      }).parseAsync({ username, email, password })
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return {
+          errors: error.issues.map(({ path, message }) => ({
+            field: path.join('.'),
+            message
+          }))
+        }
+      }
+    }
+
     if (await repository.findOneBy({ username })) {
       errors.push({ field: 'username', message: 'This username already exists' })
     }
 
-    // TODO: Test this
     if (await repository.findOneBy({ email })) {
       errors.push({ field: 'email', message: 'This email is already in use.' })
     }
