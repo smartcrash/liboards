@@ -32,7 +32,7 @@ export type FieldError = {
 export type Mutation = {
   __typename?: 'Mutation';
   createUser: AuthenticationResponse;
-  loginWithEmailAndPassword: AuthenticationResponse;
+  loginWithPassword: AuthenticationResponse;
 };
 
 
@@ -43,7 +43,7 @@ export type MutationCreateUserArgs = {
 };
 
 
-export type MutationLoginWithEmailAndPasswordArgs = {
+export type MutationLoginWithPasswordArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
 };
@@ -71,6 +71,14 @@ export type CreateUserMutationVariables = Exact<{
 
 export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number } | null } };
 
+export type LoginWithPasswordMutationVariables = Exact<{
+  password: Scalars['String'];
+  email: Scalars['String'];
+}>;
+
+
+export type LoginWithPasswordMutation = { __typename?: 'Mutation', loginWithPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number } | null } };
+
 
 export const CreateUserDocument = gql`
     mutation CreateUser($password: String!, $email: String!, $username: String!) {
@@ -88,4 +96,21 @@ export const CreateUserDocument = gql`
 
 export function useCreateUserMutation() {
   return Urql.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument);
+};
+export const LoginWithPasswordDocument = gql`
+    mutation LoginWithPassword($password: String!, $email: String!) {
+  loginWithPassword(password: $password, email: $email) {
+    errors {
+      field
+      message
+    }
+    user {
+      id
+    }
+  }
+}
+    `;
+
+export function useLoginWithPasswordMutation() {
+  return Urql.useMutation<LoginWithPasswordMutation, LoginWithPasswordMutationVariables>(LoginWithPasswordDocument);
 };

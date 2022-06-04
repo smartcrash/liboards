@@ -132,7 +132,7 @@ test.group('createUser', () => {
   })
 })
 
-test.group('loginWithEmailAndPassword', () => {
+test.group('loginWithPassword', () => {
   test('should return error if email does\'nt exist', async ({ expect, client }) => {
     const email = faker.internet.exampleEmail()
     const password = faker.internet.password()
@@ -140,7 +140,7 @@ test.group('loginWithEmailAndPassword', () => {
     const queryData = {
       query: `
         mutation($email: String!, $password: String!) {
-          loginWithEmailAndPassword(email: $email, password: $password) {
+          loginWithPassword(email: $email, password: $password) {
             errors { field, message }
             user {
               id
@@ -156,12 +156,12 @@ test.group('loginWithEmailAndPassword', () => {
     const response = await client.post('/').json(queryData)
     const { data } = response.body()
 
-    expect(data.loginWithEmailAndPassword.user).toBeNull()
+    expect(data.loginWithPassword.user).toBeNull()
 
-    expect(data.loginWithEmailAndPassword.errors).not.toBeNull()
-    expect(data.loginWithEmailAndPassword.errors).toHaveLength(1)
-    expect(data.loginWithEmailAndPassword.errors[0].field).toBe('email')
-    expect(data.loginWithEmailAndPassword.errors[0].message).toBe("This email does\'nt exists.")
+    expect(data.loginWithPassword.errors).not.toBeNull()
+    expect(data.loginWithPassword.errors).toHaveLength(1)
+    expect(data.loginWithPassword.errors[0].field).toBe('email')
+    expect(data.loginWithPassword.errors[0].message).toBe("This email does\'nt exists.")
   })
 
   test('should return error if password is incorrect', async ({ expect, client }) => {
@@ -194,7 +194,7 @@ test.group('loginWithEmailAndPassword', () => {
     const queryData = {
       query: `
         mutation($email: String!, $password: String!) {
-          loginWithEmailAndPassword(email: $email, password: $password) {
+          loginWithPassword(email: $email, password: $password) {
             errors { field, message }
             user {
               id
@@ -210,12 +210,12 @@ test.group('loginWithEmailAndPassword', () => {
     const response = await client.post('/').json(queryData)
     const { data } = response.body()
 
-    expect(data.loginWithEmailAndPassword.user).toBeNull()
+    expect(data.loginWithPassword.user).toBeNull()
 
-    expect(data.loginWithEmailAndPassword.errors).not.toBeNull()
-    expect(data.loginWithEmailAndPassword.errors).toHaveLength(1)
-    expect(data.loginWithEmailAndPassword.errors[0].field).toBe('password')
-    expect(data.loginWithEmailAndPassword.errors[0].message).toBe("Incorrect password, try again.")
+    expect(data.loginWithPassword.errors).not.toBeNull()
+    expect(data.loginWithPassword.errors).toHaveLength(1)
+    expect(data.loginWithPassword.errors[0].field).toBe('password')
+    expect(data.loginWithPassword.errors[0].message).toBe("Incorrect password, try again.")
   })
 
   test('cookie session should not exist if invalid data is given', async ({ expect, client }) => {
@@ -225,7 +225,7 @@ test.group('loginWithEmailAndPassword', () => {
     const queryData = {
       query: `
         mutation($email: String!, $password: String!) {
-          loginWithEmailAndPassword(email: $email, password: $password) {
+          loginWithPassword(email: $email, password: $password) {
             errors { field, message }
             user {
               id
@@ -272,7 +272,7 @@ test.group('loginWithEmailAndPassword', () => {
     const queryData = {
       query: `
         mutation($email: String!, $password: String!) {
-          loginWithEmailAndPassword(email: $email, password: $password) {
+          loginWithPassword(email: $email, password: $password) {
             errors { field, message }
             user {
               id
@@ -288,10 +288,10 @@ test.group('loginWithEmailAndPassword', () => {
     const response = await client.post('/').json(queryData)
     const { data } = response.body()
 
-    expect(data.loginWithEmailAndPassword.errors).toBeNull()
-    expect(data.loginWithEmailAndPassword.user).toBeDefined()
-    expect(data.loginWithEmailAndPassword.user).toMatchObject({ username, email })
-    expect(typeof data.loginWithEmailAndPassword.user.id).toBe('number')
+    expect(data.loginWithPassword.errors).toBeNull()
+    expect(data.loginWithPassword.user).toBeDefined()
+    expect(data.loginWithPassword.user).toMatchObject({ username, email })
+    expect(typeof data.loginWithPassword.user.id).toBe('number')
 
     expect(response.cookie('sid')).toBeDefined()
     expect(response.cookie('sid').value).not.toHaveLength(0)

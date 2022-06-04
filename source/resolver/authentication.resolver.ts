@@ -28,7 +28,6 @@ export class AuthenticationResolver {
     return dataSource.getRepository(User).findOne({})
   }
 
-
   @Mutation(() => AuthenticationResponse)
   async createUser(
     @Arg('username') username: string,
@@ -79,9 +78,8 @@ export class AuthenticationResolver {
     return { user }
   }
 
-
   @Mutation(() => AuthenticationResponse)
-  async loginWithEmailAndPassword(
+  async loginWithPassword(
     @Arg('email') email: string,
     @Arg('password') password: string,
     @Ctx() { req, dataSource }: TContext

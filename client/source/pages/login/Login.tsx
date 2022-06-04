@@ -12,27 +12,26 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { useCreateUserMutation } from "../../generated/graphql";
+import { useLoginWithPasswordMutation } from "../../generated/graphql";
 
 interface FieldValues {
-  username: string;
   email: string;
   password: string;
 }
 
-export const SignUp = () => {
+export const Login = () => {
   const {
     register,
     handleSubmit,
     setError,
     formState: { isSubmitting, errors },
   } = useForm<FieldValues>({});
-  const [, createUser] = useCreateUserMutation();
+  const [, loginWithPassword] = useLoginWithPasswordMutation();
   const onSubmit = handleSubmit(async (values) => {
-    const response = await createUser(values);
+    const response = await loginWithPassword(values);
 
-    if (response.data?.createUser) {
-      const { user, errors } = response.data.createUser;
+    if (response.data?.loginWithPassword) {
+      const { user, errors } = response.data.loginWithPassword;
 
       if (errors?.length) {
         errors.forEach(({ field, message }) =>
@@ -53,11 +52,11 @@ export const SignUp = () => {
       <Stack spacing={"8"}>
         <Stack spacing={"6"}>
           <Stack spacing={{ base: "2", md: "3" }} textAlign={"center"}>
-            <Heading size={"lg"}>Create a new account</Heading>
+            <Heading size={"lg"}>Log in to your account</Heading>
             <HStack spacing={2} justify={"center"}>
-              <Text color={"muted"}>Already have an account?</Text>
-              {/* TODO: Redirect to /login */}
-              <Button variant={"link"}>Login</Button>
+              <Text color={"muted"}>Don't have an account?</Text>
+              {/* TODO: Redirect to /sign-up */}
+              <Button variant={"link"}>Sign up</Button>
             </HStack>
           </Stack>
         </Stack>
@@ -69,15 +68,6 @@ export const SignUp = () => {
         >
           <Stack spacing={6}>
             <Stack spacing={5}>
-              <FormControl isInvalid={!!errors.username?.message}>
-                <FormLabel htmlFor={"username"}>Name</FormLabel>
-                <Input
-                  id={"username"}
-                  {...register("username", { required: true })}
-                />
-                <FormErrorMessage>{errors.username?.message}</FormErrorMessage>
-              </FormControl>
-
               <FormControl isInvalid={!!errors.email?.message}>
                 <FormLabel htmlFor={"email"}>Email</FormLabel>
                 <Input
@@ -101,7 +91,7 @@ export const SignUp = () => {
             </Stack>
 
             <Button isLoading={isSubmitting} type={"submit"}>
-              Sign up
+              Sign in
             </Button>
           </Stack>
         </Box>
