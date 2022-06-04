@@ -35,15 +35,28 @@ export class AuthenticationResolver {
     @Arg('password') password: string,
     @Ctx() { req, dataSource }: TContext
   ): Promise<AuthenticationResponse> {
+    const repository = dataSource.getRepository(User)
+    const errors: FieldError[] = []
+
+    // TODO: Test this
+    if (await repository.findOneBy({ username })) {
+      errors.push({ field: 'username', message: 'This username already exists' })
+    }
+
+    // TODO: Test this
+    if (await repository.findOneBy({ email })) {
+      errors.push({ field: 'email', message: 'This email is already in use.' })
+    }
+
+    if (errors.length) return { errors }
+
     const user = new User()
-
     // TODO: Add input validation
-
     user.username = username
     user.email = email
     user.password = password
 
-    await dataSource.getRepository(User).save(user)
+    await repository.save(user)
 
     req.session.userId = user.id
 

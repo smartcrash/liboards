@@ -47,6 +47,51 @@ test.group('createUser', () => {
     expect(response.cookie('sid')).toBeDefined()
     expect(response.cookie('sid').value).not.toHaveLength(0)
   })
+
+  test('should prevent duplicate `username` and `email`', async ({ expect, client }) => {
+    const username = faker.internet.userName()
+    const email = faker.internet.exampleEmail()
+    const password = faker.internet.password()
+
+    const user = new User()
+
+    user.username = username
+    user.email = email
+    user.password = password
+
+    await dataSource.getRepository(User).save(user)
+
+    const queryData = {
+      query: `
+        mutation($username: String!, $email: String!, $password: String!) {
+          createUser(username: $username, email: $email, password: $password) {
+            errors { field, message }
+            user {
+              id
+              username
+              email
+            }
+          }
+        }
+      `,
+      variables: {
+        username,
+        email,
+        password,
+      }
+    };
+
+    const response = await client.post('/').json(queryData)
+
+    const { data } = response.body()
+
+    expect(data.createUser.user).toBeNull()
+
+    expect(data.createUser.errors).toBeDefined()
+    expect(data.createUser.errors).toHaveLength(2)
+    expect(data.createUser.errors).toContainEqual({ field: 'username', message: 'This username already exists' })
+    expect(data.createUser.errors).toContainEqual({ field: 'email', message: 'This email is already in use.' })
+  })
 })
 
 test.group('loginWithEmailAndPassword', () => {
