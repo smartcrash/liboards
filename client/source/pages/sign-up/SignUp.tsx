@@ -11,6 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
+import { useCreateUserMutation } from "../../generated/graphql";
 
 interface FieldValues {
   username: string;
@@ -19,9 +20,26 @@ interface FieldValues {
 }
 
 export const SignUp = () => {
-  const { register, handleSubmit } = useForm<FieldValues>({});
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { isSubmitting },
+  } = useForm<FieldValues>({});
+  const [, createUser] = useCreateUserMutation();
+  const onSubmit = handleSubmit(async (values) => {
+    const response = await createUser(values);
+
+    if (response.data?.createUser) {
+      const { user, errors } = response.data.createUser;
+
+      if (errors?.length) {
+        errors.forEach(({ field, message }) =>
+          setError(field as any, { message })
+        );
+      }
+    }
+    console.log(response);
   });
 
   return (
@@ -77,7 +95,9 @@ export const SignUp = () => {
               </FormControl>
             </Stack>
 
-            <Button type={"submit"}>Sign in</Button>
+            <Button isLoading={isSubmitting} type={"submit"}>
+              Sign in
+            </Button>
           </Stack>
         </Box>
       </Stack>

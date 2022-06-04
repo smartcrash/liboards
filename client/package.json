@@ -7,18 +7,27 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "generate": "graphql-codegen --config codegen.yml",
+    "prebuild": "yarn generate",
+    "predev": "yarn generate"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.1.2",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "framer-motion": "^6.3.10",
+    "graphql": "^16.5.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-hook-form": "^7.31.3"
+    "react-hook-form": "^7.31.3",
+    "urql": "^2.2.1"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.6.2",
+    "@graphql-codegen/typescript": "2.4.11",
+    "@graphql-codegen/typescript-operations": "2.4.0",
+    "@graphql-codegen/typescript-urql": "^3.5.10",
     "@testing-library/react": "^13.3.0",
     "@types/jest": "^28.1.0",
     "@types/react": "^18.0.0",
