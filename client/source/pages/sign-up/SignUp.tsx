@@ -3,6 +3,7 @@ import {
   Button,
   Container,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Heading,
   HStack,
@@ -24,7 +25,7 @@ export const SignUp = () => {
     register,
     handleSubmit,
     setError,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = useForm<FieldValues>({});
   const [, createUser] = useCreateUserMutation();
   const onSubmit = handleSubmit(async (values) => {
@@ -37,9 +38,10 @@ export const SignUp = () => {
         errors.forEach(({ field, message }) =>
           setError(field as any, { message })
         );
+      } else if (user) {
+        // TODO: Redirect to '/dashboard'
       }
     }
-    console.log(response);
   });
 
   return (
@@ -67,15 +69,16 @@ export const SignUp = () => {
         >
           <Stack spacing={6}>
             <Stack spacing={5}>
-              <FormControl>
+              <FormControl isInvalid={!!errors.username?.message}>
                 <FormLabel htmlFor={"username"}>Name</FormLabel>
                 <Input
                   id={"username"}
                   {...register("username", { required: true })}
                 />
+                <FormErrorMessage>{errors.username?.message}</FormErrorMessage>
               </FormControl>
 
-              <FormControl>
+              <FormControl isInvalid={!!errors.email?.message}>
                 <FormLabel htmlFor={"email"}>Email</FormLabel>
                 <Input
                   id={"email"}
@@ -83,15 +86,17 @@ export const SignUp = () => {
                   autoComplete={"email"}
                   {...register("email", { required: true })}
                 />
+                <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
               </FormControl>
 
-              <FormControl>
+              <FormControl isInvalid={!!errors.password?.message}>
                 <FormLabel htmlFor={"password"}>Password</FormLabel>
                 <Input
                   id={"password"}
                   type={"password"}
                   {...register("password", { required: true })}
                 />
+                <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
               </FormControl>
             </Stack>
 

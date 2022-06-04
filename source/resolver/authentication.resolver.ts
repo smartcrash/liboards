@@ -67,7 +67,7 @@ export class AuthenticationResolver {
     if (errors.length) return { errors }
 
     const user = new User()
-    // TODO: Add input validation
+
     user.username = username
     user.email = email
     user.password = password
