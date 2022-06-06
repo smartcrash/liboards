@@ -9,7 +9,7 @@ import http from 'http';
 import { createClient as createRedisClient } from 'redis';
 import "reflect-metadata";
 import { buildSchema } from 'type-graphql';
-import { NODE_ENV, PORT } from './constants';
+import { NODE_ENV, PORT, SESSION_COOKIE } from './constants';
 import { dataSource } from './dataSource';
 import { TContext } from './types';
 
@@ -28,7 +28,7 @@ async function createServer() {
 
   app.use(
     session({
-      name: 'sid',
+      name: SESSION_COOKIE,
       secret: "keyboard cat", // TODO: Move to .env
       resave: false,
       saveUninitialized: false,

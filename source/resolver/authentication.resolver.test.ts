@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
+import { SESSION_COOKIE } from '../constants';
 import { dataSource } from '../dataSource';
 import { User } from '../entity';
 
@@ -44,8 +45,8 @@ test.group('createUser', () => {
     expect(user).toMatchObject({ username, email })
     expect(user.password).not.toBe(password)
 
-    expect(response.cookie('sid')).toBeDefined()
-    expect(response.cookie('sid').value).not.toHaveLength(0)
+    expect(response.cookie(SESSION_COOKIE)).toBeDefined()
+    expect(response.cookie(SESSION_COOKIE).value).not.toHaveLength(0)
   })
 
   test('should validate values', async ({ expect, client }) => {
@@ -240,7 +241,7 @@ test.group('loginWithPassword', () => {
 
     const response = await client.post('/').json(queryData)
 
-    expect(response.cookie('sid')).toBeUndefined()
+    expect(response.cookie(SESSION_COOKIE)).toBeUndefined()
   })
 
   test('should start session if valid data is given', async ({ expect, client }) => {
@@ -293,8 +294,60 @@ test.group('loginWithPassword', () => {
     expect(data.loginWithPassword.user).toMatchObject({ username, email })
     expect(typeof data.loginWithPassword.user.id).toBe('number')
 
-    expect(response.cookie('sid')).toBeDefined()
-    expect(response.cookie('sid').value).not.toHaveLength(0)
+    expect(response.cookie(SESSION_COOKIE)).toBeDefined()
+    expect(response.cookie(SESSION_COOKIE).value).not.toHaveLength(0)
+  })
+})
+
+test.group('logout', () => {
+  test('should end session', async ({ expect, client }) => {
+    const username = faker.internet.userName()
+    const email = faker.internet.exampleEmail()
+    const password = faker.internet.password()
+
+    const user = new User()
+
+    user.username = username
+    user.email = email
+    user.password = password
+
+    await dataSource.getRepository(User).save(user)
+
+    {
+      const queryData = {
+        query: `
+        mutation($email: String!, $password: String!) {
+          loginWithPassword(email: $email, password: $password) {
+            errors { field, message }
+            user {
+              id
+              username
+              email
+            }
+          }
+        }
+      `,
+        variables: { email, password, }
+      }
+
+      await client.post('/').json(queryData)
+    }
+
+    {
+      const queryData = {
+        query: `
+          mutation Logout {
+            logout
+          }
+      `,
+      }
+      const response = await client.post('/').json(queryData)
+
+      const { data } = response.body()
+
+      expect(data.logout).toBe(true)
+      expect(response.cookie(SESSION_COOKIE).value).toBe('')
+    }
   })
 })
 

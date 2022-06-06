@@ -1,6 +1,7 @@
 import { verify } from 'argon2';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import { z, ZodError } from 'zod';
+import { SESSION_COOKIE } from '../constants';
 import { User } from "../entity";
 import { TContext } from '../types';
 
@@ -102,5 +103,14 @@ export class AuthenticationResolver {
     )
 
     return { user }
+  }
+
+  @Mutation(() => Boolean)
+  async logout(
+    @Ctx() { req, res }: TContext
+  ): Promise<boolean> {
+    await new Promise<any>((resolve) => req.session.destroy(resolve))
+    res.clearCookie(SESSION_COOKIE)
+    return true
   }
 }
