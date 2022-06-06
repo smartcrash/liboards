@@ -7,9 +7,10 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { useCurrentUserQuery } from "../generated/graphql";
+import { useCurrentUserQuery, useLogoutMutation } from "../generated/graphql";
 
 function NavBar() {
+  const [, logout] = useLogoutMutation();
   const [{ data, fetching }] = useCurrentUserQuery();
 
   let leftElement = <></>;
@@ -18,7 +19,12 @@ function NavBar() {
     leftElement = (
       <HStack spacing={5}>
         <Text fontWeight={"bold"}>{data.currentUser.username}</Text>
-        <Button colorScheme={"gray"} variant={"outline"} fontWeight={"normal"}>
+        <Button
+          colorScheme={"gray"}
+          variant={"outline"}
+          fontWeight={"normal"}
+          onClick={() => logout()}
+        >
           Logout
         </Button>
       </HStack>
