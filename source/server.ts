@@ -1,12 +1,12 @@
 
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
-import sqlite from "better-sqlite3";
-import createSqliteStore from 'better-sqlite3-session-store';
+import connectRedis from 'connect-redis'
 import cors from 'cors';
 import express from 'express';
 import session from "express-session";
 import http from 'http';
+import { createClient as createRedisClient } from 'redis';
 import "reflect-metadata";
 import { buildSchema } from 'type-graphql';
 import { NODE_ENV, PORT } from './constants';
@@ -16,30 +16,32 @@ import { TContext } from './types';
 async function createServer() {
   const app = express();
   const httpServer = http.createServer(app);
-  const SqliteStore = createSqliteStore(session)
-  const db = new sqlite("sessions.db", {});
 
   app.use(cors({
     origin: ['http://localhost:3000', 'https://studio.apollographql.com'],
     credentials: true,
   }))
 
+  const RedisStore = connectRedis(session)
+  const redis = createRedisClient({ legacyMode: true })
+  redis.connect().catch(console.error)
+
   app.use(
     session({
       name: 'sid',
+      secret: "keyboard cat", // TODO: Move to .env
+      resave: false,
       saveUninitialized: false,
-      store: new SqliteStore({
-        client: db,
-        expired: { clear: false }
+      store: new RedisStore({
+        client: redis,
+        disableTouch: true
       }),
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true,
         sameSite: 'lax',
-        secure: NODE_ENV === 'production' // Whether the cookie is only visible over https
+        secure: NODE_ENV === 'production', // Whether the cookie is only visible over https
       },
-      secret: "qneojn231on321io3j9012u490123j2n1in", // TODO: Move to .env
-      resave: false,
     })
   )
 
