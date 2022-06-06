@@ -5,11 +5,7 @@ mutation CreateUser($password: String!, $email: String!, $username: String!) {
       message
     }
     user {
-      id
-      username
-      email
-      createdAt
-      updatedAt
+      ...CurrentUser
     }
   }
 }

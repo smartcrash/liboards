@@ -1,9 +1,5 @@
 query CurrentUser {
   currentUser {
-    id
-    username
-    email
-    createdAt
-    updatedAt
+    ...CurrentUser
   }
 }
