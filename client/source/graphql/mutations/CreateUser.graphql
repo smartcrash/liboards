@@ -6,6 +6,10 @@ mutation CreateUser($password: String!, $email: String!, $username: String!) {
     }
     user {
       id
+      username
+      email
+      createdAt
+      updatedAt
     }
   }
 }

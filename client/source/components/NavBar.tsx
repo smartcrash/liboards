@@ -1,7 +1,40 @@
-import { Box, Button, ButtonGroup, HStack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  HStack,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import { useCurrentUserQuery } from "../generated/graphql";
 
 function NavBar() {
+  const [{ data, fetching }] = useCurrentUserQuery();
+
+  let leftElement = <></>;
+  if (fetching) leftElement = <Spinner />;
+  else if (data?.currentUser)
+    leftElement = (
+      <HStack spacing={5}>
+        <Text fontWeight={"bold"}>{data.currentUser.username}</Text>
+        <Button colorScheme={"gray"} variant={"outline"} fontWeight={"normal"}>
+          Logout
+        </Button>
+      </HStack>
+    );
+  else
+    leftElement = (
+      <ButtonGroup spacing={4} size={"sm"}>
+        <Button as={Link} to={"/login"} variant={"ghost"} colorScheme={"gray"}>
+          Sign in
+        </Button>
+        <Button as={Link} to={"/signup"}>
+          Create account
+        </Button>
+      </ButtonGroup>
+    );
+
   return (
     <Box as={"nav"} bg={"gray.50"}>
       <HStack
@@ -12,21 +45,7 @@ function NavBar() {
         <Box>
           <Link to={"/"}>Liboards</Link>
         </Box>
-        <Box>
-          <ButtonGroup spacing={4} size={"sm"}>
-            <Button
-              as={Link}
-              to={"/login"}
-              variant={"ghost"}
-              colorScheme={"gray"}
-            >
-              Sign in
-            </Button>
-            <Button as={Link} to={"/signup"}>
-              Create account
-            </Button>
-          </ButtonGroup>
-        </Box>
+        <Box>{leftElement}</Box>
       </HStack>
     </Box>
   );

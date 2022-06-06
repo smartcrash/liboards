@@ -69,7 +69,7 @@ export type CreateUserMutationVariables = Exact<{
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number } | null } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any } | null } };
 
 export type LoginWithPasswordMutationVariables = Exact<{
   password: Scalars['String'];
@@ -77,12 +77,12 @@ export type LoginWithPasswordMutationVariables = Exact<{
 }>;
 
 
-export type LoginWithPasswordMutation = { __typename?: 'Mutation', loginWithPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number } | null } };
+export type LoginWithPasswordMutation = { __typename?: 'Mutation', loginWithPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any } | null } };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number } | null };
+export type CurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any } | null };
 
 
 export const CreateUserDocument = gql`
@@ -94,6 +94,10 @@ export const CreateUserDocument = gql`
     }
     user {
       id
+      username
+      email
+      createdAt
+      updatedAt
     }
   }
 }
@@ -111,6 +115,10 @@ export const LoginWithPasswordDocument = gql`
     }
     user {
       id
+      username
+      email
+      createdAt
+      updatedAt
     }
   }
 }
@@ -123,6 +131,10 @@ export const CurrentUserDocument = gql`
     query CurrentUser {
   currentUser {
     id
+    username
+    email
+    createdAt
+    updatedAt
   }
 }
     `;
