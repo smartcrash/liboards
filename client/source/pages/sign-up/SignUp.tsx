@@ -12,6 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import { useCreateUserMutation } from "../../generated/graphql";
 
 interface FieldValues {
@@ -21,13 +22,14 @@ interface FieldValues {
 }
 
 export const SignUp = () => {
+  const [, createUser] = useCreateUserMutation();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     setError,
     formState: { isSubmitting, errors },
   } = useForm<FieldValues>({});
-  const [, createUser] = useCreateUserMutation();
   const onSubmit = handleSubmit(async (values) => {
     const response = await createUser(values);
 
@@ -39,7 +41,7 @@ export const SignUp = () => {
           setError(field as any, { message })
         );
       } else if (user) {
-        // TODO: Redirect to '/dashboard'
+        navigate("/", { replace: true });
       }
     }
   });
@@ -56,8 +58,9 @@ export const SignUp = () => {
             <Heading size={"lg"}>Create a new account</Heading>
             <HStack spacing={2} justify={"center"}>
               <Text color={"muted"}>Already have an account?</Text>
-              {/* TODO: Redirect to /login */}
-              <Button variant={"link"}>Login</Button>
+              <Button as={Link} to={"/login"} variant={"link"}>
+                Login
+              </Button>
             </HStack>
           </Stack>
         </Stack>

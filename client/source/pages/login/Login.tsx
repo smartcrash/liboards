@@ -12,6 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import { useLoginWithPasswordMutation } from "../../generated/graphql";
 
 interface FieldValues {
@@ -20,13 +21,14 @@ interface FieldValues {
 }
 
 export const Login = () => {
+  const [, loginWithPassword] = useLoginWithPasswordMutation();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     setError,
     formState: { isSubmitting, errors },
   } = useForm<FieldValues>({});
-  const [, loginWithPassword] = useLoginWithPasswordMutation();
   const onSubmit = handleSubmit(async (values) => {
     const response = await loginWithPassword(values);
 
@@ -38,7 +40,7 @@ export const Login = () => {
           setError(field as any, { message })
         );
       } else if (user) {
-        // TODO: Redirect to '/dashboard'
+        navigate("/", { replace: true });
       }
     }
   });
@@ -55,8 +57,9 @@ export const Login = () => {
             <Heading size={"lg"}>Log in to your account</Heading>
             <HStack spacing={2} justify={"center"}>
               <Text color={"muted"}>Don't have an account?</Text>
-              {/* TODO: Redirect to /sign-up */}
-              <Button variant={"link"}>Sign up</Button>
+              <Button as={Link} to={"/signup"} variant={"link"}>
+                Sign up
+              </Button>
             </HStack>
           </Stack>
         </Stack>
