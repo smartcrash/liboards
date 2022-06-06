@@ -37,7 +37,7 @@ test.group('createUser', () => {
     expect(data.createUser.user).toMatchObject({ username, email })
     expect(typeof data.createUser.user.id).toBe('number')
 
-    const { id } = data.createUser
+    const { id } = data.createUser.user
     const user = await dataSource.getRepository(User).findOneBy({ id })
 
     expect(user).toBeDefined()
