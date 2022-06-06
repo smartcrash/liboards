@@ -22,10 +22,13 @@ class AuthenticationResponse {
 
 @Resolver()
 export class AuthenticationResolver {
-  @Query(() => AuthenticationResponse)
-  currentUser(@Ctx() { dataSource }: TContext): Promise<User> {
-    // TODO: Return logged user
-    return dataSource.getRepository(User).findOne({})
+  @Query(() => User, { nullable: true })
+  currentUser(@Ctx() { req, dataSource }: TContext): Promise<User> {
+    const id = req.session.userId
+    const repository = dataSource.getRepository(User)
+
+    if (id) return repository.findOneBy({ id })
+    return null
   }
 
   @Mutation(() => AuthenticationResponse)
@@ -95,6 +98,8 @@ export class AuthenticationResolver {
     }
 
     req.session.userId = user.id
+    req.session.save((error) => console.log(error)
+    )
 
     return { user }
   }

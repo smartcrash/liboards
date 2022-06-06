@@ -50,7 +50,7 @@ export type MutationLoginWithPasswordArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  currentUser: AuthenticationResponse;
+  currentUser?: Maybe<User>;
 };
 
 export type User = {
@@ -78,6 +78,11 @@ export type LoginWithPasswordMutationVariables = Exact<{
 
 
 export type LoginWithPasswordMutation = { __typename?: 'Mutation', loginWithPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number } | null } };
+
+export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number } | null };
 
 
 export const CreateUserDocument = gql`
@@ -113,4 +118,15 @@ export const LoginWithPasswordDocument = gql`
 
 export function useLoginWithPasswordMutation() {
   return Urql.useMutation<LoginWithPasswordMutation, LoginWithPasswordMutationVariables>(LoginWithPasswordDocument);
+};
+export const CurrentUserDocument = gql`
+    query CurrentUser {
+  currentUser {
+    id
+  }
+}
+    `;
+
+export function useCurrentUserQuery(options?: Omit<Urql.UseQueryArgs<CurrentUserQueryVariables>, 'query'>) {
+  return Urql.useQuery<CurrentUserQuery>({ query: CurrentUserDocument, ...options });
 };
