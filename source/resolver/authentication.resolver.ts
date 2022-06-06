@@ -3,7 +3,9 @@ import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-gra
 import { z, ZodError } from 'zod';
 import { SESSION_COOKIE } from '../constants';
 import { User } from "../entity";
+import { sendMail } from '../sendMail';
 import { TContext } from '../types';
+import { v4 as uuid } from 'uuid'
 
 @ObjectType()
 class FieldError {
@@ -103,6 +105,33 @@ export class AuthenticationResolver {
     )
 
     return { user }
+  }
+
+  @Mutation(() => Boolean)
+  async sendResetPasswordEmail(
+    @Arg('email') email: string,
+    @Ctx() { redis, dataSource }: TContext
+  ): Promise<Boolean> {
+    const repository = dataSource.getRepository(User)
+    const user = await repository.findOneBy({ email })
+
+    if (!user) return false
+
+    const token = uuid()
+
+    await redis.set(`password_resets:${token}`, user.id, {
+      EX: 60 * 60 * 24 * 3 // 3 days
+    })
+
+    sendMail(user.email, {
+      subject: 'Reset password',
+      html: `
+        <p>Here is your reset password link:</p>
+        <a href="http://localhost:3000/password/${token}">Resert password</a>
+      `
+    })
+
+    return true
   }
 
   @Mutation(() => Boolean)

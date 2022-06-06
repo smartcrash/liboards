@@ -54,7 +54,7 @@ async function createServer() {
   const server = new ApolloServer({
     schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    context: ({ req, res }) => ({ req, res, dataSource } as TContext)
+    context: ({ req, res }) => ({ req, res, dataSource, redis } as TContext)
   });
 
   await server.start()
