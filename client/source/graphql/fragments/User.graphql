@@ -1,4 +1,4 @@
-fragment CurrentUser on User {
+fragment UserFragment on User {
   id
   username
   email
