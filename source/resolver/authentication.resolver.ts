@@ -123,11 +123,11 @@ export class AuthenticationResolver {
       EX: 60 * 60 * 24 * 3 // 3 days
     })
 
-    sendMail(user.email, {
+    await sendMail(user.email, {
       subject: 'Reset password',
       html: `
         <p>Here is your reset password link:</p>
-        <a href="http://localhost:3000/password/${token}">Resert password</a>
+        <a href="http://localhost:3000/reset-password/${token}">Resert password</a>
       `
     })
 
