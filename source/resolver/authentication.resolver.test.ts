@@ -3,6 +3,9 @@ import { test } from '@japa/runner';
 import { SESSION_COOKIE } from '../constants';
 import { dataSource } from '../dataSource';
 import { User } from '../entity';
+import { redis } from '../redis';
+import { verify } from 'argon2';
+import sinon from 'sinon'
 
 test.group('createUser', () => {
   test('should create user', async ({ expect, client }) => {
@@ -296,6 +299,112 @@ test.group('loginWithPassword', () => {
 
     expect(response.cookie(SESSION_COOKIE)).toBeDefined()
     expect(response.cookie(SESSION_COOKIE).value).not.toHaveLength(0)
+  })
+})
+
+test.group('resetPassword', () => {
+  test('should return error is token is expired', async ({ expect, client }) => {
+    sinon.replace(redis, 'get', sinon.fake.resolves('') as any)
+
+    const queryData = {
+      query: `
+        mutation ResetPassword($newPassword: String!, $token: String!) {
+          resetPassword(newPassword: $newPassword, token: $token) {
+            errors {
+              field
+              message
+            }
+            user {
+              id
+            }
+          }
+        }`,
+      variables: {
+        token: 'invalid token',
+        newPassword: '12345'
+      }
+    }
+    const response = await client.post('/').json(queryData)
+    const { data } = response.body()
+
+    expect(data.resetPassword.errors).toBeDefined()
+    expect(data.resetPassword.errors).toHaveLength(1)
+    expect(data.resetPassword.errors).toContainEqual({ field: 'token', message: 'Sorry, your token seems to have expired. Please try again.' })
+  })
+
+  test('should handle non-existing user', async ({ expect, client }) => {
+    sinon.replace(redis, 'get', sinon.fake.resolves('9999999999') as any)
+
+    const queryData = {
+      query: `
+        mutation ResetPassword($newPassword: String!, $token: String!) {
+          resetPassword(newPassword: $newPassword, token: $token) {
+            errors {
+              field
+              message
+            }
+            user {
+              id
+            }
+          }
+        }`,
+      variables: {
+        token: 'invalid token',
+        newPassword: '12345'
+      }
+    }
+    const response = await client.post('/').json(queryData)
+    const { data } = response.body()
+
+    expect(data.resetPassword.errors).toBeDefined()
+    expect(data.resetPassword.errors).toHaveLength(1)
+    expect(data.resetPassword.errors).toContainEqual({ field: 'token', message: 'User no longer exists.' })
+  })
+
+  test('should change password with token', async ({ expect, client }) => {
+    const oldPassword = faker.internet.password()
+    const newPassword = faker.internet.password()
+
+    const user = new User()
+
+    user.username = faker.internet.userName()
+    user.email = faker.internet.exampleEmail()
+    user.password = oldPassword
+
+    const { id } = await dataSource.getRepository(User).save(user)
+
+    sinon.replace(redis, 'get', sinon.fake.resolves(`${id}`) as any)
+
+    const queryData = {
+      query: `
+        mutation ResetPassword($newPassword: String!, $token: String!) {
+          resetPassword(newPassword: $newPassword, token: $token) {
+            errors {
+              field
+              message
+            }
+            user {
+              id
+            }
+          }
+        }`,
+      variables: {
+        token: 'valid token',
+        newPassword,
+      }
+    }
+    const response = await client.post('/').json(queryData)
+    const { data } = response.body()
+
+    expect(data.resetPassword.errors).toBeNull()
+    expect(data.resetPassword.user).toBeDefined()
+    expect(data.resetPassword.user.id).toBe(id)
+
+    const { password } = await dataSource.getRepository(User).findOneBy({ id })
+    expect(await verify(password, oldPassword)).toBe(false)
+    expect(await verify(password, newPassword)).toBe(true)
+
+    sinon.restore()
   })
 })
 

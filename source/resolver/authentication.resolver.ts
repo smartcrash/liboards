@@ -134,6 +134,39 @@ export class AuthenticationResolver {
     return true
   }
 
+  @Mutation(() => AuthenticationResponse)
+  async resetPassword(
+    @Arg('token') token: string,
+    @Arg('newPassword') newPassword: string,
+    @Ctx() { redis, dataSource }: TContext
+  ): Promise<AuthenticationResponse> {
+    const userId = await redis.get(`password_resets:${token}`)
+
+    if (!userId) return {
+      errors: [{
+        field: 'token',
+        message: "Sorry, your token seems to have expired. Please try again."
+      }]
+    }
+
+    const repository = dataSource.getRepository(User)
+    const user = await repository.findOneBy({ id: +userId })
+
+    if (!user) return {
+      errors: [{
+        field: 'token',
+        message: "User no longer exists."
+      }]
+    }
+
+
+    user.password = newPassword
+
+    await repository.save(user)
+
+    return { user }
+  }
+
   @Mutation(() => Boolean)
   async logout(
     @Ctx() { req, res }: TContext

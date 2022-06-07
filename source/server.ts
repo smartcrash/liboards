@@ -6,11 +6,11 @@ import cors from 'cors';
 import express from 'express';
 import session from "express-session";
 import http from 'http';
-import { createClient as createRedisClient } from 'redis';
 import "reflect-metadata";
 import { buildSchema } from 'type-graphql';
 import { NODE_ENV, PORT, SESSION_COOKIE } from './constants';
 import { dataSource } from './dataSource';
+import { redis } from './redis';
 import { TContext } from './types';
 
 async function createServer() {
@@ -23,8 +23,6 @@ async function createServer() {
   }))
 
   const RedisStore = connectRedis(session)
-  const redis = createRedisClient({ legacyMode: true })
-  redis.connect().catch(console.error)
 
   app.use(
     session({

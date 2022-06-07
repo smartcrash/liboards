@@ -6,6 +6,7 @@ import { specReporter } from '@japa/spec-reporter'
 import { PORT } from '../source/constants'
 import { dataSource } from '../source/dataSource'
 import { createServer } from '../source/server'
+import sinon from 'sinon'
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,8 @@ configure({
     forceExit: true,
     importer: (filePath) => import(filePath),
     configureSuite(suite) {
+      suite.onGroup((group) => group.each.teardown(() => sinon.restore()))
+
       suite.setup(async () => {
         await dataSource.initialize()
         const server = await createServer()
