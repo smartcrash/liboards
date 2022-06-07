@@ -60,6 +60,7 @@ export function PasswordInput<T>({
             icon={isOpen ? <ViewOffIcon /> : <ViewIcon />}
             size={"lg"}
             onClick={onClick}
+            tabIndex={-1}
           />
         </InputRightElement>
         <ChakraInput

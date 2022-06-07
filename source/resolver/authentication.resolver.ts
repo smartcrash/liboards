@@ -117,7 +117,9 @@ export class AuthenticationResolver {
 
     const token = uuid()
 
-    await redisClient.set(`password_resets:${token}`, `${user.id}`)
+    await redisClient.set(`password_resets:${token}`, `${user.id}`, {
+      EX: 60 * 60 // 1 hour
+    })
 
     await sendMail(user.email, {
       subject: 'Reset password',
@@ -155,10 +157,10 @@ export class AuthenticationResolver {
       }]
     }
 
-
     user.password = newPassword
 
     await repository.save(user)
+    await redisClient.del(`password_resets:${token}`)
 
     return { user }
   }
