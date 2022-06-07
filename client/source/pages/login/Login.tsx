@@ -2,17 +2,14 @@ import {
   Box,
   Button,
   Container,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Heading,
   HStack,
-  Input,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { Input } from "../../components/Input";
 import { useLoginWithPasswordMutation } from "../../generated/graphql";
 
 interface FieldValues {
@@ -24,9 +21,9 @@ export const Login = () => {
   const [, loginWithPassword] = useLoginWithPasswordMutation();
   const navigate = useNavigate();
   const {
-    register,
     handleSubmit,
     setError,
+    control,
     formState: { isSubmitting, errors },
   } = useForm<FieldValues>({});
   const onSubmit = handleSubmit(async (values) => {
@@ -71,26 +68,23 @@ export const Login = () => {
         >
           <Stack spacing={6}>
             <Stack spacing={5}>
-              <FormControl isInvalid={!!errors.email?.message}>
-                <FormLabel htmlFor={"email"}>Email</FormLabel>
-                <Input
-                  id={"email"}
-                  type={"email"}
-                  autoComplete={"email"}
-                  {...register("email", { required: true })}
-                />
-                <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
-              </FormControl>
+              <Input
+                type={"email"}
+                autoComplete={"email"}
+                label={"Email"}
+                name={"email"}
+                control={control}
+                rules={{ required: true }}
+              />
 
-              <FormControl isInvalid={!!errors.password?.message}>
-                <FormLabel htmlFor={"password"}>Password</FormLabel>
-                <Input
-                  id={"password"}
-                  type={"password"}
-                  {...register("password", { required: true })}
-                />
-                <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
-              </FormControl>
+              <Input
+                type={"password"}
+                label={"Password"}
+                autoComplete={"password"}
+                name={"password"}
+                control={control}
+                rules={{ required: true }}
+              />
             </Stack>
 
             <Button isLoading={isSubmitting} type={"submit"}>

@@ -2,17 +2,14 @@ import {
   Box,
   Button,
   Container,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   Heading,
   HStack,
-  Input,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { Input } from "../../components/Input";
 import { useCreateUserMutation } from "../../generated/graphql";
 
 interface FieldValues {
@@ -25,9 +22,9 @@ export const SignUp = () => {
   const [, createUser] = useCreateUserMutation();
   const navigate = useNavigate();
   const {
-    register,
     handleSubmit,
     setError,
+    control,
     formState: { isSubmitting, errors },
   } = useForm<FieldValues>({});
   const onSubmit = handleSubmit(async (values) => {
@@ -72,35 +69,31 @@ export const SignUp = () => {
         >
           <Stack spacing={6}>
             <Stack spacing={5}>
-              <FormControl isInvalid={!!errors.username?.message}>
-                <FormLabel htmlFor={"username"}>Name</FormLabel>
-                <Input
-                  id={"username"}
-                  {...register("username", { required: true })}
-                />
-                <FormErrorMessage>{errors.username?.message}</FormErrorMessage>
-              </FormControl>
+              <Input
+                label={"Name"}
+                name={"username"}
+                autoComplete={"username"}
+                control={control}
+                rules={{ required: true }}
+              />
 
-              <FormControl isInvalid={!!errors.email?.message}>
-                <FormLabel htmlFor={"email"}>Email</FormLabel>
-                <Input
-                  id={"email"}
-                  type={"email"}
-                  autoComplete={"email"}
-                  {...register("email", { required: true })}
-                />
-                <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
-              </FormControl>
+              <Input
+                label={"Email"}
+                name={"email"}
+                type={"email"}
+                autoComplete={"email"}
+                control={control}
+                rules={{ required: true }}
+              />
 
-              <FormControl isInvalid={!!errors.password?.message}>
-                <FormLabel htmlFor={"password"}>Password</FormLabel>
-                <Input
-                  id={"password"}
-                  type={"password"}
-                  {...register("password", { required: true })}
-                />
-                <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
-              </FormControl>
+              <Input
+                label={"Password"}
+                name={"password"}
+                type={"password"}
+                autoComplete={"password"}
+                control={control}
+                rules={{ required: true }}
+              />
             </Stack>
 
             <Button isLoading={isSubmitting} type={"submit"}>
