@@ -27,6 +27,9 @@ const theme = extendTheme({
   components: {
     Button: {
       defaultProps: { colorScheme: 'primary' }
+    },
+    FormLabel: {
+      baseStyle: { fontWeight: 'bold' }
     }
   }
 });
