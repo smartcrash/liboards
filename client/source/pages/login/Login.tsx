@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { Input } from "../../components/Input";
+import { Input, PasswordInput } from "../../components";
 import { useLoginWithPasswordMutation } from "../../generated/graphql";
 
 interface FieldValues {
@@ -77,10 +77,9 @@ export const Login = () => {
                 rules={{ required: true }}
               />
 
-              <Input
-                type={"password"}
+              <PasswordInput
                 label={"Password"}
-                autoComplete={"password"}
+                autoComplete={"current-password"}
                 name={"password"}
                 control={control}
                 rules={{ required: true }}
