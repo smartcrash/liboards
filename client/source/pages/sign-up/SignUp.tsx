@@ -8,8 +8,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { Input, PasswordInput } from "../../components";
+import { useNavigate } from "react-router-dom";
+import { Input, Link, PasswordInput } from "../../components";
 import { useCreateUserMutation } from "../../generated/graphql";
 
 interface FieldValues {
@@ -25,7 +25,7 @@ export const SignUp = () => {
     handleSubmit,
     setError,
     control,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting },
   } = useForm<FieldValues>({});
   const onSubmit = handleSubmit(async (values) => {
     const response = await createUser(values);
@@ -55,9 +55,7 @@ export const SignUp = () => {
             <Heading size={"lg"}>Create a new account</Heading>
             <HStack spacing={2} justify={"center"}>
               <Text color={"muted"}>Already have an account?</Text>
-              <Button as={Link} to={"/login"} variant={"link"}>
-                Login
-              </Button>
+              <Link to={"/login"}>Login</Link>
             </HStack>
           </Stack>
         </Stack>

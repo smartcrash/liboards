@@ -8,8 +8,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { Input, PasswordInput } from "../../components";
+import { useNavigate } from "react-router-dom";
+import { Input, Link, PasswordInput } from "../../components";
 import { useLoginWithPasswordMutation } from "../../generated/graphql";
 
 interface FieldValues {
@@ -54,9 +54,7 @@ export const Login = () => {
             <Heading size={"lg"}>Log in to your account</Heading>
             <HStack spacing={2} justify={"center"}>
               <Text color={"muted"}>Don't have an account?</Text>
-              <Button as={Link} to={"/signup"} variant={"link"}>
-                Sign up
-              </Button>
+              <Link to={"/signup"}>Sign up</Link>
             </HStack>
           </Stack>
         </Stack>
