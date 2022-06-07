@@ -101,8 +101,6 @@ export class AuthenticationResolver {
     }
 
     req.session.userId = user.id
-    req.session.save((error) => console.log(error)
-    )
 
     return { user }
   }
@@ -110,7 +108,7 @@ export class AuthenticationResolver {
   @Mutation(() => Boolean)
   async sendResetPasswordEmail(
     @Arg('email') email: string,
-    @Ctx() { redis, dataSource }: TContext
+    @Ctx() { redisClient, dataSource }: TContext
   ): Promise<Boolean> {
     const repository = dataSource.getRepository(User)
     const user = await repository.findOneBy({ email })
@@ -119,9 +117,7 @@ export class AuthenticationResolver {
 
     const token = uuid()
 
-    await redis.set(`password_resets:${token}`, user.id, {
-      EX: 60 * 60 * 24 * 3 // 3 days
-    })
+    await redisClient.set(`password_resets:${token}`, `${user.id}`)
 
     await sendMail(user.email, {
       subject: 'Reset password',
@@ -138,9 +134,9 @@ export class AuthenticationResolver {
   async resetPassword(
     @Arg('token') token: string,
     @Arg('newPassword') newPassword: string,
-    @Ctx() { redis, dataSource }: TContext
+    @Ctx() { redisClient, dataSource }: TContext
   ): Promise<AuthenticationResponse> {
-    const userId = await redis.get(`password_resets:${token}`)
+    const userId = await redisClient.get(`password_resets:${token}`)
 
     if (!userId) return {
       errors: [{

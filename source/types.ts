@@ -6,5 +6,5 @@ export type TContext = {
   req: Request & { session: Request['session'] & { userId?: number } }
   res: Response
   dataSource: DataSource
-  redis: RedisClientType
+  redisClient: RedisClientType
 }

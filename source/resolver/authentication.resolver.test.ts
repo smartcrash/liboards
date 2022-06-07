@@ -3,7 +3,7 @@ import { test } from '@japa/runner';
 import { SESSION_COOKIE } from '../constants';
 import { dataSource } from '../dataSource';
 import { User } from '../entity';
-import { redis } from '../redis';
+import { redisClient } from '../redisClient';
 import { verify } from 'argon2';
 import sinon from 'sinon'
 
@@ -304,7 +304,7 @@ test.group('loginWithPassword', () => {
 
 test.group('resetPassword', () => {
   test('should return error is token is expired', async ({ expect, client }) => {
-    sinon.replace(redis, 'get', sinon.fake.resolves('') as any)
+    sinon.replace(redisClient, 'get', sinon.fake.resolves('') as any)
 
     const queryData = {
       query: `
@@ -333,7 +333,7 @@ test.group('resetPassword', () => {
   })
 
   test('should handle non-existing user', async ({ expect, client }) => {
-    sinon.replace(redis, 'get', sinon.fake.resolves('9999999999') as any)
+    sinon.replace(redisClient, 'get', sinon.fake.resolves('9999999999') as any)
 
     const queryData = {
       query: `
@@ -373,7 +373,7 @@ test.group('resetPassword', () => {
 
     const { id } = await dataSource.getRepository(User).save(user)
 
-    sinon.replace(redis, 'get', sinon.fake.resolves(`${id}`) as any)
+    sinon.replace(redisClient, 'get', sinon.fake.resolves(`${id}`) as any)
 
     const queryData = {
       query: `

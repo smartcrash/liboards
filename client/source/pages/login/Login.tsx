@@ -24,7 +24,7 @@ export const Login = () => {
     handleSubmit,
     setError,
     control,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting },
   } = useForm<FieldValues>({});
   const onSubmit = handleSubmit(async (values) => {
     const response = await loginWithPassword(values);
@@ -83,6 +83,12 @@ export const Login = () => {
                 rules={{ required: true }}
               />
             </Stack>
+
+            <HStack justifyContent={"flex-end"}>
+              <Link to={"/forgot-password"} size={"sm"}>
+                Forgot password?
+              </Link>
+            </HStack>
 
             <Button isLoading={isSubmitting} type={"submit"}>
               Sign in

@@ -6,11 +6,12 @@ import cors from 'cors';
 import express from 'express';
 import session from "express-session";
 import http from 'http';
+import { createClient as createRedisClient } from 'redis';
 import "reflect-metadata";
 import { buildSchema } from 'type-graphql';
 import { NODE_ENV, PORT, SESSION_COOKIE } from './constants';
 import { dataSource } from './dataSource';
-import { redis } from './redis';
+import { redisClient } from './redisClient';
 import { TContext } from './types';
 
 async function createServer() {
@@ -23,6 +24,8 @@ async function createServer() {
   }))
 
   const RedisStore = connectRedis(session)
+  const client = createRedisClient({ legacyMode: true })
+  await client.connect()
 
   app.use(
     session({
@@ -31,7 +34,7 @@ async function createServer() {
       resave: false,
       saveUninitialized: false,
       store: new RedisStore({
-        client: redis,
+        client,
         disableTouch: true
       }),
       cookie: {
@@ -52,7 +55,7 @@ async function createServer() {
   const server = new ApolloServer({
     schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    context: ({ req, res }) => ({ req, res, dataSource, redis } as TContext)
+    context: ({ req, res }) => ({ req, res, dataSource, redisClient } as TContext)
   });
 
   await server.start()

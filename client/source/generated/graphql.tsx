@@ -34,6 +34,8 @@ export type Mutation = {
   createUser: AuthenticationResponse;
   loginWithPassword: AuthenticationResponse;
   logout: Scalars['Boolean'];
+  resetPassword: AuthenticationResponse;
+  sendResetPasswordEmail: Scalars['Boolean'];
 };
 
 
@@ -47,6 +49,17 @@ export type MutationCreateUserArgs = {
 export type MutationLoginWithPasswordArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationResetPasswordArgs = {
+  newPassword: Scalars['String'];
+  token: Scalars['String'];
+};
+
+
+export type MutationSendResetPasswordEmailArgs = {
+  email: Scalars['String'];
 };
 
 export type Query = {
@@ -63,7 +76,7 @@ export type User = {
   username: Scalars['String'];
 };
 
-export type CurrentUserFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any };
+export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any };
 
 export type CreateUserMutationVariables = Exact<{
   password: Scalars['String'];
@@ -87,13 +100,28 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
+export type ResetPasswordMutationVariables = Exact<{
+  newPassword: Scalars['String'];
+  token: Scalars['String'];
+}>;
+
+
+export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any } | null } };
+
+export type SendResetPasswordEmailMutationVariables = Exact<{
+  email: Scalars['String'];
+}>;
+
+
+export type SendResetPasswordEmailMutation = { __typename?: 'Mutation', sendResetPasswordEmail: boolean };
+
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type CurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any } | null };
 
-export const CurrentUserFragmentDoc = gql`
-    fragment CurrentUser on User {
+export const UserFragmentFragmentDoc = gql`
+    fragment UserFragment on User {
   id
   username
   email
@@ -109,11 +137,11 @@ export const CreateUserDocument = gql`
       message
     }
     user {
-      ...CurrentUser
+      ...UserFragment
     }
   }
 }
-    ${CurrentUserFragmentDoc}`;
+    ${UserFragmentFragmentDoc}`;
 
 export function useCreateUserMutation() {
   return Urql.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument);
@@ -126,11 +154,11 @@ export const LoginWithPasswordDocument = gql`
       message
     }
     user {
-      ...CurrentUser
+      ...UserFragment
     }
   }
 }
-    ${CurrentUserFragmentDoc}`;
+    ${UserFragmentFragmentDoc}`;
 
 export function useLoginWithPasswordMutation() {
   return Urql.useMutation<LoginWithPasswordMutation, LoginWithPasswordMutationVariables>(LoginWithPasswordDocument);
@@ -144,13 +172,39 @@ export const LogoutDocument = gql`
 export function useLogoutMutation() {
   return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
 };
+export const ResetPasswordDocument = gql`
+    mutation ResetPassword($newPassword: String!, $token: String!) {
+  resetPassword(newPassword: $newPassword, token: $token) {
+    errors {
+      field
+      message
+    }
+    user {
+      ...UserFragment
+    }
+  }
+}
+    ${UserFragmentFragmentDoc}`;
+
+export function useResetPasswordMutation() {
+  return Urql.useMutation<ResetPasswordMutation, ResetPasswordMutationVariables>(ResetPasswordDocument);
+};
+export const SendResetPasswordEmailDocument = gql`
+    mutation SendResetPasswordEmail($email: String!) {
+  sendResetPasswordEmail(email: $email)
+}
+    `;
+
+export function useSendResetPasswordEmailMutation() {
+  return Urql.useMutation<SendResetPasswordEmailMutation, SendResetPasswordEmailMutationVariables>(SendResetPasswordEmailDocument);
+};
 export const CurrentUserDocument = gql`
     query CurrentUser {
   currentUser {
-    ...CurrentUser
+    ...UserFragment
   }
 }
-    ${CurrentUserFragmentDoc}`;
+    ${UserFragmentFragmentDoc}`;
 
 export function useCurrentUserQuery(options?: Omit<Urql.UseQueryArgs<CurrentUserQueryVariables>, 'query'>) {
   return Urql.useQuery<CurrentUserQuery>({ query: CurrentUserDocument, ...options });
