@@ -7,7 +7,7 @@ describe('Resetting passwords', () => {
     cy.exec('npm run schema:sync')
   })
 
-  it.only('should send email with intructions to reset password and should be able to change password using the email\'s link', () => {
+  it('should send email with intructions to reset password and should be able to change password using the email\'s link', () => {
     const email = 'foo@bar.com'
     const username = 'jhondoe'
     const password = '12345'
