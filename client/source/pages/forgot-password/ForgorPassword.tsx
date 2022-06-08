@@ -58,9 +58,14 @@ export const ForgotPassword = () => {
                   name={"email"}
                   control={control}
                   rules={{ required: true }}
+                  data-testid={"email"}
                 />
 
-                <Button isLoading={isSubmitting} type={"submit"}>
+                <Button
+                  isLoading={isSubmitting}
+                  type={"submit"}
+                  data-testid={"submit"}
+                >
                   Reset password
                 </Button>
 

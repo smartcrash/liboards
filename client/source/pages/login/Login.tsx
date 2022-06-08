@@ -89,7 +89,11 @@ export const Login = () => {
             </Stack>
 
             <HStack justifyContent={"flex-end"}>
-              <Link to={"/forgot-password"} size={"sm"}>
+              <Link
+                to={"/forgot-password"}
+                size={"sm"}
+                data-testid={"forgot-password"}
+              >
                 Forgot password?
               </Link>
             </HStack>

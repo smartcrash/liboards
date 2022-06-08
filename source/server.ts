@@ -1,7 +1,7 @@
 
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
-import connectRedis from 'connect-redis'
+import connectRedis from 'connect-redis';
 import cors from 'cors';
 import express from 'express';
 import session from "express-session";

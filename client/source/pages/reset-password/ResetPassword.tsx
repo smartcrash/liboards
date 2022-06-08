@@ -72,9 +72,14 @@ export const ResetPassword = () => {
               autoComplete={"new-password"}
               name={"newPassword"}
               control={control}
+              data-testid={"newPassword"}
             />
 
-            <Button isLoading={isSubmitting} type={"submit"}>
+            <Button
+              isLoading={isSubmitting}
+              type={"submit"}
+              data-testid={"submit"}
+            >
               Reset password
             </Button>
           </Stack>
