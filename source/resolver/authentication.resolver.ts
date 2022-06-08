@@ -62,7 +62,7 @@ export class AuthenticationResolver {
     }
 
     if (await repository.findOneBy({ username })) {
-      errors.push({ field: 'username', message: 'This username already exists' })
+      errors.push({ field: 'username', message: 'This username already exists.' })
     }
 
     if (await repository.findOneBy({ email })) {

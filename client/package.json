@@ -10,8 +10,7 @@
     "test:coverage": "vitest run --coverage",
     "generate": "graphql-codegen --config codegen.yml",
     "prebuild": "yarn generate",
-    "predev": "yarn generate",
-    "cypress:open": "cypress open"
+    "predev": "yarn generate"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.1",

@@ -6,10 +6,10 @@ export const dataSource = new DataSource({
   type: "sqlite",
   database: "database.sqlite",
   logging: false,
-  synchronize: false,
+  synchronize: true,
   dropSchema: false,
   migrationsRun: true,
   entities: [User],
-  migrations: ["source/migration/**/*.ts"],
-  subscribers: ["source/subscriber/**/*.ts"],
+  // migrations: ["source/migration/**/*.ts"],
+  // subscribers: ["source/subscriber/**/*.ts"],
 })

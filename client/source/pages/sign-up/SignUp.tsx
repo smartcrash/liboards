@@ -73,6 +73,7 @@ export const SignUp = () => {
                 autoComplete={"username"}
                 control={control}
                 rules={{ required: true }}
+                data-testid={"username"}
               />
 
               <Input
@@ -82,6 +83,7 @@ export const SignUp = () => {
                 autoComplete={"email"}
                 control={control}
                 rules={{ required: true }}
+                data-testid={"email"}
               />
 
               <PasswordInput
@@ -90,10 +92,15 @@ export const SignUp = () => {
                 autoComplete={"new-password"}
                 control={control}
                 rules={{ required: true }}
+                data-testid={"password"}
               />
             </Stack>
 
-            <Button isLoading={isSubmitting} type={"submit"}>
+            <Button
+              isLoading={isSubmitting}
+              type={"submit"}
+              data-testid={"submit"}
+            >
               Sign up
             </Button>
           </Stack>

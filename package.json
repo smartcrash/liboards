@@ -5,13 +5,16 @@
   "scripts": {
     "start": "nodemon",
     "test": "node -r ts-node/register bin/test.ts",
-    "migration:generate": "npx typeorm-ts-node-esm migration:generate -d ./source/DataSource.ts",
-    "migration:revert": "npx typeorm-ts-node-esm migration:revert -d ./source/DataSource.ts"
+    "migration:generate": "npx typeorm-ts-node-esm migration:generate -d ./source/dataSource.ts",
+    "migration:revert": "npx typeorm-ts-node-esm migration:revert -d ./source/dataSource.ts",
+    "schema:drop": "npx typeorm-ts-node-esm schema:drop -d ./source/dataSource.ts",
+    "schema:sync": "npx typeorm-ts-node-esm schema:sync -d ./source/dataSource.ts",
+    "cypress": "cypress run",
+    "cypress:open": "cypress open"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@faker-js/faker": "^7.1.0",
     "@japa/api-client": "^1.3.1",
     "@japa/expect": "^1.1.4",
     "@japa/run-failed-tests": "^1.0.7",

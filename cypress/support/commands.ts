@@ -1,37 +1,50 @@
 /// <reference types="cypress" />
-// ***********************************************
-// This example commands.ts shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-//
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+
+Cypress.Commands.add("getByTestId", (selector, ...args) => {
+  return cy.get(`[data-testid="${selector}"]`, ...args);
+});
+
+Cypress.Commands.add("createUser", (username, email, password) => {
+  cy.location("pathname").then((currentPath) => {
+    if (currentPath !== '/signup') {
+      cy.visit('/signup');
+    }
+  });
+
+  cy.getByTestId("username").type(username);
+  cy.getByTestId("email").type(email);
+  cy.getByTestId("password").type(password);
+  cy.getByTestId("submit").click();
+});
+
+Cypress.Commands.add("loginWithPassword", (email, password) => {
+  cy.location("pathname").then((currentPath) => {
+    if (currentPath !== '/login') {
+      cy.visit('/login');
+    }
+  });
+
+  cy.getByTestId("email").type(email);
+  cy.getByTestId("password").type(password);
+  cy.getByTestId("submit").click();
+});
+
+
+Cypress.Commands.add("logout", () => {
+  cy.getByTestId("logout").click();
+});
+
+declare namespace Cypress {
+  interface Chainable {
+    createUser(username: string, email: string, password: string): void
+    loginWithPassword(email: string, password: string): void
+    logout(): void
+
+    /**
+     * Custom command to select DOM element by data-testid attribute.
+     * @example cy.getByTestId('greeting')
+     */
+    getByTestId(dataTestIdAttribute: string, args?: any): Chainable<JQuery<HTMLElement>>;
+
+  }
+}

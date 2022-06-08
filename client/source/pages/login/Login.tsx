@@ -54,7 +54,9 @@ export const Login = () => {
             <Heading size={"lg"}>Log in to your account</Heading>
             <HStack spacing={2} justify={"center"}>
               <Text color={"muted"}>Don't have an account?</Text>
-              <Link to={"/signup"}>Sign up</Link>
+              <Link to={"/signup"} data-testid={"go-to-signup"}>
+                Sign up
+              </Link>
             </HStack>
           </Stack>
         </Stack>
@@ -73,6 +75,7 @@ export const Login = () => {
                 name={"email"}
                 control={control}
                 rules={{ required: true }}
+                data-testid={"email"}
               />
 
               <PasswordInput
@@ -81,6 +84,7 @@ export const Login = () => {
                 name={"password"}
                 control={control}
                 rules={{ required: true }}
+                data-testid={"password"}
               />
             </Stack>
 
@@ -90,7 +94,11 @@ export const Login = () => {
               </Link>
             </HStack>
 
-            <Button isLoading={isSubmitting} type={"submit"}>
+            <Button
+              isLoading={isSubmitting}
+              type={"submit"}
+              data-testid={"submit"}
+            >
               Sign in
             </Button>
           </Stack>

@@ -24,6 +24,7 @@ function NavBar() {
           variant={"outline"}
           fontWeight={"normal"}
           onClick={() => logout()}
+          data-testid={"logout"}
         >
           Logout
         </Button>
