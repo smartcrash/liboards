@@ -11,9 +11,9 @@ Cypress.Commands.add("createUser", (username, email, password) => {
     }
   });
 
-  cy.getByTestId("username").type(username);
-  cy.getByTestId("email").type(email);
-  cy.getByTestId("password").type(password);
+  cy.getByTestId("username").clear().type(username);
+  cy.getByTestId("email").clear().type(email);
+  cy.getByTestId("password").clear().type(password);
   cy.getByTestId("submit").click();
 });
 
@@ -24,8 +24,8 @@ Cypress.Commands.add("loginWithPassword", (email, password) => {
     }
   });
 
-  cy.getByTestId("email").type(email);
-  cy.getByTestId("password").type(password);
+  cy.getByTestId("email").clear().type(email);
+  cy.getByTestId("password").clear().type(password);
   cy.getByTestId("submit").click();
 });
 
