@@ -6,3 +6,4 @@ export * from './reset-password'
 export * from './forgot-password'
 
 export * from './dashboard'
+export * from './board'

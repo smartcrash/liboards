@@ -2,7 +2,6 @@ import { AddIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
-  Button,
   HStack,
   Menu,
   MenuButton,
@@ -11,8 +10,9 @@ import {
   MenuList,
   Text,
 } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { Container } from "./";
+import { Link } from "./Link";
 
 function NavBar() {
   const { user, logout } = useAuth();
@@ -20,50 +20,49 @@ function NavBar() {
   if (!user) return null;
 
   return (
-    <Box as={"nav"}>
-      <HStack
-        justifyContent={"space-between"}
-        px={{ base: 2, sm: 6, lg: 8 }}
-        h={20}
-      >
-        <Box>
-          <Link to={"/"}>Liboards</Link>
-        </Box>
-        <Box>
-          <HStack spacing={10}>
-            <Button leftIcon={<AddIcon fontSize={"xs"} />}>Create</Button>
+    <Container as={"nav"}>
+      <HStack justifyContent={"space-between"} h={20}>
+        <Link to={"/"}>Liboards</Link>
 
-            <Menu>
-              <MenuButton>
+        <HStack spacing={10}>
+          <Link
+            to={"/board"}
+            variant={"solid"}
+            leftIcon={<AddIcon fontSize={"xs"} />}
+          >
+            Create
+          </Link>
+
+          <Menu>
+            <MenuButton>
+              <HStack>
+                <Text>{user.username}</Text>
+                <Avatar name={user.username} bg={"gray.400"} size={"md"} />
+              </HStack>
+            </MenuButton>
+            <MenuList>
+              <MenuItem>
                 <HStack>
-                  <Text>{user.username}</Text>
-                  <Avatar name={user.username} bg={"gray.400"} size={"md"} />
+                  <Avatar name={user.username} bg={"gray.400"} />
+                  <Box>
+                    <Text fontSize={"sm"}>{user.username}</Text>
+                    <Text fontSize={"sm"} color={"gray.500"}>
+                      {user.email}
+                    </Text>
+                  </Box>
                 </HStack>
-              </MenuButton>
-              <MenuList>
-                <MenuItem>
-                  <HStack>
-                    <Avatar name={user.username} bg={"gray.400"} />
-                    <Box>
-                      <Text fontSize={"sm"}>{user.username}</Text>
-                      <Text fontSize={"sm"} color={"gray.500"}>
-                        {user.email}
-                      </Text>
-                    </Box>
-                  </HStack>
-                </MenuItem>
+              </MenuItem>
 
-                <MenuDivider />
+              <MenuDivider />
 
-                <MenuItem onClick={() => logout()} data-testid={"logout"}>
-                  Logout
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </HStack>
-        </Box>
+              <MenuItem onClick={() => logout()} data-testid={"logout"}>
+                Logout
+              </MenuItem>
+            </MenuList>
+          </Menu>
+        </HStack>
       </HStack>
-    </Box>
+    </Container>
   );
 }
 
