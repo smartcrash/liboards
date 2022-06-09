@@ -8,9 +8,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { Input, Link, PasswordInput } from "../../components";
-import { useCreateUserMutation } from "../../generated/graphql";
+import { useAuth } from "../../hooks/useAuth";
 
 interface FieldValues {
   username: string;
@@ -19,27 +18,19 @@ interface FieldValues {
 }
 
 export const SignUp = () => {
-  const [, createUser] = useCreateUserMutation();
-  const navigate = useNavigate();
+  const { createUser } = useAuth();
   const {
     handleSubmit,
     setError,
     control,
     formState: { isSubmitting },
   } = useForm<FieldValues>({});
-  const onSubmit = handleSubmit(async (values) => {
-    const response = await createUser(values);
+  const onSubmit = handleSubmit(async ({ username, email, password }) => {
+    const response = await createUser(username, email, password);
 
-    if (response.data?.createUser) {
-      const { user, errors } = response.data.createUser;
-
-      if (errors?.length) {
-        errors.forEach(({ field, message }) =>
-          setError(field as any, { message })
-        );
-      } else if (user) {
-        navigate("/", { replace: true });
-      }
+    if (response?.errors?.length) {
+      const { errors } = response;
+      errors.forEach(({ field, message }: any) => setError(field, { message }));
     }
   });
 

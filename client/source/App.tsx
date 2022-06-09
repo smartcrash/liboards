@@ -1,19 +1,44 @@
-import { Text } from "@chakra-ui/react";
-import { Navigate, Outlet } from "react-router-dom";
-import NavBar from "./components/NavBar";
+import {
+  BrowserRouter as Router,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 import { useCurrentUserQuery } from "./generated/graphql";
+import {
+  Dashboard,
+  ForgotPassword,
+  Loading,
+  Login,
+  ResetPassword,
+  SignUp,
+} from "./pages";
 
 function App() {
   const [{ data, fetching }] = useCurrentUserQuery();
-
-  if (fetching) return <Text>Loading</Text>;
-  if (!data?.currentUser) return <Navigate to={"/login"} replace />;
+  const user = !!data?.currentUser;
 
   return (
-    <>
-      <NavBar />
-      <Outlet />
-    </>
+    <Router>
+      <Routes>
+        {fetching ? (
+          <Route path="*" element={<Loading />} />
+        ) : user ? (
+          <>
+            <Route path="/" element={<Dashboard />}></Route>
+            <Route path="*" element={<Navigate to={"/"} replace />}></Route>
+          </>
+        ) : (
+          <>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="*" element={<Navigate to={"/login"} replace />} />
+          </>
+        )}
+      </Routes>
+    </Router>
   );
 }
 

@@ -12,16 +12,16 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { PasswordInput } from "../../components";
-import { useResetPasswordMutation } from "../../generated/graphql";
+import { useAuth } from "../../hooks/useAuth";
 
 interface FieldValues {
   newPassword: string;
 }
 
 export const ResetPassword = () => {
-  const { token } = useParams<{ token: string }>();
+  const { token = "" } = useParams<{ token: string }>();
   const navigate = useNavigate();
-  const [, resetPassword] = useResetPasswordMutation();
+  const { resetPassword } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const {
     control,
@@ -30,17 +30,14 @@ export const ResetPassword = () => {
   } = useForm<FieldValues>();
 
   const onSubmit = handleSubmit(async ({ newPassword }) => {
-    if (!token) return;
-
     setError(null);
 
-    const { data } = await resetPassword({ newPassword, token });
+    const response = await resetPassword(token, newPassword);
 
-    if (data?.resetPassword.errors && data.resetPassword.errors.length) {
-      setError(data.resetPassword.errors[0].message);
-    } else if (data?.resetPassword.user) {
-      navigate("/login");
-    }
+    if (response?.errors?.length) {
+      const { errors } = response;
+      setError(errors[0].message);
+    } else navigate("/login");
   });
 
   return (

@@ -13,14 +13,14 @@ import {
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { Input, Link } from "../../components";
-import { useSendResetPasswordEmailMutation } from "../../generated/graphql";
+import { useAuth } from "../../hooks/useAuth";
 
 interface FieldValues {
   email: string;
 }
 
 export const ForgotPassword = () => {
-  const [, sendResertPasswordEmail] = useSendResetPasswordEmailMutation();
+  const { sendResertPasswordEmail } = useAuth();
   const {
     control,
     handleSubmit,

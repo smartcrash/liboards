@@ -31,7 +31,7 @@ Cypress.Commands.add("loginWithPassword", (email, password) => {
 
 
 Cypress.Commands.add("logout", () => {
-  cy.getByTestId("logout").click();
+  cy.getByTestId("logout").click({ force: true });
 });
 
 declare namespace Cypress {
