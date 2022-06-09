@@ -1,8 +1,15 @@
+import { AddIcon } from "@chakra-ui/icons";
 import {
+  Avatar,
   Box,
   Button,
   ButtonGroup,
   HStack,
+  Menu,
+  MenuButton,
+  MenuDivider,
+  MenuItem,
+  MenuList,
   Spinner,
   Text,
 } from "@chakra-ui/react";
@@ -17,17 +24,40 @@ function NavBar() {
   if (fetching) leftElement = <Spinner />;
   else if (data?.currentUser)
     leftElement = (
-      <HStack spacing={5}>
-        <Text fontWeight={"bold"}>{data.currentUser.username}</Text>
-        <Button
-          colorScheme={"gray"}
-          variant={"outline"}
-          fontWeight={"normal"}
-          onClick={() => logout()}
-          data-testid={"logout"}
-        >
-          Logout
-        </Button>
+      <HStack spacing={10}>
+        <Button leftIcon={<AddIcon fontSize={"xs"} />}>Create</Button>
+
+        <Menu>
+          <MenuButton>
+            <HStack>
+              <Text>{data.currentUser.username}</Text>
+              <Avatar
+                name={data.currentUser.username}
+                bg={"gray.400"}
+                size={"md"}
+              />
+            </HStack>
+          </MenuButton>
+          <MenuList>
+            <MenuItem>
+              <HStack>
+                <Avatar name={data.currentUser.username} bg={"gray.400"} />
+                <Box>
+                  <Text fontSize={"sm"}>{data.currentUser.username}</Text>
+                  <Text fontSize={"sm"} color={"gray.500"}>
+                    {data.currentUser.email}
+                  </Text>
+                </Box>
+              </HStack>
+            </MenuItem>
+
+            <MenuDivider />
+
+            <MenuItem onClick={() => logout()} data-testid={"logout"}>
+              Logout
+            </MenuItem>
+          </MenuList>
+        </Menu>
       </HStack>
     );
   else
@@ -43,11 +73,11 @@ function NavBar() {
     );
 
   return (
-    <Box as={"nav"} bg={"gray.50"}>
+    <Box as={"nav"}>
       <HStack
         justifyContent={"space-between"}
         px={{ base: 2, sm: 6, lg: 8 }}
-        h={16}
+        h={20}
       >
         <Box>
           <Link to={"/"}>Liboards</Link>
