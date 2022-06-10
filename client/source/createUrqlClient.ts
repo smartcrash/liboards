@@ -7,20 +7,17 @@ import {
 } from "@urql/exchange-graphcache";
 import {
   createClient,
-  dedupExchange,
-  fetchExchange,
-  errorExchange
+  dedupExchange, errorExchange, fetchExchange
 } from "urql";
 import {
   CreateUserMutation,
   CurrentUserDocument,
   CurrentUserQuery,
   LoginWithPasswordMutation,
-  LogoutMutation,
-  Query
+  LogoutMutation
 } from "./generated/graphql";
 
-function updateQuery<R extends DataFields, Q extends Query>(
+function updateQuery<R extends DataFields, Q>(
   cache: Cache,
   queryInput: QueryInput,
   result: any,
@@ -72,6 +69,8 @@ export const createUrqlClient = () => createClient({
               () => ({ currentUser: null })
             );
           },
+
+          createBoard: (result, args, cache, info) => cache.invalidate('Query', 'allBoards'),
         },
       },
     }),
