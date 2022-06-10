@@ -72,6 +72,6 @@ describe('Resetting passwords', () => {
     cy.contains('Incorrect password, try again.')
 
     cy.loginWithPassword(email, newPassword)
-    cy.location("pathname").should("equal", "/");
+    cy.location("pathname").should("equal", "/projects");
   })
 })

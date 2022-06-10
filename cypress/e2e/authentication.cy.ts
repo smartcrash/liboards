@@ -24,14 +24,14 @@ describe('User authentication flow', () => {
 
 
     cy.createUser(username, email, password)
-    cy.location("pathname").should("equal", "/");
+    cy.location("pathname").should("equal", "/projects");
     cy.contains(username)
 
     cy.logout()
     cy.location("pathname").should("equal", "/login");
 
     cy.loginWithPassword(email, password)
-    cy.location("pathname").should("equal", "/");
+    cy.location("pathname").should("equal", "/projects");
     cy.contains(username)
   })
 
