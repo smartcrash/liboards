@@ -7,5 +7,5 @@ export const isAuth: MiddlewareFn<TContext> = async ({ context }, next) => {
     throw new Error("not authenticated");
   }
 
-  next()
+  return next()
 }
