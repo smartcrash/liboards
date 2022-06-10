@@ -7,7 +7,7 @@ import { TContext } from '../types';
 export class BoardResolver {
   @UseMiddleware(isAuth)
   @Query(() => [Board])
-  async boards(
+  async allBoards(
     @Ctx() { req, dataSource }: TContext
   ): Promise<Board[]> {
     return dataSource
@@ -15,6 +15,23 @@ export class BoardResolver {
       .find({
         relations: { user: true },
         where: { userId: req.session.userId }
+      })
+  }
+
+  @UseMiddleware(isAuth)
+  @Query(() => Board, { nullable: true })
+  async findBoardById(
+    @Arg('id', () => Int) id: number,
+    @Ctx() { req, dataSource }: TContext
+  ): Promise<Board> {
+    return dataSource
+      .getRepository(Board)
+      .findOne({
+        relations: { user: true },
+        where: {
+          id,
+          userId: req.session.userId
+        }
       })
   }
 

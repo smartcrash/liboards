@@ -80,12 +80,12 @@ test.group('createBoard', () => {
   })
 })
 
-test.group('boards', () => {
+test.group('allBoards', () => {
   test('should throw error not authenticated', async ({ expect, client }) => {
     const queryData = {
       query: `
         {
-          boards {
+          boards: allBoards {
             id
           }
         }
@@ -113,7 +113,7 @@ test.group('boards', () => {
     const queryData = {
       query: `
         {
-          boards {
+          boards: allBoards {
             id
             user { id }
           }
@@ -130,12 +130,12 @@ test.group('boards', () => {
   })
 })
 
-test.group('updateBoard', () => {
+test.group('findBoardById', () => {
   test('should throw error not authenticated', async ({ expect, client }) => {
     const queryData = {
       query: `
-        mutation UpdateBoard($id: Int!) {
-          updateBoard(id: $id) {
+        query Query($id: Int!) {
+          board: findBoardById(id: $id) {
             id
           }
         }
@@ -146,7 +146,85 @@ test.group('updateBoard', () => {
     const response = await client.post('/').json(queryData)
     const { data, errors } = response.body()
 
-    expect(data.updateBoard).toBeNull()
+    expect(data.board).toBeNull()
+    expect(errors).toBeDefined()
+    expect(errors).toHaveLength(1)
+    expect(errors[0].message).toBe('not authenticated')
+  })
+
+  test('should return single board', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const { id, title, description } = await createBoard(user.id)
+
+    const queryData = {
+      query: `
+        query Query($id: Int!) {
+          board: findBoardById(id: $id) {
+            id
+            title
+            description
+            user { id }
+          }
+        }
+      `,
+      variables: { id }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.board).toBeDefined()
+    expect(data.board).toMatchObject({
+      id,
+      title,
+      description,
+      user: { id: user.id }
+    })
+  })
+
+  test('should return `null` if it was not created by the user', async ({ expect, client, createUser }) => {
+    const [user] = await createUser(client)
+    const [cookie] = await createUser(client)
+    const { id } = await createBoard(user.id)
+
+    const queryData = {
+      query: `
+        query Query($id: Int!) {
+          board: findBoardById(id: $id) {
+            id
+            title
+            description
+            user { id }
+          }
+        }
+      `,
+      variables: { id }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.board).toBeNull()
+  })
+})
+
+test.group('updateBoard', () => {
+  test('should throw error not authenticated', async ({ expect, client }) => {
+    const queryData = {
+      query: `
+        mutation UpdateBoard($id: Int!) {
+          board: updateBoard(id: $id) {
+            id
+          }
+        }
+      `,
+      variables: { id: 1 }
+    };
+
+    const response = await client.post('/').json(queryData)
+    const { data, errors } = response.body()
+
+    expect(data.board).toBeNull()
     expect(errors).toBeDefined()
     expect(errors).toHaveLength(1)
     expect(errors[0].message).toBe('not authenticated')
