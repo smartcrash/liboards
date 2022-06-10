@@ -30,6 +30,7 @@ export type Board = {
   id: Scalars['Float'];
   title: Scalars['String'];
   updatedAt: Scalars['DateTime'];
+  user: User;
 };
 
 export type FieldError = {
@@ -46,6 +47,7 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   resetPassword: AuthenticationResponse;
   sendResetPasswordEmail: Scalars['Boolean'];
+  updateBoard?: Maybe<Board>;
 };
 
 
@@ -78,21 +80,36 @@ export type MutationSendResetPasswordEmailArgs = {
   email: Scalars['String'];
 };
 
+
+export type MutationUpdateBoardArgs = {
+  description?: InputMaybe<Scalars['String']>;
+  id: Scalars['Int'];
+  title?: InputMaybe<Scalars['String']>;
+};
+
 export type Query = {
   __typename?: 'Query';
+  allBoards: Array<Board>;
   currentUser?: Maybe<User>;
+  findBoardById?: Maybe<Board>;
+};
+
+
+export type QueryFindBoardByIdArgs = {
+  id: Scalars['Int'];
 };
 
 export type User = {
   __typename?: 'User';
-  createdAt: Scalars['DateTime'];
+  boards: Array<Board>;
+  createdAt: Scalars['String'];
   email: Scalars['String'];
   id: Scalars['Float'];
-  updatedAt: Scalars['DateTime'];
+  updatedAt: Scalars['String'];
   username: Scalars['String'];
 };
 
-export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any };
+export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string };
 
 export type CreateBoardMutationVariables = Exact<{
   title?: InputMaybe<Scalars['String']>;
@@ -100,7 +117,7 @@ export type CreateBoardMutationVariables = Exact<{
 }>;
 
 
-export type CreateBoardMutation = { __typename?: 'Mutation', createBoard: { __typename?: 'Board', id: number, title: string, description: string } };
+export type CreateBoardMutation = { __typename?: 'Mutation', board: { __typename?: 'Board', id: number, title: string, description: string } };
 
 export type CreateUserMutationVariables = Exact<{
   password: Scalars['String'];
@@ -109,7 +126,7 @@ export type CreateUserMutationVariables = Exact<{
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any } | null } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null } };
 
 export type LoginWithPasswordMutationVariables = Exact<{
   password: Scalars['String'];
@@ -117,7 +134,7 @@ export type LoginWithPasswordMutationVariables = Exact<{
 }>;
 
 
-export type LoginWithPasswordMutation = { __typename?: 'Mutation', loginWithPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any } | null } };
+export type LoginWithPasswordMutation = { __typename?: 'Mutation', loginWithPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -130,7 +147,7 @@ export type ResetPasswordMutationVariables = Exact<{
 }>;
 
 
-export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any } | null } };
+export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null } };
 
 export type SendResetPasswordEmailMutationVariables = Exact<{
   email: Scalars['String'];
@@ -139,10 +156,15 @@ export type SendResetPasswordEmailMutationVariables = Exact<{
 
 export type SendResetPasswordEmailMutation = { __typename?: 'Mutation', sendResetPasswordEmail: boolean };
 
+export type AllBoardsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AllBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any }> };
+
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any } | null };
+export type CurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null };
 
 export const UserFragmentFragmentDoc = gql`
     fragment UserFragment on User {
@@ -155,7 +177,7 @@ export const UserFragmentFragmentDoc = gql`
     `;
 export const CreateBoardDocument = gql`
     mutation CreateBoard($title: String, $description: String) {
-  createBoard(title: $title, description: $description) {
+  board: createBoard(title: $title, description: $description) {
     id
     title
     description
@@ -234,6 +256,21 @@ export const SendResetPasswordEmailDocument = gql`
 
 export function useSendResetPasswordEmailMutation() {
   return Urql.useMutation<SendResetPasswordEmailMutation, SendResetPasswordEmailMutationVariables>(SendResetPasswordEmailDocument);
+};
+export const AllBoardsDocument = gql`
+    query AllBoards {
+  boards: allBoards {
+    id
+    title
+    description
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export function useAllBoardsQuery(options?: Omit<Urql.UseQueryArgs<AllBoardsQueryVariables>, 'query'>) {
+  return Urql.useQuery<AllBoardsQuery>({ query: AllBoardsDocument, ...options });
 };
 export const CurrentUserDocument = gql`
     query CurrentUser {

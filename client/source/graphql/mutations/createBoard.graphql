@@ -1,5 +1,5 @@
 mutation CreateBoard($title: String, $description: String) {
-  createBoard(title: $title, description: $description) {
+  board: createBoard(title: $title, description: $description) {
     id
     title
     description

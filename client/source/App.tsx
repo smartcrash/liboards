@@ -6,12 +6,14 @@ import {
 } from "react-router-dom";
 import { useCurrentUserQuery } from "./generated/graphql";
 import {
-  Board,
+  CreateProject,
   Dashboard,
   ForgotPassword,
+  ListProjects,
   Loading,
   Login,
   ResetPassword,
+  ShowProject,
   SignUp,
 } from "./pages";
 
@@ -27,9 +29,10 @@ function App() {
         ) : user ? (
           <>
             <Route path="/" element={<Dashboard />}>
-              <Route path="/board" element={<Board />}></Route>
+              <Route path="/" element={<ListProjects />}></Route>
+              <Route path="/p" element={<CreateProject />}></Route>
+              <Route path="/p/:id" element={<ShowProject />}></Route>
             </Route>
-
             <Route path="*" element={<Navigate to={"/"} replace />} />
           </>
         ) : (

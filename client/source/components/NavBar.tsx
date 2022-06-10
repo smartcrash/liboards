@@ -26,7 +26,7 @@ function NavBar() {
 
         <HStack spacing={10}>
           <Link
-            to={"/board"}
+            to={"/p"}
             variant={"solid"}
             leftIcon={<AddIcon fontSize={"xs"} />}
           >

@@ -1,0 +1,9 @@
+query AllBoards {
+  boards: allBoards {
+    id
+    title
+    description
+    createdAt
+    updatedAt
+  }
+}
