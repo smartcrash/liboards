@@ -29,14 +29,15 @@ export class User {
     }
   }
 
-  @OneToMany(() => Board, board => board.author)
+  @Field(() => [Board])
+  @OneToMany(() => Board, board => board.user)
   boards: Board[]
 
-  @Field()
+  @Field(() => String)
   @CreateDateColumn()
   createdAt: Date;
 
-  @Field()
+  @Field(() => String)
   @UpdateDateColumn()
   updatedAt: Date;
 }

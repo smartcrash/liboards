@@ -62,7 +62,7 @@ test.group('createBoard', () => {
 
     expect(board).toBeDefined()
     expect(board).toMatchObject({ title, description })
-    expect(board.authorId).toBe(user.id)
+    expect(board.userId).toBe(user.id)
   })
 
 })

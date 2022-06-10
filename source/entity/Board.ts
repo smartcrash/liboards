@@ -18,10 +18,11 @@ export class Board {
   description: string;
 
   @Column()
-  authorId: number
+  userId: number
 
+  @Field(() => User)
   @ManyToOne(() => User, user => user.boards)
-  author: User
+  user: User
 
   @Field()
   @CreateDateColumn()
