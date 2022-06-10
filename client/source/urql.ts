@@ -8,7 +8,8 @@ import {
 import {
   createClient,
   dedupExchange,
-  fetchExchange
+  fetchExchange,
+  errorExchange
 } from "urql";
 import {
   CreateUserMutation,
@@ -73,6 +74,13 @@ export const createUrqlClient = () => createClient({
           },
         },
       },
+    }),
+    errorExchange({
+      onError: (error) => {
+        const isAuthError = error.message.includes('not authenticated')
+
+        if (isAuthError) window.location.replace('/login')
+      }
     }),
     fetchExchange,
   ],
