@@ -131,7 +131,7 @@ test.group('createUser', () => {
 
     expect(data.createUser.errors).toBeDefined()
     expect(data.createUser.errors).toHaveLength(2)
-    expect(data.createUser.errors).toContainEqual({ field: 'username', message: 'This username already exists' })
+    expect(data.createUser.errors).toContainEqual({ field: 'username', message: 'This username already exists.' })
     expect(data.createUser.errors).toContainEqual({ field: 'email', message: 'This email is already in use.' })
   })
 })
