@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { PasswordInput } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
+import { route } from "../../routes";
 
 interface FieldValues {
   newPassword: string;
@@ -37,7 +38,7 @@ export const ResetPassword = () => {
     if (response?.errors?.length) {
       const { errors } = response;
       setError(errors[0].message);
-    } else navigate("/login");
+    } else navigate(route("login"));
   });
 
   return (

@@ -10,6 +10,7 @@ import {
 import { useForm } from "react-hook-form";
 import { Input, Link, PasswordInput } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
+import { route } from "../../routes";
 
 interface FieldValues {
   email: string;
@@ -45,7 +46,7 @@ export const Login = () => {
             <Heading size={"lg"}>Log in to your account</Heading>
             <HStack spacing={2} justify={"center"}>
               <Text color={"muted"}>Don't have an account?</Text>
-              <Link to={"/signup"} data-testid={"go-to-signup"}>
+              <Link to={route("signUp")} data-testid={"go-to-signup"}>
                 Sign up
               </Link>
             </HStack>
@@ -81,7 +82,7 @@ export const Login = () => {
 
             <HStack justifyContent={"flex-end"}>
               <Link
-                to={"/forgot-password"}
+                to={route("forgotPwd")}
                 size={"sm"}
                 data-testid={"forgot-password"}
               >

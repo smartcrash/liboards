@@ -1,6 +1,7 @@
 import { Box, Heading, HStack, Text } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useAllBoardsQuery } from "../../../generated/graphql";
+import { route } from "../../../routes";
 
 export const ListProjects = () => {
   const [{ data }] = useAllBoardsQuery();
@@ -25,8 +26,9 @@ export const ListProjects = () => {
             color={"white"}
             borderRadius={"md"}
             as={Link}
-            to={`/p/${id}`}
+            to={route("projects.show", { id })}
             flexShrink={0}
+            key={id}
           >
             <Heading fontSize={"xl"}>{title}</Heading>
             <Text mt={4}>{description}</Text>

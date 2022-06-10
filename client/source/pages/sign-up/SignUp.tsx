@@ -10,6 +10,7 @@ import {
 import { useForm } from "react-hook-form";
 import { Input, Link, PasswordInput } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
+import { route } from "../../routes";
 
 interface FieldValues {
   username: string;
@@ -46,7 +47,7 @@ export const SignUp = () => {
             <Heading size={"lg"}>Create a new account</Heading>
             <HStack spacing={2} justify={"center"}>
               <Text color={"muted"}>Already have an account?</Text>
-              <Link to={"/login"}>Login</Link>
+              <Link to={route("login")}>Login</Link>
             </HStack>
           </Stack>
         </Stack>

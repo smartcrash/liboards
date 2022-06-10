@@ -14,6 +14,7 @@ import {
 import { useForm } from "react-hook-form";
 import { Input, Link } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
+import { route } from "../../routes";
 
 interface FieldValues {
   email: string;
@@ -71,7 +72,7 @@ export const ForgotPassword = () => {
 
                 <Link
                   leftIcon={<ArrowBackIcon />}
-                  to={"/login"}
+                  to={route("login")}
                   colorScheme={"gray"}
                 >
                   Back to log in

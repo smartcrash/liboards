@@ -16,6 +16,7 @@ import {
   ShowProject,
   SignUp,
 } from "./pages";
+import { routes } from "./routes";
 
 function App() {
   const [{ data, fetching }] = useCurrentUserQuery();
@@ -28,20 +29,30 @@ function App() {
           <Route path="*" element={<Loading />} />
         ) : user ? (
           <>
-            <Route path="/" element={<Dashboard />}>
-              <Route path="/" element={<ListProjects />}></Route>
-              <Route path="/p" element={<CreateProject />}></Route>
-              <Route path="/p/:id" element={<ShowProject />}></Route>
+            <Route path={routes.index} element={<Dashboard />}>
+              <Route
+                path={routes.index}
+                element={<Navigate to={routes["projects.list"]} replace />}
+              />
+              <Route
+                path={routes["projects.list"]}
+                element={<ListProjects />}
+              />
+              <Route
+                path={routes["projects.create"]}
+                element={<CreateProject />}
+              />
+              <Route path={routes["projects.show"]} element={<ShowProject />} />
             </Route>
-            <Route path="*" element={<Navigate to={"/"} replace />} />
+            <Route path="*" element={<Navigate to={routes.index} replace />} />
           </>
         ) : (
           <>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password/:token" element={<ResetPassword />} />
-            <Route path="*" element={<Navigate to={"/login"} replace />} />
+            <Route path={routes.login} element={<Login />} />
+            <Route path={routes.signUp} element={<SignUp />} />
+            <Route path={routes.forgotPwd} element={<ForgotPassword />} />
+            <Route path={routes.resetPwd} element={<ResetPassword />} />
+            <Route path="*" element={<Navigate to={routes.login} replace />} />
           </>
         )}
       </Routes>

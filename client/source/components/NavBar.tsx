@@ -11,6 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useAuth } from "../hooks/useAuth";
+import { route } from "../routes";
 import { Container } from "./";
 import { Link } from "./Link";
 
@@ -22,11 +23,11 @@ function NavBar() {
   return (
     <Container as={"nav"}>
       <HStack justifyContent={"space-between"} h={20}>
-        <Link to={"/"}>Liboards</Link>
+        <Link to={route("index")}>Liboards</Link>
 
         <HStack spacing={10}>
           <Link
-            to={"/p"}
+            to={route("projects.create")}
             variant={"solid"}
             leftIcon={<AddIcon fontSize={"xs"} />}
           >
