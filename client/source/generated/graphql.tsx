@@ -23,6 +23,15 @@ export type AuthenticationResponse = {
   user?: Maybe<User>;
 };
 
+export type Board = {
+  __typename?: 'Board';
+  createdAt: Scalars['DateTime'];
+  description: Scalars['String'];
+  id: Scalars['Float'];
+  title: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
 export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
@@ -31,11 +40,18 @@ export type FieldError = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createBoard: Board;
   createUser: AuthenticationResponse;
   loginWithPassword: AuthenticationResponse;
   logout: Scalars['Boolean'];
   resetPassword: AuthenticationResponse;
   sendResetPasswordEmail: Scalars['Boolean'];
+};
+
+
+export type MutationCreateBoardArgs = {
+  description?: InputMaybe<Scalars['String']>;
+  title?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -77,6 +93,14 @@ export type User = {
 };
 
 export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: any, updatedAt: any };
+
+export type CreateBoardMutationVariables = Exact<{
+  title?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type CreateBoardMutation = { __typename?: 'Mutation', createBoard: { __typename?: 'Board', id: number, title: string, description: string } };
 
 export type CreateUserMutationVariables = Exact<{
   password: Scalars['String'];
@@ -129,6 +153,19 @@ export const UserFragmentFragmentDoc = gql`
   updatedAt
 }
     `;
+export const CreateBoardDocument = gql`
+    mutation CreateBoard($title: String, $description: String) {
+  createBoard(title: $title, description: $description) {
+    id
+    title
+    description
+  }
+}
+    `;
+
+export function useCreateBoardMutation() {
+  return Urql.useMutation<CreateBoardMutation, CreateBoardMutationVariables>(CreateBoardDocument);
+};
 export const CreateUserDocument = gql`
     mutation CreateUser($password: String!, $email: String!, $username: String!) {
   createUser(password: $password, email: $email, username: $username) {

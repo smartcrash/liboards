@@ -1,6 +1,6 @@
 
 import { DataSource } from "typeorm";
-import { User } from "./entity";
+import { User, Board } from "./entity";
 
 export const dataSource = new DataSource({
   type: "sqlite",
@@ -9,7 +9,7 @@ export const dataSource = new DataSource({
   synchronize: true,
   dropSchema: false,
   migrationsRun: true,
-  entities: [User],
+  entities: [User, Board],
   // migrations: ["source/migration/**/*.ts"],
   // subscribers: ["source/subscriber/**/*.ts"],
 })
