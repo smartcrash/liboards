@@ -38,8 +38,8 @@ export class BoardResolver {
   @UseMiddleware(isAuth)
   @Mutation(() => Board)
   async createBoard(
-    @Arg('title', () => String, { nullable: true }) title: string | null,
-    @Arg('description', () => String, { nullable: true }) description: string | null,
+    @Arg('title') title: string,
+    @Arg('description', () => String, { nullable: true }) description: string,
     @Ctx() { req, dataSource }: TContext
   ): Promise<Board> {
     const repository = dataSource.getRepository(Board)

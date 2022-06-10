@@ -22,15 +22,18 @@ test.group('createBoard', () => {
   test('should throw error not authenticated', async ({ expect, client }) => {
     const queryData = {
       query: `
-        mutation CreateBoard {
-          createBoard {
+        mutation CreateBoard($description: String, $title: String!) {
+          createBoard(description: $description, title: $title) {
             id
             title
             description
           }
         }
       `,
-      variables: {}
+      variables: {
+        title: faker.lorem.words(),
+        description: faker.lorem.sentences(),
+      }
     };
 
     const response = await client.post('/').json(queryData)
@@ -50,7 +53,7 @@ test.group('createBoard', () => {
 
     const queryData = {
       query: `
-        mutation Mutation($description: String, $title: String) {
+        mutation CreateBoard($description: String, $title: String!) {
           createBoard(description: $description, title: $title) {
             id
             title

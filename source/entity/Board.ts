@@ -10,7 +10,7 @@ export class Board {
   id: number;
 
   @Field()
-  @Column({ default: '' })
+  @Column()
   title: string;
 
   @Field()
