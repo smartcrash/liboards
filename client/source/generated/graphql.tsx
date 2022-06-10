@@ -53,7 +53,7 @@ export type Mutation = {
 
 export type MutationCreateBoardArgs = {
   description?: InputMaybe<Scalars['String']>;
-  title?: InputMaybe<Scalars['String']>;
+  title: Scalars['String'];
 };
 
 
@@ -112,7 +112,7 @@ export type User = {
 export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string };
 
 export type CreateBoardMutationVariables = Exact<{
-  title?: InputMaybe<Scalars['String']>;
+  title: Scalars['String'];
   description?: InputMaybe<Scalars['String']>;
 }>;
 
@@ -176,7 +176,7 @@ export const UserFragmentFragmentDoc = gql`
 }
     `;
 export const CreateBoardDocument = gql`
-    mutation CreateBoard($title: String, $description: String) {
+    mutation CreateBoard($title: String!, $description: String) {
   board: createBoard(title: $title, description: $description) {
     id
     title
