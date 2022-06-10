@@ -1,19 +1,71 @@
-import { useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { Button, Container, Heading, Stack, Text } from "@chakra-ui/react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { Input } from "../../../components";
 import { useCreateBoardMutation } from "../../../generated/graphql";
 import { route } from "../../../routes";
 
+interface FieldValues {
+  title: string;
+  description?: string;
+}
+
 export const CreateProject = () => {
-  const [{ data, fetching }, createBoard] = useCreateBoardMutation();
+  const [, createBoard] = useCreateBoardMutation();
+  const navigate = useNavigate();
+  const {
+    handleSubmit,
+    control,
+    formState: { isSubmitting },
+  } = useForm<FieldValues>({});
 
-  useEffect(() => {
-    createBoard();
-  }, []);
+  const onSubmit = handleSubmit(async ({ title, description }) => {
+    const { data, error } = await createBoard({ title, description });
 
-  if (fetching) return <>loading...</>;
-  else if (data?.board)
-    return (
-      <Navigate to={route("projects.show", { id: data.board.id })} replace />
-    );
-  return <>Something went wrong :o</>;
+    if (data?.board.id) {
+      const id = data?.board.id;
+      navigate(route("projects.show", { id }));
+    } else {
+      // Something went wrong! :O
+      console.error("Error at `createBoard` muration", { data, error });
+    }
+  });
+
+  return (
+    <Container maxW={"lg"}>
+      <Stack mb={12}>
+        <Heading fontSize={"3xl"}>Create new project</Heading>
+        <Text color={"gray.500"}>
+          A project contains a board, and a board is made up of cards ordered on
+          lists. Use it to manage your project, track information, or organize
+          antthing.
+        </Text>
+      </Stack>
+
+      <Stack as={"form"} onSubmit={onSubmit} spacing={6}>
+        <Input
+          label={"Project name"}
+          name={"title"}
+          control={control}
+          rules={{ required: true }}
+          data-testid={"title"}
+        />
+        <Input
+          label={"Description"}
+          name={"description"}
+          control={control}
+          placeholder={"(optional)"}
+          data-testid={"description"}
+        />
+
+        <Button
+          isDisabled={isSubmitting}
+          type={"submit"}
+          data-testid={"submit"}
+        >
+          Create project
+        </Button>
+      </Stack>
+    </Container>
+  );
 };

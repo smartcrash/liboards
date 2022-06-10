@@ -166,6 +166,13 @@ export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type CurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null };
 
+export type FindBoardByIdQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } } | null };
+
 export const UserFragmentFragmentDoc = gql`
     fragment UserFragment on User {
   id
@@ -282,4 +289,23 @@ export const CurrentUserDocument = gql`
 
 export function useCurrentUserQuery(options?: Omit<Urql.UseQueryArgs<CurrentUserQueryVariables>, 'query'>) {
   return Urql.useQuery<CurrentUserQuery>({ query: CurrentUserDocument, ...options });
+};
+export const FindBoardByIdDocument = gql`
+    query FindBoardById($id: Int!) {
+  board: findBoardById(id: $id) {
+    id
+    title
+    description
+    user {
+      id
+      username
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export function useFindBoardByIdQuery(options: Omit<Urql.UseQueryArgs<FindBoardByIdQueryVariables>, 'query'>) {
+  return Urql.useQuery<FindBoardByIdQuery>({ query: FindBoardByIdDocument, ...options });
 };

@@ -30,6 +30,7 @@ function NavBar() {
             to={route("projects.create")}
             variant={"solid"}
             leftIcon={<AddIcon fontSize={"xs"} />}
+            data-testid={"new-project"}
           >
             Create
           </Link>
