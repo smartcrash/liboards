@@ -68,6 +68,7 @@ export function PasswordInput<T>({
           id={name}
           type={isOpen ? "text" : "password"}
           ref={mergeRef}
+          isRequired={!!rules?.required}
           {...props}
           {...field}
         />

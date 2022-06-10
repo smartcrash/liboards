@@ -39,6 +39,7 @@ export function Input<T>({
       <ChakraInput
         value={value ? `${value}` : ""}
         id={name}
+        isRequired={!!rules?.required}
         {...props}
         {...field}
       />
