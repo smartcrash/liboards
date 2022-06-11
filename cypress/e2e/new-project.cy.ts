@@ -7,7 +7,7 @@ describe('New Project', () => {
     cy.exec('npm run schema:drop')
     cy.exec('npm run schema:sync')
 
-    cy.createUser(chance.name(), chance.email(), chance.word())
+    cy.createUser()
   })
 
   beforeEach(() => cy.visit('/'))

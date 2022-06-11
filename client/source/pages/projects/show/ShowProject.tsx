@@ -1,11 +1,16 @@
-import { Box, Heading, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import { useFindBoardByIdQuery } from "../../../generated/graphql";
+import {
+  useFindBoardByIdQuery,
+  useUpdateBoardMutation,
+} from "../../../generated/graphql";
+import { EditableTitleAndDesc } from "./EditableTitleAndDesc";
 
 export const ShowProject = () => {
   const params = useParams<{ id: string }>();
   const id = parseInt(params.id!);
   const [{ data, fetching }] = useFindBoardByIdQuery({ variables: { id } });
+  const [, update] = useUpdateBoardMutation();
 
   if (fetching) return <>loading...</>; // TODO: Add skeleton
   if (!data?.board) return <>Something went wrong! :O</>;
@@ -14,8 +19,10 @@ export const ShowProject = () => {
 
   return (
     <Box>
-      <Heading>{title}</Heading>
-      <Text>{description}</Text>
+      <EditableTitleAndDesc
+        defaultValues={{ title, description }}
+        onSubmit={(nextValues) => update({ id, ...nextValues })}
+      />
     </Box>
   );
 };

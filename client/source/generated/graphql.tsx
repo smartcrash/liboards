@@ -156,6 +156,15 @@ export type SendResetPasswordEmailMutationVariables = Exact<{
 
 export type SendResetPasswordEmailMutation = { __typename?: 'Mutation', sendResetPasswordEmail: boolean };
 
+export type UpdateBoardMutationVariables = Exact<{
+  id: Scalars['Int'];
+  title?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type UpdateBoardMutation = { __typename?: 'Mutation', board?: { __typename?: 'Board', id: number } | null };
+
 export type AllBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -263,6 +272,17 @@ export const SendResetPasswordEmailDocument = gql`
 
 export function useSendResetPasswordEmailMutation() {
   return Urql.useMutation<SendResetPasswordEmailMutation, SendResetPasswordEmailMutationVariables>(SendResetPasswordEmailDocument);
+};
+export const UpdateBoardDocument = gql`
+    mutation UpdateBoard($id: Int!, $title: String, $description: String) {
+  board: updateBoard(id: $id, title: $title, description: $description) {
+    id
+  }
+}
+    `;
+
+export function useUpdateBoardMutation() {
+  return Urql.useMutation<UpdateBoardMutation, UpdateBoardMutationVariables>(UpdateBoardDocument);
 };
 export const AllBoardsDocument = gql`
     query AllBoards {
