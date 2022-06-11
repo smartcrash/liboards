@@ -117,7 +117,7 @@ export type CreateBoardMutationVariables = Exact<{
 }>;
 
 
-export type CreateBoardMutation = { __typename?: 'Mutation', board: { __typename?: 'Board', id: number, title: string, description: string } };
+export type CreateBoardMutation = { __typename?: 'Mutation', board: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any } };
 
 export type CreateUserMutationVariables = Exact<{
   password: Scalars['String'];
@@ -197,6 +197,8 @@ export const CreateBoardDocument = gql`
     id
     title
     description
+    createdAt
+    updatedAt
   }
 }
     `;

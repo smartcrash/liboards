@@ -10,6 +10,9 @@ import {
   dedupExchange, errorExchange, fetchExchange
 } from "urql";
 import {
+  AllBoardsDocument,
+  AllBoardsQuery,
+  CreateBoardMutation,
   CreateUserMutation,
   CurrentUserDocument,
   CurrentUserQuery,
@@ -42,8 +45,8 @@ export const createUrqlClient = () => createClient({
               cache,
               { query: CurrentUserDocument },
               result,
-              (result, query) => {
-                if (result.loginWithPassword.errors) return query;
+              (result, data) => {
+                if (result.loginWithPassword.errors) return data;
                 else return { currentUser: result.loginWithPassword.user };
               }
             );
@@ -54,8 +57,8 @@ export const createUrqlClient = () => createClient({
               cache,
               { query: CurrentUserDocument },
               result,
-              (result, query) => {
-                if (result.createUser.errors) return query;
+              (result, data) => {
+                if (result.createUser.errors) return data;
                 else return { currentUser: result.createUser.user };
               }
             );
@@ -70,7 +73,16 @@ export const createUrqlClient = () => createClient({
             );
           },
 
-          createBoard: (result, args, cache, info) => cache.invalidate('Query', 'allBoards'),
+          createBoard: (result, args, cache, info) => {
+            updateQuery<CreateBoardMutation, AllBoardsQuery>(
+              cache,
+              { query: AllBoardsDocument },
+              // NOTE: This works under the assumpsion that the `allBoards` query
+              // returns boards ordered by `createdAt`, this may change in the
+              // future.
+              result, (result, data) => ({ boards: [result.board, ...data.boards] })
+            )
+          }
         },
       },
     }),

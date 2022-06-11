@@ -3,5 +3,7 @@ mutation CreateBoard($title: String!, $description: String) {
     id
     title
     description
+    createdAt
+    updatedAt
   }
 }
