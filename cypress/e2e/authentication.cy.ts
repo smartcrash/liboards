@@ -1,18 +1,17 @@
-describe('User authentication flow', () => {
-  beforeEach(() => {
-    cy.exec('npm run schema:drop')
-    cy.exec('npm run schema:sync')
-  })
+import Chance from 'chance'
 
+const chance = new Chance()
+
+describe('User authentication flow', () => {
   it('should redirect unauthenticated user to signin page', () => {
     cy.visit('/')
     cy.location("pathname").should("equal", "/login");
   })
 
   it("should allow visitor to create account, login with password, and logout", () => {
-    const username = "bobross"
-    const email = "painterjoy90@gmail.com"
-    const password = "s3cret"
+    const username = chance.name()
+    const email = chance.email()
+    const password = chance.word({ length: 5 })
 
     /**
      * On login page should exists a link that redirects to
@@ -36,9 +35,9 @@ describe('User authentication flow', () => {
   })
 
   it("should display login errors", () => {
-    const username = "bobross"
-    const email = "painterjoy90@gmail.com"
-    const password = "s3cret"
+    const username = chance.name()
+    const email = chance.email()
+    const password = chance.word({ length: 5 })
 
     cy.createUser(username, email, password)
     cy.logout()
@@ -58,9 +57,9 @@ describe('User authentication flow', () => {
   });
 
   it("should display sign-up errors", () => {
-    const username = "bobross"
-    const email = "painterjoy90@gmail.com"
-    const password = "s3cret"
+    const username = chance.name()
+    const email = chance.email()
+    const password = chance.word({ length: 5 })
 
     cy.createUser(username, email, password)
     cy.logout()

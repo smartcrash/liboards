@@ -3,12 +3,7 @@ import Chance from 'chance'
 const chance = new Chance()
 
 describe('New Project', () => {
-  before(() => {
-    cy.exec('npm run schema:drop')
-    cy.exec('npm run schema:sync')
-
-    cy.createUser()
-  })
+  before(() => cy.createUser())
 
   beforeEach(() => cy.visit('/'))
 

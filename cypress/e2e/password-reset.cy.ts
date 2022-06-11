@@ -1,17 +1,16 @@
+import Chance from 'chance'
+
+const chance = new Chance()
+
 const API_TOKEN = '93cd1ac23fd513acf6184add4160c5d6'
 const INBOX_ID = 1016655
 
 describe('Resetting passwords', () => {
-  beforeEach(() => {
-    cy.exec('npm run schema:drop')
-    cy.exec('npm run schema:sync')
-  })
-
   it('should send email with intructions to reset password and should be able to change password using the email\'s link', () => {
-    const email = 'foo@bar.com'
-    const username = 'jhondoe'
-    const password = '12345'
-    const newPassword = 'stronger_s3cret'
+    const username = chance.name()
+    const email = chance.email()
+    const password = chance.word({ length: 5 })
+    const newPassword = chance.word({ length: 8 })
 
     cy.createUser(username, email, password)
     cy.logout()
