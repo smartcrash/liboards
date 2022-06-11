@@ -109,7 +109,6 @@ test.group('allBoards', () => {
     const [user1] = await createUser(client)
     const [user2, cookie] = await createUser(client)
 
-
     const _ = await createBoard(user1.id)
     const board2 = await createBoard(user2.id)
 
@@ -130,6 +129,77 @@ test.group('allBoards', () => {
     expect(data.boards).toHaveLength(1)
     expect(data.boards[0].id).toBe(board2.id)
     expect(data.boards[0].user.id).toBe(user2.id)
+  })
+
+  test('should omit deleted boards', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+
+    await createBoard(user.id)
+    await createBoard(user.id)
+    const { id } = await createBoard(user.id)
+    await dataSource.getRepository(Board).softDelete({ id })
+
+
+    const queryData = {
+      query: `
+        {
+          boards: allBoards {
+            id
+            user { id }
+          }
+        }
+      `,
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.boards).toHaveLength(2)
+    expect(data.boards).not.toContain(expect.arrayContaining([{ id }]))
+  })
+})
+
+test.group('allDeletedBoards', () => {
+  const AllDeletedBoardsQuery = `
+    {
+      boards: allDeletedBoards {
+        id
+      }
+    }
+  `
+
+  test('should throw error not authenticated', async ({ expect, client }) => {
+    const queryData = {
+      query: AllDeletedBoardsQuery,
+      variables: { id: -1 }
+    };
+
+    const response = await client.post('/').json(queryData)
+    const { data, errors } = response.body()
+
+    expect(data).toBeNull()
+    expect(errors).toBeDefined()
+    expect(errors).toHaveLength(1)
+    expect(errors[0].message).toBe('not authenticated')
+  })
+
+  test('should only include deleted boards', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+
+    await createBoard(user.id)
+    await createBoard(user.id)
+    const { id } = await createBoard(user.id)
+    await dataSource.getRepository(Board).softDelete({ id })
+
+    const queryData = {
+      query: AllDeletedBoardsQuery,
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.boards).toHaveLength(1)
+    expect(data.boards[0].id).toBe(id)
   })
 })
 

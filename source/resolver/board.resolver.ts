@@ -1,4 +1,5 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
+import { IsNull, Not } from "typeorm";
 import { Board } from "../entity";
 import { isAuth } from "../middlewares/isAuth";
 import { TContext } from '../types';
@@ -13,8 +14,27 @@ export class BoardResolver {
     return dataSource
       .getRepository(Board)
       .find({
+        // TODO: Make field resolver
         relations: { user: true },
         where: { userId: req.session.userId }
+      })
+  }
+
+  @UseMiddleware(isAuth)
+  @Query(() => [Board])
+  async allDeletedBoards(
+    @Ctx() { req, dataSource }: TContext
+  ): Promise<Board[]> {
+    return dataSource
+      .getRepository(Board)
+      .find({
+        // TODO: Make field resolver
+        relations: { user: true },
+        where: {
+          userId: req.session.userId,
+          deletedAt: Not(IsNull())
+        },
+        withDeleted: true
       })
   }
 
