@@ -21,5 +21,11 @@ describe('New Project', () => {
     cy.location('pathname').should('match', /\/projects\/\d+/)
     cy.contains(title)
     cy.contains(description)
+
+    // For good measure, assert that the created project
+    // is listed on the projects page
+    cy.visit('/projects')
+    cy.contains(title).should('be.visible')
+    cy.contains(description).should('be.visible')
   })
 })
