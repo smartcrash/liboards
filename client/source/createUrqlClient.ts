@@ -16,7 +16,7 @@ import {
   CreateUserMutation,
   CurrentUserDocument,
   CurrentUserQuery,
-  LoginWithPasswordMutation,
+  DeleteBoardMutation, LoginWithPasswordMutation,
   LogoutMutation
 } from "./generated/graphql";
 
@@ -24,7 +24,9 @@ function updateQuery<R extends DataFields, Q>(
   cache: Cache,
   queryInput: QueryInput,
   result: any,
-  fn: (result: R, query: Q) => Q
+  // The `data` may be null if the cache doesn't actually have
+  // enough locally cached information to fulfil the query
+  fn: (result: R, data: Q | null) => Q | null
 ) {
   return cache.updateQuery(
     queryInput,
@@ -80,7 +82,21 @@ export const createUrqlClient = () => createClient({
               // NOTE: This works under the assumpsion that the `allBoards` query
               // returns boards ordered by `createdAt`, this may change in the
               // future.
-              result, (result, data) => ({ boards: [result.board, ...data.boards] })
+              result, (result, data) => ({ boards: [result.board, ...(data?.boards || [])] })
+            )
+          },
+
+          deleteBoard: (result, args, cache, info) => {
+            // TODO: Check this
+            // cache.invalidate({
+            //   __typename: 'Board',
+            //   id: (args as DeleteBoardMutationVariables).id,
+            // });
+
+            updateQuery<DeleteBoardMutation, AllBoardsQuery>(
+              cache,
+              { query: AllBoardsDocument },
+              result, (result, data) => ({ boards: (data?.boards || []).filter((board) => board.id !== args.id) })
             )
           }
         },
