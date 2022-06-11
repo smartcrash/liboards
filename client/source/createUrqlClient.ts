@@ -12,12 +12,15 @@ import {
 import {
   AllBoardsDocument,
   AllBoardsQuery,
+  AllDeletedBoardsDocument,
+  AllDeletedBoardsQuery,
   CreateBoardMutation,
   CreateUserMutation,
   CurrentUserDocument,
   CurrentUserQuery,
-  DeleteBoardMutation, DeleteBoardMutationVariables, LoginWithPasswordMutation,
-  LogoutMutation
+  DeleteBoardMutation, DeleteBoardMutationVariables, FindBoardByIdDocument, LoginWithPasswordMutation,
+  LogoutMutation,
+  RestoreBoardMutation
 } from "./generated/graphql";
 
 function updateQuery<R extends DataFields, Q>(
@@ -87,17 +90,25 @@ export const createUrqlClient = () => createClient({
           },
 
           deleteBoard: (result, args, cache, info) => {
-            cache.invalidate({
-              __typename: 'Board',
-              id: (args as DeleteBoardMutationVariables).id,
-            });
+            cache.invalidate('Query', 'findBoardById', { id: args.id })
+            cache.invalidate('Query', 'allDeletedBoards')
 
             updateQuery<DeleteBoardMutation, AllBoardsQuery>(
               cache,
               { query: AllBoardsDocument },
               result, (result, data) => ({ boards: (data?.boards || []).filter((board) => board.id !== args.id) })
             )
-          }
+          },
+
+          restoreBoard: (result, args, cache, info) => {
+            cache.invalidate('Query', 'allBoards')
+
+            updateQuery<RestoreBoardMutation, AllDeletedBoardsQuery>(
+              cache,
+              { query: AllDeletedBoardsDocument },
+              result, (result, data) => ({ boards: (data?.boards || []).filter((board) => board.id !== args.id) })
+            )
+          },
         },
       },
     }),

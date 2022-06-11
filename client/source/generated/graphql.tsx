@@ -103,6 +103,7 @@ export type MutationUpdateBoardArgs = {
 export type Query = {
   __typename?: 'Query';
   allBoards: Array<Board>;
+  allDeletedBoards: Array<Board>;
   currentUser?: Maybe<User>;
   findBoardById?: Maybe<Board>;
 };
@@ -196,6 +197,11 @@ export type AllBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type AllBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any }> };
+
+export type AllDeletedBoardsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AllDeletedBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any }> };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -345,6 +351,21 @@ export const AllBoardsDocument = gql`
 
 export function useAllBoardsQuery(options?: Omit<Urql.UseQueryArgs<AllBoardsQueryVariables>, 'query'>) {
   return Urql.useQuery<AllBoardsQuery>({ query: AllBoardsDocument, ...options });
+};
+export const AllDeletedBoardsDocument = gql`
+    query AllDeletedBoards {
+  boards: allDeletedBoards {
+    id
+    title
+    description
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export function useAllDeletedBoardsQuery(options?: Omit<Urql.UseQueryArgs<AllDeletedBoardsQueryVariables>, 'query'>) {
+  return Urql.useQuery<AllDeletedBoardsQuery>({ query: AllDeletedBoardsDocument, ...options });
 };
 export const CurrentUserDocument = gql`
     query CurrentUser {
