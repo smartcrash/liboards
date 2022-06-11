@@ -1,5 +1,5 @@
 mutation UpdateBoard($id: Int!, $title: String, $description: String) {
   board: updateBoard(id: $id, title: $title, description: $description) {
-    id
+    ...BoardFragment
   }
 }

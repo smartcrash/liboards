@@ -1,9 +1,5 @@
 query AllDeletedBoards {
   boards: allDeletedBoards {
-    id
-    title
-    description
-    createdAt
-    updatedAt
+    ...BoardFragment
   }
 }

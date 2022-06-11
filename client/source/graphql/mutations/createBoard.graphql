@@ -1,9 +1,5 @@
 mutation CreateBoard($title: String!, $description: String) {
   board: createBoard(title: $title, description: $description) {
-    id
-    title
-    description
-    createdAt
-    updatedAt
+    ...BoardFragment
   }
 }

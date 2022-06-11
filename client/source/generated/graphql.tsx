@@ -123,6 +123,8 @@ export type User = {
   username: Scalars['String'];
 };
 
+export type BoardFragmentFragment = { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any };
+
 export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string };
 
 export type CreateBoardMutationVariables = Exact<{
@@ -191,7 +193,7 @@ export type UpdateBoardMutationVariables = Exact<{
 }>;
 
 
-export type UpdateBoardMutation = { __typename?: 'Mutation', board?: { __typename?: 'Board', id: number } | null };
+export type UpdateBoardMutation = { __typename?: 'Mutation', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any } | null };
 
 export type AllBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -215,6 +217,15 @@ export type FindBoardByIdQueryVariables = Exact<{
 
 export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } } | null };
 
+export const BoardFragmentFragmentDoc = gql`
+    fragment BoardFragment on Board {
+  id
+  title
+  description
+  createdAt
+  updatedAt
+}
+    `;
 export const UserFragmentFragmentDoc = gql`
     fragment UserFragment on User {
   id
@@ -227,14 +238,10 @@ export const UserFragmentFragmentDoc = gql`
 export const CreateBoardDocument = gql`
     mutation CreateBoard($title: String!, $description: String) {
   board: createBoard(title: $title, description: $description) {
-    id
-    title
-    description
-    createdAt
-    updatedAt
+    ...BoardFragment
   }
 }
-    `;
+    ${BoardFragmentFragmentDoc}`;
 
 export function useCreateBoardMutation() {
   return Urql.useMutation<CreateBoardMutation, CreateBoardMutationVariables>(CreateBoardDocument);
@@ -329,10 +336,10 @@ export function useSendResetPasswordEmailMutation() {
 export const UpdateBoardDocument = gql`
     mutation UpdateBoard($id: Int!, $title: String, $description: String) {
   board: updateBoard(id: $id, title: $title, description: $description) {
-    id
+    ...BoardFragment
   }
 }
-    `;
+    ${BoardFragmentFragmentDoc}`;
 
 export function useUpdateBoardMutation() {
   return Urql.useMutation<UpdateBoardMutation, UpdateBoardMutationVariables>(UpdateBoardDocument);
@@ -340,14 +347,10 @@ export function useUpdateBoardMutation() {
 export const AllBoardsDocument = gql`
     query AllBoards {
   boards: allBoards {
-    id
-    title
-    description
-    createdAt
-    updatedAt
+    ...BoardFragment
   }
 }
-    `;
+    ${BoardFragmentFragmentDoc}`;
 
 export function useAllBoardsQuery(options?: Omit<Urql.UseQueryArgs<AllBoardsQueryVariables>, 'query'>) {
   return Urql.useQuery<AllBoardsQuery>({ query: AllBoardsDocument, ...options });
@@ -355,14 +358,10 @@ export function useAllBoardsQuery(options?: Omit<Urql.UseQueryArgs<AllBoardsQuer
 export const AllDeletedBoardsDocument = gql`
     query AllDeletedBoards {
   boards: allDeletedBoards {
-    id
-    title
-    description
-    createdAt
-    updatedAt
+    ...BoardFragment
   }
 }
-    `;
+    ${BoardFragmentFragmentDoc}`;
 
 export function useAllDeletedBoardsQuery(options?: Omit<Urql.UseQueryArgs<AllDeletedBoardsQueryVariables>, 'query'>) {
   return Urql.useQuery<AllDeletedBoardsQuery>({ query: AllDeletedBoardsDocument, ...options });
