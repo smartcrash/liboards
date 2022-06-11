@@ -399,3 +399,92 @@ test.group('deletBoard', () => {
     expect(board.deletedAt).toBeNull()
   })
 })
+
+test.group('restoreBoard', () => {
+  test('should throw error not authenticated', async ({ expect, client }) => {
+    const queryData = {
+      query: `
+        mutation RestoreBoard($id: Int!) {
+          id: restoreBoard(id: $id)
+        }
+      `,
+      variables: { id: -1 }
+    };
+
+    const response = await client.post('/').json(queryData)
+    const { data, errors } = response.body()
+
+    expect(data.id).toBeNull()
+    expect(errors).toBeDefined()
+    expect(errors).toHaveLength(1)
+    expect(errors[0].message).toBe('not authenticated')
+  })
+
+  test('should restore deleted board', async ({ expect, client, createUser }) => {
+    const repository = dataSource.getRepository(Board)
+    const [user, cookie] = await createUser(client)
+
+    const { id } = await createBoard(user.id)
+    await repository.softDelete({ id })
+
+    // Ensure that is initialy deleted
+    expect((await repository.findOne({
+      where: { id },
+      withDeleted: true
+    })).deletedAt).not.toBeNull()
+
+    const queryData = {
+      query: `
+        mutation RestoreBoard($id: Int!) {
+          id: restoreBoard(id: $id)
+        }
+      `,
+      variables: { id }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.id).toBeDefined()
+    expect(data.id).toBe(id)
+
+    const board = await repository.findOneBy({ id })
+
+    expect(board).not.toBeNull()
+    expect(board.deletedAt).toBeNull()
+  })
+
+  test('should only be able to restore owned boards', async ({ expect, client, createUser }) => {
+    const repository = dataSource.getRepository(Board)
+    const [user] = await createUser(client)
+    const [, cookie] = await createUser(client)
+
+    const { id } = await createBoard(user.id)
+    await repository.softDelete({ id })
+
+    // Ensure that is initialy deleted
+    expect((await repository.findOne({
+      where: { id },
+      withDeleted: true
+    })).deletedAt).not.toBeNull()
+
+    const queryData = {
+      query: `
+        mutation RestoreBoard($id: Int!) {
+          id: restoreBoard(id: $id)
+        }
+      `,
+      variables: { id }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+
+    const board = await repository.findOne({
+      where: { id },
+      withDeleted: true
+    })
+
+    expect(board).not.toBeNull()
+    expect(board.deletedAt).not.toBeNull()
+  })
+})

@@ -92,4 +92,17 @@ export class BoardResolver {
 
     return board.id
   }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => Int, { nullable: true })
+  async restoreBoard(
+    @Arg('id', () => Int) id: number,
+    @Ctx() { req, dataSource }: TContext
+  ): Promise<number | null> {
+    const { userId } = req.session
+
+    await dataSource.getRepository(Board).restore({ id, userId })
+
+    return id
+  }
 }

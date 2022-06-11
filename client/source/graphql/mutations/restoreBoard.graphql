@@ -1,0 +1,3 @@
+mutation RestoreBoard($id: Int!) {
+  id: restoreBoard(id: $id)
+}

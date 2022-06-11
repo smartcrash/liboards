@@ -26,6 +26,7 @@ export type AuthenticationResponse = {
 export type Board = {
   __typename?: 'Board';
   createdAt: Scalars['DateTime'];
+  deletedAt: Scalars['DateTime'];
   description: Scalars['String'];
   id: Scalars['Float'];
   title: Scalars['String'];
@@ -43,9 +44,11 @@ export type Mutation = {
   __typename?: 'Mutation';
   createBoard: Board;
   createUser: AuthenticationResponse;
+  deleteBoard?: Maybe<Scalars['Int']>;
   loginWithPassword: AuthenticationResponse;
   logout: Scalars['Boolean'];
   resetPassword: AuthenticationResponse;
+  restoreBoard?: Maybe<Scalars['Int']>;
   sendResetPasswordEmail: Scalars['Boolean'];
   updateBoard?: Maybe<Board>;
 };
@@ -64,6 +67,11 @@ export type MutationCreateUserArgs = {
 };
 
 
+export type MutationDeleteBoardArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationLoginWithPasswordArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -73,6 +81,11 @@ export type MutationLoginWithPasswordArgs = {
 export type MutationResetPasswordArgs = {
   newPassword: Scalars['String'];
   token: Scalars['String'];
+};
+
+
+export type MutationRestoreBoardArgs = {
+  id: Scalars['Int'];
 };
 
 
@@ -128,6 +141,13 @@ export type CreateUserMutationVariables = Exact<{
 
 export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null } };
 
+export type DeleteBoardMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type DeleteBoardMutation = { __typename?: 'Mutation', id?: number | null };
+
 export type LoginWithPasswordMutationVariables = Exact<{
   password: Scalars['String'];
   email: Scalars['String'];
@@ -148,6 +168,13 @@ export type ResetPasswordMutationVariables = Exact<{
 
 
 export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null } };
+
+export type RestoreBoardMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type RestoreBoardMutation = { __typename?: 'Mutation', id?: number | null };
 
 export type SendResetPasswordEmailMutationVariables = Exact<{
   email: Scalars['String'];
@@ -223,6 +250,15 @@ export const CreateUserDocument = gql`
 export function useCreateUserMutation() {
   return Urql.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument);
 };
+export const DeleteBoardDocument = gql`
+    mutation DeleteBoard($id: Int!) {
+  id: deleteBoard(id: $id)
+}
+    `;
+
+export function useDeleteBoardMutation() {
+  return Urql.useMutation<DeleteBoardMutation, DeleteBoardMutationVariables>(DeleteBoardDocument);
+};
 export const LoginWithPasswordDocument = gql`
     mutation LoginWithPassword($password: String!, $email: String!) {
   loginWithPassword(password: $password, email: $email) {
@@ -265,6 +301,15 @@ export const ResetPasswordDocument = gql`
 
 export function useResetPasswordMutation() {
   return Urql.useMutation<ResetPasswordMutation, ResetPasswordMutationVariables>(ResetPasswordDocument);
+};
+export const RestoreBoardDocument = gql`
+    mutation RestoreBoard($id: Int!) {
+  id: restoreBoard(id: $id)
+}
+    `;
+
+export function useRestoreBoardMutation() {
+  return Urql.useMutation<RestoreBoardMutation, RestoreBoardMutationVariables>(RestoreBoardDocument);
 };
 export const SendResetPasswordEmailDocument = gql`
     mutation SendResetPasswordEmail($email: String!) {
