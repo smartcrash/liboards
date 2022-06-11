@@ -62,7 +62,7 @@ export class BoardResolver {
     @Arg('title', () => String, { nullable: true }) title: string | null,
     @Arg('description', () => String, { nullable: true }) description: string | null,
     @Ctx() { req, dataSource }: TContext
-  ): Promise<Board | undefined> {
+  ): Promise<Board | null> {
     const { userId } = req.session
     const repository = dataSource.getRepository(Board)
 
@@ -76,5 +76,20 @@ export class BoardResolver {
     await repository.save(board)
 
     return board
+  }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => Int, { nullable: true })
+  async deleteBoard(
+    @Arg('id', () => Int) id: number,
+    @Ctx() { req, dataSource }: TContext
+  ): Promise<number | null> {
+    const { userId } = req.session
+    const repository = dataSource.getRepository(Board)
+    const board = await repository.findOneBy({ id, userId })
+
+    await repository.softDelete({ id, userId })
+
+    return board.id
   }
 }

@@ -1,5 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./User";
 
 @ObjectType()
@@ -31,4 +31,8 @@ export class Board {
   @Field()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Field()
+  @DeleteDateColumn()
+  deletedAt: Date
 }

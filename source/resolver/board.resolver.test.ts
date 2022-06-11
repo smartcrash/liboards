@@ -323,3 +323,79 @@ test.group('updateBoard', () => {
     expect(board.description).toBe(board1.description) // It should not have changed
   })
 })
+
+test.group('deletBoard', () => {
+  test('should throw error not authenticated', async ({ expect, client }) => {
+    const queryData = {
+      query: `
+        mutation DeleteBoard($id: Int!) {
+          id: deleteBoard(id: $id)
+        }
+      `,
+      variables: { id: -1 }
+    };
+
+    const response = await client.post('/').json(queryData)
+    const { data, errors } = response.body()
+
+    expect(data.id).toBeNull()
+    expect(errors).toBeDefined()
+    expect(errors).toHaveLength(1)
+    expect(errors[0].message).toBe('not authenticated')
+  })
+
+  test('should soft delete board', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+
+    const { id } = await createBoard(user.id)
+
+    const queryData = {
+      query: `
+        mutation DeleteBoard($id: Int!) {
+          id: deleteBoard(id: $id)
+        }
+      `,
+      variables: { id }
+    };
+
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.id).toBeDefined()
+    expect(data.id).toBe(id)
+
+    const board = await dataSource.getRepository(Board).findOne({ where: { id }, withDeleted: true })
+
+    expect(board).not.toBeNull()
+    expect(board.deletedAt).toBeDefined()
+    expect(board.deletedAt.toDateString()).toBe(new Date().toDateString())
+  })
+
+  test('should not be able to delete someone else\'s board', async ({ expect, client, createUser }) => {
+    const [user1] = await createUser(client)
+    const [, cookie] = await createUser(client)
+
+    const { id } = await createBoard(user1.id)
+
+    const queryData = {
+      query: `
+        mutation DeleteBoard($id: Int!) {
+          id: deleteBoard(id: $id)
+        }
+      `,
+      variables: { id }
+    };
+
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.id).toBeNull()
+
+    const board = await dataSource.getRepository(Board).findOne({ where: { id }, withDeleted: true })
+
+    expect(board).toBeDefined()
+    expect(board.deletedAt).toBeNull()
+  })
+})
