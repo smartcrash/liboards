@@ -16,7 +16,7 @@ import {
   CreateUserMutation,
   CurrentUserDocument,
   CurrentUserQuery,
-  DeleteBoardMutation, LoginWithPasswordMutation,
+  DeleteBoardMutation, DeleteBoardMutationVariables, LoginWithPasswordMutation,
   LogoutMutation
 } from "./generated/graphql";
 
@@ -87,11 +87,10 @@ export const createUrqlClient = () => createClient({
           },
 
           deleteBoard: (result, args, cache, info) => {
-            // TODO: Check this
-            // cache.invalidate({
-            //   __typename: 'Board',
-            //   id: (args as DeleteBoardMutationVariables).id,
-            // });
+            cache.invalidate({
+              __typename: 'Board',
+              id: (args as DeleteBoardMutationVariables).id,
+            });
 
             updateQuery<DeleteBoardMutation, AllBoardsQuery>(
               cache,
