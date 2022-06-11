@@ -11,13 +11,9 @@ export class BoardResolver {
   async allBoards(
     @Ctx() { req, dataSource }: TContext
   ): Promise<Board[]> {
-    return dataSource
-      .getRepository(Board)
-      .find({
-        // TODO: Make field resolver
-        relations: { user: true },
-        where: { userId: req.session.userId }
-      })
+    const { userId } = req.session
+
+    return dataSource.getRepository(Board).findBy({ userId })
   }
 
   @UseMiddleware(isAuth)
@@ -25,14 +21,14 @@ export class BoardResolver {
   async allDeletedBoards(
     @Ctx() { req, dataSource }: TContext
   ): Promise<Board[]> {
+    const { userId } = req.session
+
     return dataSource
       .getRepository(Board)
       .find({
-        // TODO: Make field resolver
-        relations: { user: true },
         where: {
-          userId: req.session.userId,
-          deletedAt: Not(IsNull())
+          userId,
+          deletedAt: Not(IsNull()),
         },
         withDeleted: true
       })

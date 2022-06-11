@@ -1,4 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
+import { TypeormLoader } from "type-graphql-dataloader";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./User";
 
@@ -22,6 +23,7 @@ export class Board {
 
   @Field(() => User)
   @ManyToOne(() => User, user => user.boards)
+  @TypeormLoader()
   user: User
 
   @Field()

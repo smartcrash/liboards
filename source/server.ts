@@ -13,6 +13,7 @@ import { NODE_ENV, PORT, SESSION_COOKIE } from './constants';
 import { dataSource } from './dataSource';
 import { redisClient } from './redisClient';
 import { TContext } from './types';
+import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
 
 async function createServer() {
   const app = express();
@@ -54,7 +55,10 @@ async function createServer() {
 
   const server = new ApolloServer({
     schema,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      ApolloServerLoaderPlugin({ typeormGetConnection: () => dataSource })
+    ],
     context: ({ req, res }) => ({ req, res, dataSource, redisClient } as TContext)
   });
 
