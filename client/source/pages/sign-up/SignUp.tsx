@@ -19,14 +19,23 @@ export const SignUp = () => {
     control,
     formState: { isSubmitting },
   } = useForm<FieldValues>({});
-  const onSubmit = handleSubmit(async ({ username, email, password }) => {
-    const response = await createUser(username, email, password);
+  const onSubmit = handleSubmit(
+    async ({ username, email, password, passwordConfirm }) => {
+      if (password !== passwordConfirm) {
+        setError("passwordConfirm", { message: "Passwords must match." });
+        return;
+      }
 
-    if (response?.errors?.length) {
-      const { errors } = response;
-      errors.forEach(({ field, message }: any) => setError(field, { message }));
+      const response = await createUser(username, email, password);
+
+      if (response?.errors?.length) {
+        const { errors } = response;
+        errors.forEach(({ field, message }: any) =>
+          setError(field, { message })
+        );
+      }
     }
-  });
+  );
 
   return (
     <Container pt={{ base: 16, sm: 24 }} pb={10} px={6}>
