@@ -1,17 +1,21 @@
-import { Button, ButtonProps } from "@chakra-ui/react";
+import {
+  forwardRef,
+  Link as ChakraLink,
+  LinkProps as ChakraLinkProps,
+} from "@chakra-ui/react";
 import { Link as RouterLink, To } from "react-router-dom";
 
-interface LinkProps extends ButtonProps {
+interface LinkProps extends ChakraLinkProps {
   reloadDocument?: boolean;
   replace?: boolean;
   state?: any;
   to: To;
 }
 
-export const Link = ({ children, ...props }: LinkProps) => {
+export const Link = forwardRef(({ children, ...props }: LinkProps, ref) => {
   return (
-    <Button as={RouterLink} variant={"link"} {...props}>
+    <ChakraLink as={RouterLink} ref={ref} {...props}>
       {children}
-    </Button>
+    </ChakraLink>
   );
-};
+});
