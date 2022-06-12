@@ -54,7 +54,6 @@ export const Login = () => {
           <Spacer />
         </Hide>
 
-        {/* Form */}
         <VStack
           as={"form"}
           onSubmit={onSubmit}
