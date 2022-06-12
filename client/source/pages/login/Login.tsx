@@ -69,7 +69,6 @@ export const Login = () => {
           >
             <Box flexGrow={1}>
               <Input
-                type={"email"}
                 autoComplete={"email"}
                 label={"Username or email"}
                 placeholder={"Enter your username or email"}

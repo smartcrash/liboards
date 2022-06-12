@@ -90,10 +90,11 @@ export class AuthenticationResolver {
     @Arg('password') password: string,
     @Ctx() { req, dataSource }: TContext
   ): Promise<AuthenticationResponse> {
-    const user = await dataSource.getRepository(User).findOneBy({ email })
+    const repository = dataSource.getRepository(User)
+    const user = await repository.findOne({ where: [{ email }, { username: email }] })
 
     if (!user) {
-      return { errors: [{ field: 'email', message: "This email does\'nt exists." }] }
+      return { errors: [{ field: 'email', message: "This user does\'nt exists." }] }
     }
 
     if (!(await verify(user.password, password))) {

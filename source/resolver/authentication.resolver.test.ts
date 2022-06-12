@@ -165,7 +165,7 @@ test.group('loginWithPassword', () => {
     expect(data.loginWithPassword.errors).not.toBeNull()
     expect(data.loginWithPassword.errors).toHaveLength(1)
     expect(data.loginWithPassword.errors[0].field).toBe('email')
-    expect(data.loginWithPassword.errors[0].message).toBe("This email does\'nt exists.")
+    expect(data.loginWithPassword.errors[0].message).toBe("This user does\'nt exists.")
   })
 
   test('should return error if password is incorrect', async ({ expect, client }) => {
