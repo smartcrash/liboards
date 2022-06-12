@@ -6,13 +6,15 @@ import {
   AlertTitle,
   Box,
   Button,
-  Container,
+  ButtonGroup,
   Heading,
   Stack,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { Input, Link } from "../../components";
+import { Link } from "react-router-dom";
+import { Container, Input } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
 import { route } from "../../routes";
 
@@ -34,64 +36,95 @@ export const ForgotPassword = () => {
 
   return (
     <Container
-      maxW={"lg"}
-      py={{ base: "12", md: "24" }}
-      px={{ base: "4", sm: "8" }}
+      pt={{ base: "12", md: "24" }}
+      px={6}
+      w={"full"}
+      maxW={"2xl"}
+      mx={"auto"}
     >
       {!isSubmitSuccessful ? (
         <>
-          <Stack spacing={8}>
-            <Stack spacing={3}>
-              <Heading size={"lg"}>Forgot password?</Heading>
+          <Stack spacing={10}>
+            <VStack
+              alignItems={"stretch"}
+              textAlign={{ base: "left", sm: "center" }}
+              spacing={6}
+            >
+              <Heading fontSize={{ base: "4xl", sm: "4xl" }}>
+                Forgot password?
+              </Heading>
               <Text color={"gray.500"}>
                 No worries, enter the email associated with your account and
                 we'll send you the instructions to reset your password.
               </Text>
-            </Stack>
+            </VStack>
 
-            <Box as={"form"} onSubmit={onSubmit}>
-              <Stack spacing={6}>
-                <Input
-                  type={"email"}
-                  label={"Email"}
-                  autoComplete={"email"}
-                  placeholder={"Enter your email"}
-                  name={"email"}
-                  control={control}
-                  rules={{ required: true }}
-                  data-testid={"email"}
-                />
+            <VStack
+              as={"form"}
+              onSubmit={onSubmit}
+              spacing={8}
+              alignItems={"stretch"}
+            >
+              <Input
+                type={"email"}
+                label={"Email"}
+                autoComplete={"email"}
+                placeholder={"Enter your email"}
+                size={"lg"}
+                name={"email"}
+                control={control}
+                rules={{ required: true }}
+                data-testid={"email"}
+              />
 
+              <ButtonGroup flexDir={"column"} spacing={0} rowGap={3}>
                 <Button
                   isLoading={isSubmitting}
                   type={"submit"}
                   data-testid={"submit"}
+                  size={"lg"}
                 >
                   Reset password
                 </Button>
 
-                <Link
-                  leftIcon={<ArrowBackIcon />}
+                <Button
+                  as={Link}
                   to={route("login")}
+                  leftIcon={<ArrowBackIcon />}
                   colorScheme={"gray"}
                 >
                   Back to log in
-                </Link>
-              </Stack>
-            </Box>
+                </Button>
+              </ButtonGroup>
+            </VStack>
           </Stack>
         </>
       ) : (
         <>
           <Stack spacing={8}>
-            <Alert
+            <Heading>Check your email!</Heading>
+            <Text>
+              We have sent a password recover instruccions to your email.
+              <br />
+              Did not receive the email? Check your spam filter, or{" "}
+              <Button
+                variant={"link"}
+                color={"gray.800"}
+                onClick={() => reset()}
+              >
+                try another email address.
+              </Button>
+            </Text>
+
+            {/* <Alert
               status={"success"}
-              variant={"subtle"}
+              variant={"solid"}
               flexDirection={"column"}
               alignItems={"center"}
               justifyContent={"center"}
               textAlign={"center"}
               height={"200px"}
+              borderRadius={"2xl"}
             >
               <AlertIcon boxSize={"40px"} />
               <AlertTitle mt={6} mb={1} fontSize={"lg"}>
@@ -102,17 +135,7 @@ export const ForgotPassword = () => {
               </AlertDescription>
             </Alert>
 
-            <Text fontSize={"sm"} textAlign={"center"} color={"gray.500"}>
-              Did not receive the email? Check your spam filter, or
-              <Button
-                variant={"link"}
-                colorScheme={"gray"}
-                size={"sm"}
-                onClick={() => reset()}
-              >
-                try another email address.
-              </Button>
-            </Text>
+            */}
           </Stack>
         </>
       )}
