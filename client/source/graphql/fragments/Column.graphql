@@ -1,0 +1,8 @@
+fragment ColumnFragment on Column {
+  id
+  title
+  index
+  cards {
+    ...CardFragment
+  }
+}

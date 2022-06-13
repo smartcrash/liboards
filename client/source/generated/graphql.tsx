@@ -25,6 +25,7 @@ export type AuthenticationResponse = {
 
 export type Board = {
   __typename?: 'Board';
+  columns: Array<Column>;
   createdAt: Scalars['DateTime'];
   deletedAt: Scalars['DateTime'];
   description: Scalars['String'];
@@ -32,6 +33,22 @@ export type Board = {
   title: Scalars['String'];
   updatedAt: Scalars['DateTime'];
   user: User;
+};
+
+export type Card = {
+  __typename?: 'Card';
+  content: Scalars['String'];
+  id: Scalars['Float'];
+  index: Scalars['Float'];
+  title: Scalars['String'];
+};
+
+export type Column = {
+  __typename?: 'Column';
+  cards: Array<Card>;
+  id: Scalars['Float'];
+  index: Scalars['Float'];
+  title: Scalars['String'];
 };
 
 export type FieldError = {
@@ -42,20 +59,41 @@ export type FieldError = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addColumn?: Maybe<Column>;
   createBoard: Board;
+  createCard?: Maybe<Card>;
   createUser: AuthenticationResponse;
   deleteBoard?: Maybe<Scalars['Int']>;
+  deleteCard?: Maybe<Scalars['Int']>;
+  deleteColumn?: Maybe<Scalars['Int']>;
   loginWithPassword: AuthenticationResponse;
   logout: Scalars['Boolean'];
   resetPassword: AuthenticationResponse;
   restoreBoard?: Maybe<Scalars['Int']>;
   sendResetPasswordEmail: Scalars['Boolean'];
   updateBoard?: Maybe<Board>;
+  updateCard?: Maybe<Card>;
+  updateColumn?: Maybe<Column>;
+};
+
+
+export type MutationAddColumnArgs = {
+  boardId: Scalars['Int'];
+  index?: InputMaybe<Scalars['Int']>;
+  title: Scalars['String'];
 };
 
 
 export type MutationCreateBoardArgs = {
   description?: InputMaybe<Scalars['String']>;
+  title: Scalars['String'];
+};
+
+
+export type MutationCreateCardArgs = {
+  columnId: Scalars['Int'];
+  content?: InputMaybe<Scalars['String']>;
+  index?: InputMaybe<Scalars['Int']>;
   title: Scalars['String'];
 };
 
@@ -68,6 +106,16 @@ export type MutationCreateUserArgs = {
 
 
 export type MutationDeleteBoardArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationDeleteCardArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationDeleteColumnArgs = {
   id: Scalars['Int'];
 };
 
@@ -100,6 +148,21 @@ export type MutationUpdateBoardArgs = {
   title?: InputMaybe<Scalars['String']>;
 };
 
+
+export type MutationUpdateCardArgs = {
+  content?: InputMaybe<Scalars['String']>;
+  id: Scalars['Int'];
+  index?: InputMaybe<Scalars['Int']>;
+  title?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateColumnArgs = {
+  id: Scalars['Int'];
+  index?: InputMaybe<Scalars['Int']>;
+  title?: InputMaybe<Scalars['String']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   allBoards: Array<Board>;
@@ -125,7 +188,20 @@ export type User = {
 
 export type BoardFragmentFragment = { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any };
 
+export type CardFragmentFragment = { __typename?: 'Card', id: number, title: string, content: string, index: number };
+
+export type ColumnFragmentFragment = { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, content: string, index: number }> };
+
 export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string };
+
+export type AddColumnMutationVariables = Exact<{
+  boardId: Scalars['Int'];
+  title: Scalars['String'];
+  index?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type AddColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, content: string, index: number }> } | null };
 
 export type CreateBoardMutationVariables = Exact<{
   title: Scalars['String'];
@@ -215,7 +291,7 @@ export type FindBoardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } } | null };
+export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any, columns: Array<{ __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, content: string, index: number }> }>, user: { __typename?: 'User', id: number, username: string } } | null };
 
 export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
@@ -226,6 +302,24 @@ export const BoardFragmentFragmentDoc = gql`
   updatedAt
 }
     `;
+export const CardFragmentFragmentDoc = gql`
+    fragment CardFragment on Card {
+  id
+  title
+  content
+  index
+}
+    `;
+export const ColumnFragmentFragmentDoc = gql`
+    fragment ColumnFragment on Column {
+  id
+  title
+  index
+  cards {
+    ...CardFragment
+  }
+}
+    ${CardFragmentFragmentDoc}`;
 export const UserFragmentFragmentDoc = gql`
     fragment UserFragment on User {
   id
@@ -235,6 +329,17 @@ export const UserFragmentFragmentDoc = gql`
   updatedAt
 }
     `;
+export const AddColumnDocument = gql`
+    mutation AddColumn($boardId: Int!, $title: String!, $index: Int) {
+  column: addColumn(boardId: $boardId, title: $title, index: $index) {
+    ...ColumnFragment
+  }
+}
+    ${ColumnFragmentFragmentDoc}`;
+
+export function useAddColumnMutation() {
+  return Urql.useMutation<AddColumnMutation, AddColumnMutationVariables>(AddColumnDocument);
+};
 export const CreateBoardDocument = gql`
     mutation CreateBoard($title: String!, $description: String) {
   board: createBoard(title: $title, description: $description) {
@@ -383,6 +488,9 @@ export const FindBoardByIdDocument = gql`
     id
     title
     description
+    columns {
+      ...ColumnFragment
+    }
     user {
       id
       username
@@ -391,7 +499,7 @@ export const FindBoardByIdDocument = gql`
     updatedAt
   }
 }
-    `;
+    ${ColumnFragmentFragmentDoc}`;
 
 export function useFindBoardByIdQuery(options: Omit<Urql.UseQueryArgs<FindBoardByIdQueryVariables>, 'query'>) {
   return Urql.useQuery<FindBoardByIdQuery>({ query: FindBoardByIdDocument, ...options });
