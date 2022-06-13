@@ -3,7 +3,6 @@ import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-gra
 import { v4 as uuid } from 'uuid';
 import { z, ZodError } from 'zod';
 import { SESSION_COOKIE } from '../constants';
-import { dataSource } from '../dataSource';
 import { User } from "../entity";
 import { redisClient } from '../redisClient';
 import { UserRepository } from '../repository';
@@ -29,8 +28,12 @@ class AuthenticationResponse {
 @Resolver()
 export class AuthenticationResolver {
   @Query(() => User, { nullable: true })
-  async currentUser(@Ctx() { user }: ContextType): Promise<User> {
-    return user
+  async currentUser(@Ctx() { req }: ContextType): Promise<User> {
+    const { userId } = req.session
+
+    return userId ?
+      UserRepository.findOneBy({ id: userId })
+      : null
   }
 
   @Mutation(() => AuthenticationResponse)
