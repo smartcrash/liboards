@@ -1,4 +1,6 @@
 import { faker } from "@faker-js/faker"
+import { ApiResponse } from "@japa/api-client"
+import { Expect } from "@japa/expect"
 import { test } from "@japa/runner"
 import { dataSource } from "../dataSource"
 import { Board, Card, Column } from "../entity"
@@ -51,4 +53,12 @@ export const testThrowsIfNotAuthenticated = (queryData: string | object) => {
     expect(errors).toHaveLength(1)
     expect(errors[0].message).toBe('not authenticated')
   })
+}
+
+export const assertIsUnauthorizedError = ({ response, expect }: { response: ApiResponse, expect: Expect }) => {
+  const { errors } = response.body()
+
+  expect(errors).toBeDefined()
+  expect(errors).toHaveLength(1)
+  expect(errors[0].message).toBe('Not authorized')
 }

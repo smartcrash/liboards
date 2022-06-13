@@ -1,11 +1,13 @@
 import { verify } from 'argon2';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-graphql";
+import { v4 as uuid } from 'uuid';
 import { z, ZodError } from 'zod';
 import { SESSION_COOKIE } from '../constants';
+import { dataSource } from '../dataSource';
 import { User } from "../entity";
+import { redisClient } from '../redisClient';
 import { sendMail } from '../sendMail';
-import { TContext } from '../types';
-import { v4 as uuid } from 'uuid'
+import { ContextType } from '../types';
 
 @ObjectType()
 class FieldError {
@@ -26,7 +28,7 @@ class AuthenticationResponse {
 @Resolver()
 export class AuthenticationResolver {
   @Query(() => User, { nullable: true })
-  currentUser(@Ctx() { req, dataSource }: TContext): Promise<User> {
+  currentUser(@Ctx() { req }: ContextType): Promise<User> {
     const id = req.session.userId
     const repository = dataSource.getRepository(User)
 
@@ -39,7 +41,7 @@ export class AuthenticationResolver {
     @Arg('username') username: string,
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { req }: ContextType
   ): Promise<AuthenticationResponse> {
     const repository = dataSource.getRepository(User)
     const errors: FieldError[] = []
@@ -88,7 +90,7 @@ export class AuthenticationResolver {
   async loginWithPassword(
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { req }: ContextType
   ): Promise<AuthenticationResponse> {
     const repository = dataSource.getRepository(User)
     const user = await repository.findOne({ where: [{ email }, { username: email }] })
@@ -109,7 +111,6 @@ export class AuthenticationResolver {
   @Mutation(() => Boolean)
   async sendResetPasswordEmail(
     @Arg('email') email: string,
-    @Ctx() { redisClient, dataSource }: TContext
   ): Promise<Boolean> {
     const repository = dataSource.getRepository(User)
     const user = await repository.findOneBy({ email })
@@ -137,7 +138,6 @@ export class AuthenticationResolver {
   async resetPassword(
     @Arg('token') token: string,
     @Arg('newPassword') newPassword: string,
-    @Ctx() { redisClient, dataSource }: TContext
   ): Promise<AuthenticationResponse> {
     const userId = await redisClient.get(`password_resets:${token}`)
 
@@ -168,7 +168,7 @@ export class AuthenticationResolver {
 
   @Mutation(() => Boolean)
   async logout(
-    @Ctx() { req, res }: TContext
+    @Ctx() { req, res }: ContextType
   ): Promise<boolean> {
     await new Promise<any>((resolve) => req.session.destroy(resolve))
     res.clearCookie(SESSION_COOKIE)

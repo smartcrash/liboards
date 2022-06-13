@@ -1,15 +1,16 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import { IsNull, Not } from "typeorm";
+import { dataSource } from "../dataSource";
 import { Board } from "../entity";
 import { Authenticate } from "../middlewares/Authenticate";
-import { TContext } from '../types';
+import { ContextType } from '../types';
 
 @Resolver(Board)
 export class BoardResolver {
   @UseMiddleware(Authenticate)
   @Query(() => [Board])
   async allBoards(
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { req }: ContextType
   ): Promise<Board[]> {
     const { userId } = req.session
 
@@ -19,7 +20,7 @@ export class BoardResolver {
   @UseMiddleware(Authenticate)
   @Query(() => [Board])
   async allDeletedBoards(
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { req }: ContextType
   ): Promise<Board[]> {
     const { userId } = req.session
 
@@ -38,7 +39,7 @@ export class BoardResolver {
   @Query(() => Board, { nullable: true })
   async findBoardById(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { req }: ContextType
   ): Promise<Board> {
     const { userId } = req.session
 
@@ -55,7 +56,7 @@ export class BoardResolver {
   async createBoard(
     @Arg('title') title: string,
     @Arg('description', () => String, { nullable: true }) description: string,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { req }: ContextType
   ): Promise<Board> {
     const { userId } = req.session
     const repository = dataSource.getRepository(Board)
@@ -77,7 +78,7 @@ export class BoardResolver {
     @Arg('id', () => Int) id: number,
     @Arg('title', () => String, { nullable: true }) title: string | null,
     @Arg('description', () => String, { nullable: true }) description: string | null,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { req }: ContextType
   ): Promise<Board | null> {
     const { userId } = req.session
     const repository = dataSource.getRepository(Board)
@@ -98,7 +99,7 @@ export class BoardResolver {
   @Mutation(() => Int, { nullable: true })
   async deleteBoard(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { req }: ContextType
   ): Promise<number | null> {
     const { userId } = req.session
     const repository = dataSource.getRepository(Board)
@@ -113,7 +114,7 @@ export class BoardResolver {
   @Mutation(() => Int, { nullable: true })
   async restoreBoard(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { req }: ContextType
   ): Promise<number | null> {
     const { userId } = req.session
 

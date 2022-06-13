@@ -1,7 +1,8 @@
 import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import { dataSource } from "../dataSource";
 import { Card, Column } from "../entity";
 import { Authenticate } from "../middlewares/Authenticate";
-import { TContext } from "../types";
+import { ContextType } from "../types";
 
 @Resolver(Card)
 export class CardResolver {
@@ -12,7 +13,7 @@ export class CardResolver {
     @Arg('title') title: string,
     @Arg('content', { nullable: true }) content: string | null,
     @Arg('index', () => Int, { nullable: true }) index: number = 0,
-    @Ctx() { req, dataSource }: TContext): Promise<Card | null> {
+    @Ctx() { req }: ContextType): Promise<Card | null> {
     const { userId } = req.session
     const column = await dataSource
       .getRepository(Column)
@@ -42,7 +43,7 @@ export class CardResolver {
     @Arg('title', { nullable: true }) title: string | null,
     @Arg('content', { nullable: true }) content: string | null,
     @Arg('index', () => Int, { nullable: true }) index: number | null,
-    @Ctx() { req, dataSource }: TContext): Promise<Card | null> {
+    @Ctx() { req }: ContextType): Promise<Card | null> {
     const { userId } = req.session
     const card = await dataSource.getRepository(Card).findOneBy({ id })
 
@@ -70,7 +71,7 @@ export class CardResolver {
   @Mutation(() => Int, { nullable: true })
   async deleteCard(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req, dataSource }: TContext): Promise<number | null> {
+    @Ctx() { req }: ContextType): Promise<number | null> {
     const { userId } = req.session
     const card = await dataSource.getRepository(Card).findOneBy({ id })
 

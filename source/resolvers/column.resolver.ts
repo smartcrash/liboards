@@ -1,8 +1,9 @@
 
 import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import { dataSource } from "../dataSource";
 import { Board, Column } from "../entity";
 import { Authenticate } from "../middlewares/Authenticate";
-import { TContext } from "../types";
+import { ContextType } from "../types";
 
 @Resolver(Column)
 export class ColumnResolver {
@@ -12,7 +13,7 @@ export class ColumnResolver {
     @Arg('boardId', () => Int) boardId: number,
     @Arg('title') title: string,
     @Arg('index', () => Int, { nullable: true }) index: number = 0,
-    @Ctx() { req, dataSource }: TContext): Promise<Column | null> {
+    @Ctx() { req }: ContextType): Promise<Column | null> {
     const { userId } = req.session
     const board = await dataSource.getRepository(Board).findOneBy({ id: boardId, createdById: userId })
 
@@ -35,7 +36,7 @@ export class ColumnResolver {
     @Arg('id', () => Int) id: number,
     @Arg('title', { nullable: true }) title: string | null,
     @Arg('index', () => Int, { nullable: true }) index: number | null,
-    @Ctx() { req, dataSource }: TContext): Promise<Column | null> {
+    @Ctx() { req }: ContextType): Promise<Column | null> {
     const { userId } = req.session
     const repository = dataSource.getRepository(Column)
     const column = await repository.findOne({ where: { id }, relations: ['board'] })
@@ -54,7 +55,7 @@ export class ColumnResolver {
   @Mutation(() => Int, { nullable: null })
   async deleteColumn(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req, dataSource }: TContext): Promise<number | null> {
+    @Ctx() { req }: ContextType): Promise<number | null> {
     const { userId } = req.session
     const repository = dataSource.getRepository(Column)
     const column = await repository.findOne({ where: { id }, relations: ['board'] })
