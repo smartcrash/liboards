@@ -3,20 +3,7 @@ import { test } from '@japa/runner';
 import { SESSION_COOKIE } from '../constants';
 import { dataSource } from '../dataSource';
 import { Board } from '../entity';
-
-const createBoard = async (userId: number): Promise<Board> => {
-  const repository = dataSource.getRepository(Board)
-
-  const board = new Board()
-
-  board.title = faker.lorem.words()
-  board.description = faker.lorem.paragraphs()
-  board.userId = userId
-
-  await repository.save(board)
-
-  return board
-}
+import { createRandomBoard } from '../utils/testUtils';
 
 test.group('createBoard', () => {
   test('should throw error not authenticated', async ({ expect, client }) => {
@@ -109,8 +96,8 @@ test.group('allBoards', () => {
     const [user1] = await createUser(client)
     const [user2, cookie] = await createUser(client)
 
-    const _ = await createBoard(user1.id)
-    const board2 = await createBoard(user2.id)
+    const _ = await createRandomBoard(user1.id)
+    const board2 = await createRandomBoard(user2.id)
 
     const queryData = {
       query: `
@@ -134,9 +121,9 @@ test.group('allBoards', () => {
   test('should omit deleted boards', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
 
-    await createBoard(user.id)
-    await createBoard(user.id)
-    const { id } = await createBoard(user.id)
+    await createRandomBoard(user.id)
+    await createRandomBoard(user.id)
+    const { id } = await createRandomBoard(user.id)
     await dataSource.getRepository(Board).softDelete({ id })
 
 
@@ -186,9 +173,9 @@ test.group('allDeletedBoards', () => {
   test('should only include deleted boards', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
 
-    await createBoard(user.id)
-    await createBoard(user.id)
-    const { id } = await createBoard(user.id)
+    await createRandomBoard(user.id)
+    await createRandomBoard(user.id)
+    const { id } = await createRandomBoard(user.id)
     await dataSource.getRepository(Board).softDelete({ id })
 
     const queryData = {
@@ -227,7 +214,7 @@ test.group('findBoardById', () => {
 
   test('should return single board', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id, title, description } = await createBoard(user.id)
+    const { id, title, description } = await createRandomBoard(user.id)
 
     const queryData = {
       query: `
@@ -258,7 +245,7 @@ test.group('findBoardById', () => {
   test('should return `null` if it was not created by the user', async ({ expect, client, createUser }) => {
     const [user] = await createUser(client)
     const [cookie] = await createUser(client)
-    const { id } = await createBoard(user.id)
+    const { id } = await createRandomBoard(user.id)
 
     const queryData = {
       query: `
@@ -305,7 +292,7 @@ test.group('updateBoard', () => {
 
   test('should update Board and return updated entity', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id } = await createBoard(user.id)
+    const { id } = await createRandomBoard(user.id)
     const title = faker.lorem.words()
     const description = faker.lorem.paragraphs()
 
@@ -335,7 +322,7 @@ test.group('updateBoard', () => {
 
   test('should only set given properties', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id, title } = await createBoard(user.id)
+    const { id, title } = await createRandomBoard(user.id)
     const description = faker.lorem.paragraphs()
 
     const queryData = {
@@ -365,7 +352,7 @@ test.group('updateBoard', () => {
     const [user1] = await createUser(client)
     const [, cookie] = await createUser(client)
 
-    const board1 = await createBoard(user1.id)
+    const board1 = await createRandomBoard(user1.id)
 
     const queryData = {
       query: `
@@ -417,7 +404,7 @@ test.group('deletBoard', () => {
   test('should soft delete board', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
 
-    const { id } = await createBoard(user.id)
+    const { id } = await createRandomBoard(user.id)
 
     const queryData = {
       query: `
@@ -446,7 +433,7 @@ test.group('deletBoard', () => {
     const [user1] = await createUser(client)
     const [, cookie] = await createUser(client)
 
-    const { id } = await createBoard(user1.id)
+    const { id } = await createRandomBoard(user1.id)
 
     const queryData = {
       query: `
@@ -494,7 +481,7 @@ test.group('restoreBoard', () => {
     const repository = dataSource.getRepository(Board)
     const [user, cookie] = await createUser(client)
 
-    const { id } = await createBoard(user.id)
+    const { id } = await createRandomBoard(user.id)
     await repository.softDelete({ id })
 
     // Ensure that is initialy deleted
@@ -529,7 +516,7 @@ test.group('restoreBoard', () => {
     const [user] = await createUser(client)
     const [, cookie] = await createUser(client)
 
-    const { id } = await createBoard(user.id)
+    const { id } = await createRandomBoard(user.id)
     await repository.softDelete({ id })
 
     // Ensure that is initialy deleted
