@@ -34,10 +34,8 @@ export class ColumnResolver {
     @Arg('id', () => Int) id: number,
     @Arg('title', { nullable: true }) title: string | null,
     @Arg('index', () => Int, { nullable: true }) index: number | null,
-    @Ctx() { user }: ContextType): Promise<Column | null> {
+    @Ctx() { }: ContextType): Promise<Column | null> {
     const column = await ColumnRepository.findOneBy({ id })
-
-    if (column.board.createdById !== user.id) return null
 
     column.title = title ?? column.title
     column.index = index ?? column.index
