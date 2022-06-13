@@ -342,14 +342,13 @@ test.group('restoreBoard', () => {
   })
 
   test('should restore deleted board', async ({ expect, client, createUser }) => {
-    const repository = BoardRepository
     const [user, cookie] = await createUser(client)
 
     const { id } = await createRandomBoard(user.id)
-    await repository.softDelete({ id })
+    await BoardRepository.softDelete({ id })
 
     // Ensure that is initialy deleted
-    expect((await repository.findOne({
+    expect((await BoardRepository.findOne({
       where: { id },
       withDeleted: true
     })).deletedAt).not.toBeNull()
@@ -365,22 +364,21 @@ test.group('restoreBoard', () => {
     expect(data.id).toBeDefined()
     expect(data.id).toBe(id)
 
-    const board = await repository.findOneBy({ id })
+    const board = await BoardRepository.findOneBy({ id })
 
     expect(board).not.toBeNull()
     expect(board.deletedAt).toBeNull()
   })
 
   test('should only be able to restore owned boards', async ({ expect, client, createUser }) => {
-    const repository = BoardRepository
     const [user] = await createUser(client)
     const [, cookie] = await createUser(client)
 
     const { id } = await createRandomBoard(user.id)
-    await repository.softDelete({ id })
+    await BoardRepository.softDelete({ id })
 
     // Ensure that is initialy deleted
-    expect((await repository.findOne({
+    expect((await BoardRepository.findOne({
       where: { id },
       withDeleted: true
     })).deletedAt).not.toBeNull()
@@ -392,7 +390,7 @@ test.group('restoreBoard', () => {
 
     await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
 
-    const board = await repository.findOne({
+    const board = await BoardRepository.findOne({
       where: { id },
       withDeleted: true
     })
