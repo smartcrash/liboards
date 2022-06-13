@@ -27,6 +27,11 @@ export class Board {
   @TypeormLoader()
   user: User
 
+  @Field(() => [Column])
+  @ManyToOne(() => Column, column => column.board)
+  @TypeormLoader()
+  columns: Column[]
+
   @Field()
   @CreateDateColumn()
   createdAt: Date;

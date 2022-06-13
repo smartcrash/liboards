@@ -22,6 +22,11 @@ export class Column {
   @Property()
   boardId: number
 
+  // @Field(() => Board)
+  @ManyToOne(() => Board, board => board.columns)
+  // @TypeormLoader()
+  board: Board
+
   @Field(() => [Card])
   @OneToMany(() => Card, card => card.column)
   @TypeormLoader()
