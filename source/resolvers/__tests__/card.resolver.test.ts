@@ -3,7 +3,7 @@ import { test } from "@japa/runner";
 import { SESSION_COOKIE } from "../../constants";
 import { dataSource } from "../../dataSource";
 import { Card } from "../../entity";
-import { createRandomBoard, createRandomCard, createRandomColumn } from "../../utils/testUtils";
+import { createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
 const CreateCardMutation = `
   mutation CreateCard($columnId: Int!, $title: String!, $content: String, $index: Int) {
@@ -35,22 +35,12 @@ const DeleteCardMutation = `
 
 
 test.group('createCard', () => {
-  test('should throw error not authenticated', async ({ expect, client }) => {
-    const queryData = {
-      query: CreateCardMutation,
-      variables: {
-        columnId: -1,
-        title: '',
-      }
-    };
-
-    const response = await client.post('/').json(queryData)
-    const { data, errors } = response.body()
-
-    expect(data.column).toBeFalsy()
-    expect(errors).toBeDefined()
-    expect(errors).toHaveLength(1)
-    expect(errors[0].message).toBe('not authenticated')
+  testThrowsIfNotAuthenticated({
+    query: CreateCardMutation,
+    variables: {
+      columnId: -1,
+      title: '',
+    }
   })
 
   test('should create card', async ({ expect, client, createUser }) => {
@@ -114,19 +104,9 @@ test.group('createCard', () => {
 
 
 test.group('updateCard', () => {
-  test('should throw error not authenticated', async ({ expect, client }) => {
-    const queryData = {
-      query: UpdateCardMutation,
-      variables: { id: -1 }
-    };
-
-    const response = await client.post('/').json(queryData)
-    const { data, errors } = response.body()
-
-    expect(data.column).toBeFalsy()
-    expect(errors).toBeDefined()
-    expect(errors).toHaveLength(1)
-    expect(errors[0].message).toBe('not authenticated')
+  testThrowsIfNotAuthenticated({
+    query: UpdateCardMutation,
+    variables: { id: -1 }
   })
 
   test('should update card', async ({ expect, client, createUser }) => {
@@ -193,19 +173,9 @@ test.group('updateCard', () => {
 })
 
 test.group('deleteCard', () => {
-  test('should throw error not authenticated', async ({ expect, client }) => {
-    const queryData = {
-      query: DeleteCardMutation,
-      variables: { id: -1 }
-    };
-
-    const response = await client.post('/').json(queryData)
-    const { data, errors } = response.body()
-
-    expect(data.column).toBeFalsy()
-    expect(errors).toBeDefined()
-    expect(errors).toHaveLength(1)
-    expect(errors[0].message).toBe('not authenticated')
+  testThrowsIfNotAuthenticated({
+    query: DeleteCardMutation,
+    variables: { id: -1 }
   })
 
   test('should delete card', async ({ expect, client, createUser }) => {

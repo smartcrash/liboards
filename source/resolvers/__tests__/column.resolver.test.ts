@@ -4,7 +4,7 @@ import { In } from 'typeorm';
 import { SESSION_COOKIE } from '../../constants';
 import { dataSource } from '../../dataSource';
 import { Card, Column } from '../../entity';
-import { createRandomBoard, createRandomCard, createRandomColumn } from '../../utils/testUtils';
+import { createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
 
 const AddColumnMutation = `
   mutation AddColumn($boardId: Int!, $title: String!, $index: Int) {
@@ -33,22 +33,12 @@ const DeleteColumnMutation = `
 `
 
 test.group('addBoard', () => {
-  test('should throw error not authenticated', async ({ expect, client }) => {
-    const queryData = {
-      query: AddColumnMutation,
-      variables: {
-        boardId: -1,
-        title: '',
-      }
-    };
-
-    const response = await client.post('/').json(queryData)
-    const { data, errors } = response.body()
-
-    expect(data.column).toBeFalsy()
-    expect(errors).toBeDefined()
-    expect(errors).toHaveLength(1)
-    expect(errors[0].message).toBe('not authenticated')
+  testThrowsIfNotAuthenticated({
+    query: AddColumnMutation,
+    variables: {
+      boardId: -1,
+      title: '',
+    }
   })
 
   test('should add column at index to existing board', async ({ expect, client, createUser }) => {
@@ -105,6 +95,12 @@ test.group('addBoard', () => {
 })
 
 test.group('updateColumn', () => {
+  testThrowsIfNotAuthenticated({
+    query: UpdateColumnMutation,
+    variables: {
+      id: 1,
+    }
+  })
   test('should update column', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
     const { id: boardId } = await createRandomBoard(user.id)
@@ -165,6 +161,11 @@ test.group('updateColumn', () => {
 })
 
 test.group('deleteColumn', () => {
+  testThrowsIfNotAuthenticated({
+    query: DeleteColumnMutation,
+    variables: { id: 1 }
+  })
+
   test('should delete column', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
     const { id: boardId } = await createRandomBoard(user.id)

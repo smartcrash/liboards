@@ -3,33 +3,72 @@ import { test } from '@japa/runner';
 import { SESSION_COOKIE } from '../../constants';
 import { dataSource } from '../../dataSource';
 import { Board } from '../../entity';
-import { createRandomBoard } from '../../utils/testUtils';
+import { createRandomBoard, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
+
+const CreateBoardMutation = `
+  mutation CreateBoard($description: String, $title: String!) {
+    createBoard(description: $description, title: $title) {
+      id
+      title
+      description
+    }
+  }
+`
+
+const FindBoardByIdQuery = `
+  query FindBoardByIdQuery ($id: Int!) {
+    board: findBoardById(id: $id) {
+      id
+      title
+      description
+      user { id }
+    }
+  }
+`
+
+const AllBoardsQuery = `
+  {
+    boards: allBoards {
+      id
+      user { id }
+    }
+  }
+`
+
+const AllDeletedBoardsQuery = `
+  {
+    boards: allDeletedBoards {
+      id
+    }
+  }
+`
+
+const UpdateBoardMutation = `
+  mutation UpdateBoard($id: Int!, $title: String, $description: String) {
+    board: updateBoard(id: $id, title: $title, description: $description) {
+      id
+      title
+      description
+    }
+  }
+`
+
+const DeleteBoardMutation = `
+  mutation DeleteBoard($id: Int!) {
+    id: deleteBoard(id: $id)
+  }
+`
+
+const RestoreBoardMutation = `
+  mutation RestoreBoard($id: Int!) {
+    id: restoreBoard(id: $id)
+  }
+`
 
 test.group('createBoard', () => {
-  test('should throw error not authenticated', async ({ expect, client }) => {
-    const queryData = {
-      query: `
-        mutation CreateBoard($description: String, $title: String!) {
-          createBoard(description: $description, title: $title) {
-            id
-            title
-            description
-          }
-        }
-      `,
-      variables: {
-        title: faker.lorem.words(),
-        description: faker.lorem.sentences(),
-      }
-    };
-
-    const response = await client.post('/').json(queryData)
-    const { data, errors } = response.body()
-
-    expect(data).toBeNull()
-    expect(errors).toBeDefined()
-    expect(errors).toHaveLength(1)
-    expect(errors[0].message).toBe('not authenticated')
+  testThrowsIfNotAuthenticated({
+    query: CreateBoardMutation,
+    variables: { title: '', description: '', }
   })
 
   test('should create board', async ({ expect, client, createUser }) => {
@@ -39,15 +78,7 @@ test.group('createBoard', () => {
     const description = faker.lorem.sentences()
 
     const queryData = {
-      query: `
-        mutation CreateBoard($description: String, $title: String!) {
-          createBoard(description: $description, title: $title) {
-            id
-            title
-            description
-          }
-        }
-      `,
+      query: CreateBoardMutation,
       variables: {
         title,
         description
@@ -71,25 +102,9 @@ test.group('createBoard', () => {
 })
 
 test.group('allBoards', () => {
-  test('should throw error not authenticated', async ({ expect, client }) => {
-    const queryData = {
-      query: `
-        {
-          boards: allBoards {
-            id
-          }
-        }
-      `,
-      variables: {}
-    };
-
-    const response = await client.post('/').json(queryData)
-    const { data, errors } = response.body()
-
-    expect(data).toBeNull()
-    expect(errors).toBeDefined()
-    expect(errors).toHaveLength(1)
-    expect(errors[0].message).toBe('not authenticated')
+  testThrowsIfNotAuthenticated({
+    query: AllBoardsQuery,
+    variables: {}
   })
 
   test('should return only user\'s boards', async ({ expect, client, createUser }) => {
@@ -99,17 +114,7 @@ test.group('allBoards', () => {
     const _ = await createRandomBoard(user1.id)
     const board2 = await createRandomBoard(user2.id)
 
-    const queryData = {
-      query: `
-        {
-          boards: allBoards {
-            id
-            user { id }
-          }
-        }
-      `,
-    };
-
+    const queryData = { query: AllBoardsQuery };
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
     const { data } = response.body()
 
@@ -127,17 +132,7 @@ test.group('allBoards', () => {
     await dataSource.getRepository(Board).softDelete({ id })
 
 
-    const queryData = {
-      query: `
-        {
-          boards: allBoards {
-            id
-            user { id }
-          }
-        }
-      `,
-    };
-
+    const queryData = { query: AllBoardsQuery };
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
     const { data } = response.body()
 
@@ -147,27 +142,9 @@ test.group('allBoards', () => {
 })
 
 test.group('allDeletedBoards', () => {
-  const AllDeletedBoardsQuery = `
-    {
-      boards: allDeletedBoards {
-        id
-      }
-    }
-  `
-
-  test('should throw error not authenticated', async ({ expect, client }) => {
-    const queryData = {
-      query: AllDeletedBoardsQuery,
-      variables: { id: -1 }
-    };
-
-    const response = await client.post('/').json(queryData)
-    const { data, errors } = response.body()
-
-    expect(data).toBeNull()
-    expect(errors).toBeDefined()
-    expect(errors).toHaveLength(1)
-    expect(errors[0].message).toBe('not authenticated')
+  testThrowsIfNotAuthenticated({
+    query: AllDeletedBoardsQuery,
+    variables: { id: -1 }
   })
 
   test('should only include deleted boards', async ({ expect, client, createUser }) => {
@@ -178,10 +155,7 @@ test.group('allDeletedBoards', () => {
     const { id } = await createRandomBoard(user.id)
     await dataSource.getRepository(Board).softDelete({ id })
 
-    const queryData = {
-      query: AllDeletedBoardsQuery,
-    };
-
+    const queryData = { query: AllDeletedBoardsQuery };
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
     const { data } = response.body()
 
@@ -191,25 +165,9 @@ test.group('allDeletedBoards', () => {
 })
 
 test.group('findBoardById', () => {
-  test('should throw error not authenticated', async ({ expect, client }) => {
-    const queryData = {
-      query: `
-        query Query($id: Int!) {
-          board: findBoardById(id: $id) {
-            id
-          }
-        }
-      `,
-      variables: { id: 1 }
-    };
-
-    const response = await client.post('/').json(queryData)
-    const { data, errors } = response.body()
-
-    expect(data.board).toBeNull()
-    expect(errors).toBeDefined()
-    expect(errors).toHaveLength(1)
-    expect(errors[0].message).toBe('not authenticated')
+  testThrowsIfNotAuthenticated({
+    query: FindBoardByIdQuery,
+    variables: { id: 1 }
   })
 
   test('should return single board', async ({ expect, client, createUser }) => {
@@ -217,16 +175,7 @@ test.group('findBoardById', () => {
     const { id, title, description } = await createRandomBoard(user.id)
 
     const queryData = {
-      query: `
-        query Query($id: Int!) {
-          board: findBoardById(id: $id) {
-            id
-            title
-            description
-            user { id }
-          }
-        }
-      `,
+      query: FindBoardByIdQuery,
       variables: { id }
     };
 
@@ -248,16 +197,7 @@ test.group('findBoardById', () => {
     const { id } = await createRandomBoard(user.id)
 
     const queryData = {
-      query: `
-        query Query($id: Int!) {
-          board: findBoardById(id: $id) {
-            id
-            title
-            description
-            user { id }
-          }
-        }
-      `,
+      query: FindBoardByIdQuery,
       variables: { id }
     };
 
@@ -269,25 +209,9 @@ test.group('findBoardById', () => {
 })
 
 test.group('updateBoard', () => {
-  test('should throw error not authenticated', async ({ expect, client }) => {
-    const queryData = {
-      query: `
-        mutation UpdateBoard($id: Int!) {
-          board: updateBoard(id: $id) {
-            id
-          }
-        }
-      `,
-      variables: { id: 1 }
-    };
-
-    const response = await client.post('/').json(queryData)
-    const { data, errors } = response.body()
-
-    expect(data.board).toBeNull()
-    expect(errors).toBeDefined()
-    expect(errors).toHaveLength(1)
-    expect(errors[0].message).toBe('not authenticated')
+  testThrowsIfNotAuthenticated({
+    query: UpdateBoardMutation,
+    variables: { id: 1 }
   })
 
   test('should update Board and return updated entity', async ({ expect, client, createUser }) => {
@@ -297,14 +221,7 @@ test.group('updateBoard', () => {
     const description = faker.lorem.paragraphs()
 
     const queryData = {
-      query: `
-      mutation UpdateBoard($id: Int!, $title: String, $description: String) {
-        board: updateBoard(id: $id, title: $title, description: $description) {
-          id
-          title
-          description
-        }
-      }`,
+      query: UpdateBoardMutation,
       variables: {
         id,
         title,
@@ -326,14 +243,7 @@ test.group('updateBoard', () => {
     const description = faker.lorem.paragraphs()
 
     const queryData = {
-      query: `
-        mutation UpdateBoard($id: Int!, $title: String, $description: String) {
-          board: updateBoard(id: $id, title: $title, description: $description) {
-            id
-            title
-            description
-          }
-        }`,
+      query: UpdateBoardMutation,
       variables: {
         id,
         description
@@ -355,14 +265,7 @@ test.group('updateBoard', () => {
     const board1 = await createRandomBoard(user1.id)
 
     const queryData = {
-      query: `
-        mutation UpdateBoard($id: Int!, $title: String, $description: String) {
-          board: updateBoard(id: $id, title: $title, description: $description) {
-            id
-            title
-            description
-          }
-        }`,
+      query: UpdateBoardMutation,
       variables: {
         id: board1.id,
         description: faker.lorem.paragraph()
@@ -382,23 +285,9 @@ test.group('updateBoard', () => {
 })
 
 test.group('deletBoard', () => {
-  test('should throw error not authenticated', async ({ expect, client }) => {
-    const queryData = {
-      query: `
-        mutation DeleteBoard($id: Int!) {
-          id: deleteBoard(id: $id)
-        }
-      `,
-      variables: { id: -1 }
-    };
-
-    const response = await client.post('/').json(queryData)
-    const { data, errors } = response.body()
-
-    expect(data.id).toBeNull()
-    expect(errors).toBeDefined()
-    expect(errors).toHaveLength(1)
-    expect(errors[0].message).toBe('not authenticated')
+  testThrowsIfNotAuthenticated({
+    query: DeleteBoardMutation,
+    variables: { id: -1 }
   })
 
   test('should soft delete board', async ({ expect, client, createUser }) => {
@@ -407,11 +296,7 @@ test.group('deletBoard', () => {
     const { id } = await createRandomBoard(user.id)
 
     const queryData = {
-      query: `
-        mutation DeleteBoard($id: Int!) {
-          id: deleteBoard(id: $id)
-        }
-      `,
+      query: DeleteBoardMutation,
       variables: { id }
     };
 
@@ -436,14 +321,9 @@ test.group('deletBoard', () => {
     const { id } = await createRandomBoard(user1.id)
 
     const queryData = {
-      query: `
-        mutation DeleteBoard($id: Int!) {
-          id: deleteBoard(id: $id)
-        }
-      `,
+      query: DeleteBoardMutation,
       variables: { id }
     };
-
 
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
     const { data } = response.body()
@@ -458,23 +338,9 @@ test.group('deletBoard', () => {
 })
 
 test.group('restoreBoard', () => {
-  test('should throw error not authenticated', async ({ expect, client }) => {
-    const queryData = {
-      query: `
-        mutation RestoreBoard($id: Int!) {
-          id: restoreBoard(id: $id)
-        }
-      `,
-      variables: { id: -1 }
-    };
-
-    const response = await client.post('/').json(queryData)
-    const { data, errors } = response.body()
-
-    expect(data.id).toBeNull()
-    expect(errors).toBeDefined()
-    expect(errors).toHaveLength(1)
-    expect(errors[0].message).toBe('not authenticated')
+  testThrowsIfNotAuthenticated({
+    query: RestoreBoardMutation,
+    variables: { id: -1 }
   })
 
   test('should restore deleted board', async ({ expect, client, createUser }) => {
@@ -491,11 +357,7 @@ test.group('restoreBoard', () => {
     })).deletedAt).not.toBeNull()
 
     const queryData = {
-      query: `
-        mutation RestoreBoard($id: Int!) {
-          id: restoreBoard(id: $id)
-        }
-      `,
+      query: RestoreBoardMutation,
       variables: { id }
     };
 
@@ -526,15 +388,11 @@ test.group('restoreBoard', () => {
     })).deletedAt).not.toBeNull()
 
     const queryData = {
-      query: `
-        mutation RestoreBoard($id: Int!) {
-          id: restoreBoard(id: $id)
-        }
-      `,
+      query: RestoreBoardMutation,
       variables: { id }
     };
 
-    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
 
     const board = await repository.findOne({
       where: { id },

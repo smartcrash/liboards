@@ -1,11 +1,11 @@
 import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import { Card, Column } from "../entity";
-import { isAuth } from "../middlewares/isAuth";
+import { Authenticate } from "../middlewares/Authenticate";
 import { TContext } from "../types";
 
 @Resolver(Card)
 export class CardResolver {
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Mutation(() => Card, { nullable: true })
   async createCard(
     @Arg('columnId', () => Int) columnId: number,
@@ -35,7 +35,7 @@ export class CardResolver {
     return card
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Mutation(() => Card, { nullable: true })
   async updateCard(
     @Arg('id', () => Int) id: number,
@@ -66,7 +66,7 @@ export class CardResolver {
     return card
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Mutation(() => Int, { nullable: true })
   async deleteCard(
     @Arg('id', () => Int) id: number,

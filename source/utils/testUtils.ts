@@ -1,4 +1,5 @@
 import { faker } from "@faker-js/faker"
+import { test } from "@japa/runner"
 import { dataSource } from "../dataSource"
 import { Board, Card, Column } from "../entity"
 
@@ -39,4 +40,15 @@ export const createRandomCard = async (columnId: number): Promise<Card> => {
   await dataSource.getRepository(Card).save(card)
 
   return card
+}
+
+export const testThrowsIfNotAuthenticated = (queryData: string | object) => {
+  test('should throw error not authenticated', async ({ expect, client }) => {
+    const response = await client.post('/').json(queryData)
+    const { errors } = response.body()
+
+    expect(errors).toBeDefined()
+    expect(errors).toHaveLength(1)
+    expect(errors[0].message).toBe('not authenticated')
+  })
 }

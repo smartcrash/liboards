@@ -1,12 +1,12 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import { IsNull, Not } from "typeorm";
 import { Board } from "../entity";
-import { isAuth } from "../middlewares/isAuth";
+import { Authenticate } from "../middlewares/Authenticate";
 import { TContext } from '../types';
 
 @Resolver(Board)
 export class BoardResolver {
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Query(() => [Board])
   async allBoards(
     @Ctx() { req, dataSource }: TContext
@@ -16,7 +16,7 @@ export class BoardResolver {
     return dataSource.getRepository(Board).findBy({ userId })
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Query(() => [Board])
   async allDeletedBoards(
     @Ctx() { req, dataSource }: TContext
@@ -34,7 +34,7 @@ export class BoardResolver {
       })
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Query(() => Board, { nullable: true })
   async findBoardById(
     @Arg('id', () => Int) id: number,
@@ -51,7 +51,7 @@ export class BoardResolver {
       })
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Mutation(() => Board)
   async createBoard(
     @Arg('title') title: string,
@@ -71,7 +71,7 @@ export class BoardResolver {
     return board
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Mutation(() => Board, { nullable: true })
   async updateBoard(
     @Arg('id', () => Int) id: number,
@@ -94,7 +94,7 @@ export class BoardResolver {
     return board
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Mutation(() => Int, { nullable: true })
   async deleteBoard(
     @Arg('id', () => Int) id: number,
@@ -109,7 +109,7 @@ export class BoardResolver {
     return board.id
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Mutation(() => Int, { nullable: true })
   async restoreBoard(
     @Arg('id', () => Int) id: number,
