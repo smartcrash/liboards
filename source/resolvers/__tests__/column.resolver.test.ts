@@ -3,7 +3,7 @@ import { test } from '@japa/runner';
 import { SESSION_COOKIE } from '../../constants';
 import { dataSource } from '../../dataSource';
 import { Column } from '../../entity';
-import { createRandomBoard } from '../../utils/testUtils';
+import { createRandomBoard, createRandomColumn } from '../../utils/testUtils';
 
 const AddColumnMutation = `
   mutation AddColumn($boardId: Int!, $title: String!, $index: Int) {
@@ -30,19 +30,6 @@ const DeleteColumnMutation = `
     id: deleteColumn(id: $id)
   }
 `
-
-
-const createRandomColumn = async (boardId: number): Promise<Column> => {
-  const column = new Column()
-
-  column.title = faker.lorem.words()
-  column.index = faker.datatype.number()
-  column.boardId = boardId
-
-  await dataSource.getRepository(Column).save(column)
-
-  return column
-}
 
 test.group('addBoard', () => {
   test('should throw error not authenticated', async ({ expect, client }) => {
@@ -220,6 +207,8 @@ test.group('deleteColumn', () => {
 
     expect(column).toBeTruthy()
   })
+
+  test('cascades and deletes all related cards')
 })
 
 

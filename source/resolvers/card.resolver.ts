@@ -1,0 +1,92 @@
+import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import { Card, Column } from "../entity";
+import { isAuth } from "../middlewares/isAuth";
+import { TContext } from "../types";
+
+@Resolver(Card)
+export class CardResolver {
+  @UseMiddleware(isAuth)
+  @Mutation(() => Card, { nullable: true })
+  async createCard(
+    @Arg('columnId', () => Int) columnId: number,
+    @Arg('title') title: string,
+    @Arg('content', { nullable: true }) content: string | null,
+    @Arg('index', () => Int, { nullable: true }) index: number = 0,
+    @Ctx() { req, dataSource }: TContext): Promise<Card | null> {
+    const { userId } = req.session
+    const column = await dataSource
+      .getRepository(Column)
+      .findOne({
+        where: { id: columnId },
+        relations: ['board']
+      })
+
+    if (column.board.userId !== userId) return null
+
+    const card = new Card()
+
+    card.title = title
+    card.content = content
+    card.index = index
+    card.columnId = columnId
+
+    await dataSource.getRepository(Card).save(card)
+
+    return card
+  }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => Card, { nullable: true })
+  async updateCard(
+    @Arg('id', () => Int) id: number,
+    @Arg('title', { nullable: true }) title: string | null,
+    @Arg('content', { nullable: true }) content: string | null,
+    @Arg('index', () => Int, { nullable: true }) index: number | null,
+    @Ctx() { req, dataSource }: TContext): Promise<Card | null> {
+    const { userId } = req.session
+    const card = await dataSource.getRepository(Card).findOneBy({ id })
+
+    if (!card) return null
+
+    const column = await dataSource
+      .getRepository(Column)
+      .findOne({
+        where: { id: card.columnId },
+        relations: ['board']
+      })
+
+    if (column.board.userId !== userId) return null
+
+    card.title = title ?? card.title
+    card.content = content ?? card.content
+    card.index = index ?? card.index
+
+    await dataSource.getRepository(Card).save(card)
+
+    return card
+  }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => Int, { nullable: true })
+  async deleteCard(
+    @Arg('id', () => Int) id: number,
+    @Ctx() { req, dataSource }: TContext): Promise<number | null> {
+    const { userId } = req.session
+    const card = await dataSource.getRepository(Card).findOneBy({ id })
+
+    if (!card) return null
+
+    const column = await dataSource
+      .getRepository(Column)
+      .findOne({
+        where: { id: card.columnId },
+        relations: ['board']
+      })
+
+    if (column.board.userId !== userId) return null
+
+    await dataSource.getRepository(Card).delete({ id })
+
+    return card.id
+  }
+}
