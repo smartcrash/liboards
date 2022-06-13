@@ -1,8 +1,11 @@
 import {
   Box,
   Button,
+  Center,
   Heading,
   HStack,
+  Spacer,
+  Stack,
   Text,
   useDisclosure,
   VStack,
@@ -26,13 +29,13 @@ export const ListProjects = () => {
   // TODO: Make draggable?
 
   return (
-    <Box mx={"auto"} maxW={"5xl"}>
+    <Stack minH={"full"} mx={"auto"} maxW={"5xl"} pb={6}>
       <Heading fontSize={"2xl"} mb={6}>
         All projects
       </Heading>
 
       {/* TODO: Turn into grid */}
-      <HStack maxW={"full"} overflow={"scroll"}>
+      <HStack maxW={"full"} overflow={"scroll"} spacing={4}>
         {boards?.boards.map(({ id, title, description }) => (
           <Box
             w={60}
@@ -54,7 +57,27 @@ export const ListProjects = () => {
             </VStack>
           </Box>
         ))}
+
+        <Box
+          as={Link}
+          to={route("projects.create")}
+          w={60}
+          h={28}
+          p={5}
+          bg={"gray.100"}
+          _hover={{ bg: "gray.200" }}
+          borderRadius={"md"}
+          borderWidth={1}
+          shadow={"md"}
+          flexShrink={0}
+        >
+          <Center h={"full"}>
+            <Text>Create new project</Text>
+          </Center>
+        </Box>
       </HStack>
+
+      <Spacer />
 
       <Box mt={8}>
         <Button onClick={onToggle} variant={"link"}>
@@ -108,6 +131,6 @@ export const ListProjects = () => {
           )}
         </VStack>
       </Box>
-    </Box>
+    </Stack>
   );
 };
