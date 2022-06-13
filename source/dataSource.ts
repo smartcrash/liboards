@@ -10,6 +10,6 @@ export const dataSource = new DataSource({
   dropSchema: false,
   migrationsRun: true,
   entities: [User, Board],
-  // migrations: ["source/migration/**/*.ts"],
-  // subscribers: ["source/subscriber/**/*.ts"],
+  // migrations: ["source/migrations/**/*.ts"],
+  // subscribers: ["source/subscribers/**/*.ts"],
 })
