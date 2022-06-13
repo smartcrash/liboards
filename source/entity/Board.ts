@@ -20,12 +20,12 @@ export class Board {
   description: string;
 
   @Property()
-  userId: number
+  createdById: number
 
   @Field(() => User)
   @ManyToOne(() => User, user => user.boards)
   @TypeormLoader()
-  user: User
+  createdBy: User
 
   @Field(() => [Column])
   @ManyToOne(() => Column, column => column.board)

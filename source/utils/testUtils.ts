@@ -10,7 +10,7 @@ export const createRandomBoard = async (userId: number): Promise<Board> => {
 
   board.title = faker.lorem.words()
   board.description = faker.lorem.paragraphs()
-  board.userId = userId
+  board.createdById = userId
 
   await repository.save(board)
 

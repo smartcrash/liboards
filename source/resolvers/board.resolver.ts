@@ -13,7 +13,7 @@ export class BoardResolver {
   ): Promise<Board[]> {
     const { userId } = req.session
 
-    return dataSource.getRepository(Board).findBy({ userId })
+    return dataSource.getRepository(Board).findBy({ createdById: userId })
   }
 
   @UseMiddleware(Authenticate)
@@ -27,7 +27,7 @@ export class BoardResolver {
       .getRepository(Board)
       .find({
         where: {
-          userId,
+          createdById: userId,
           deletedAt: Not(IsNull()),
         },
         withDeleted: true
@@ -40,14 +40,13 @@ export class BoardResolver {
     @Arg('id', () => Int) id: number,
     @Ctx() { req, dataSource }: TContext
   ): Promise<Board> {
+    const { userId } = req.session
+
     return dataSource
       .getRepository(Board)
       .findOne({
-        relations: { user: true },
-        where: {
-          id,
-          userId: req.session.userId
-        }
+        relations: { createdBy: true },
+        where: { id, createdById: userId }
       })
   }
 
@@ -58,13 +57,14 @@ export class BoardResolver {
     @Arg('description', () => String, { nullable: true }) description: string,
     @Ctx() { req, dataSource }: TContext
   ): Promise<Board> {
+    const { userId } = req.session
     const repository = dataSource.getRepository(Board)
 
     const board = new Board()
 
     board.title = title
     board.description = description
-    board.userId = req.session.userId
+    board.createdById = userId
 
     await repository.save(board)
 
@@ -82,7 +82,7 @@ export class BoardResolver {
     const { userId } = req.session
     const repository = dataSource.getRepository(Board)
 
-    const board = await repository.findOneBy({ id, userId })
+    const board = await repository.findOneBy({ id, createdById: userId })
 
     if (!board) return null
 
@@ -102,9 +102,9 @@ export class BoardResolver {
   ): Promise<number | null> {
     const { userId } = req.session
     const repository = dataSource.getRepository(Board)
-    const board = await repository.findOneBy({ id, userId })
+    const board = await repository.findOneBy({ id, createdById: userId })
 
-    await repository.softDelete({ id, userId })
+    await repository.softDelete({ id, createdById: userId })
 
     return board.id
   }
@@ -117,7 +117,7 @@ export class BoardResolver {
   ): Promise<number | null> {
     const { userId } = req.session
 
-    await dataSource.getRepository(Board).restore({ id, userId })
+    await dataSource.getRepository(Board).restore({ id, createdById: userId })
 
     return id
   }

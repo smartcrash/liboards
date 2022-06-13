@@ -27,12 +27,12 @@ export type Board = {
   __typename?: 'Board';
   columns: Array<Column>;
   createdAt: Scalars['DateTime'];
+  createdBy: User;
   deletedAt: Scalars['DateTime'];
   description: Scalars['String'];
   id: Scalars['Float'];
   title: Scalars['String'];
   updatedAt: Scalars['DateTime'];
-  user: User;
 };
 
 export type Card = {
@@ -291,7 +291,7 @@ export type FindBoardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any, columns: Array<{ __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, content: string, index: number }> }>, user: { __typename?: 'User', id: number, username: string } } | null };
+export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string } } | null };
 
 export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
@@ -488,10 +488,7 @@ export const FindBoardByIdDocument = gql`
     id
     title
     description
-    columns {
-      ...ColumnFragment
-    }
-    user {
+    createdBy {
       id
       username
     }
@@ -499,7 +496,7 @@ export const FindBoardByIdDocument = gql`
     updatedAt
   }
 }
-    ${ColumnFragmentFragmentDoc}`;
+    `;
 
 export function useFindBoardByIdQuery(options: Omit<Urql.UseQueryArgs<FindBoardByIdQueryVariables>, 'query'>) {
   return Urql.useQuery<FindBoardByIdQuery>({ query: FindBoardByIdDocument, ...options });

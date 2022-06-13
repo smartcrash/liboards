@@ -3,7 +3,7 @@ query FindBoardById($id: Int!) {
     id
     title
     description
-    user {
+    createdBy {
       id
       username
     }

@@ -32,7 +32,7 @@ const DeleteColumnMutation = `
   }
 `
 
-test.group('addBoard', () => {
+test.group('addColumn', () => {
   testThrowsIfNotAuthenticated({
     query: AddColumnMutation,
     variables: {

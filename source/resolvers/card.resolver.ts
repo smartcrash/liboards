@@ -21,7 +21,7 @@ export class CardResolver {
         relations: ['board']
       })
 
-    if (column.board.userId !== userId) return null
+    if (column.board.createdById !== userId) return null
 
     const card = new Card()
 
@@ -55,7 +55,7 @@ export class CardResolver {
         relations: ['board']
       })
 
-    if (column.board.userId !== userId) return null
+    if (column.board.createdById !== userId) return null
 
     card.title = title ?? card.title
     card.content = content ?? card.content
@@ -83,7 +83,7 @@ export class CardResolver {
         relations: ['board']
       })
 
-    if (column.board.userId !== userId) return null
+    if (column.board.createdById !== userId) return null
 
     await dataSource.getRepository(Card).delete({ id })
 

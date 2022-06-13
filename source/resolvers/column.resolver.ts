@@ -14,7 +14,7 @@ export class ColumnResolver {
     @Arg('index', () => Int, { nullable: true }) index: number = 0,
     @Ctx() { req, dataSource }: TContext): Promise<Column | null> {
     const { userId } = req.session
-    const board = await dataSource.getRepository(Board).findOneBy({ id: boardId, userId })
+    const board = await dataSource.getRepository(Board).findOneBy({ id: boardId, createdById: userId })
 
     if (!board) return null
 
@@ -40,7 +40,7 @@ export class ColumnResolver {
     const repository = dataSource.getRepository(Column)
     const column = await repository.findOne({ where: { id }, relations: ['board'] })
 
-    if (column.board.userId !== userId) return null
+    if (column.board.createdById !== userId) return null
 
     column.title = title ?? column.title
     column.index = index ?? column.index
@@ -59,7 +59,7 @@ export class ColumnResolver {
     const repository = dataSource.getRepository(Column)
     const column = await repository.findOne({ where: { id }, relations: ['board'] })
 
-    if (column.board.userId !== userId) return null
+    if (column.board.createdById !== userId) return null
 
     await repository.delete({ id })
 

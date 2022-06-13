@@ -7,7 +7,7 @@ import { createRandomBoard, testThrowsIfNotAuthenticated } from '../../utils/tes
 
 const CreateBoardMutation = `
   mutation CreateBoard($description: String, $title: String!) {
-    createBoard(description: $description, title: $title) {
+    board: createBoard(description: $description, title: $title) {
       id
       title
       description
@@ -21,7 +21,7 @@ const FindBoardByIdQuery = `
       id
       title
       description
-      user { id }
+      createdBy { id }
     }
   }
 `
@@ -30,7 +30,7 @@ const AllBoardsQuery = `
   {
     boards: allBoards {
       id
-      user { id }
+      createdBy { id }
     }
   }
 `
@@ -88,16 +88,16 @@ test.group('createBoard', () => {
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
     const { data } = response.body()
 
-    expect(data.createBoard).toBeDefined()
-    expect(data.createBoard.title).toBe(title)
-    expect(data.createBoard.description).toBe(description)
+    expect(data.board).toBeDefined()
+    expect(data.board.title).toBe(title)
+    expect(data.board.description).toBe(description)
 
-    const { id } = data.createBoard
+    const { id } = data.board
     const board = await dataSource.getRepository(Board).findOneBy({ id })
 
     expect(board).toBeDefined()
     expect(board).toMatchObject({ title, description })
-    expect(board.userId).toBe(user.id)
+    expect(board.createdById).toBe(user.id)
   })
 })
 
@@ -116,11 +116,11 @@ test.group('allBoards', () => {
 
     const queryData = { query: AllBoardsQuery };
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
-    const { data } = response.body()
+    const { data, errors } = response.body()
 
     expect(data.boards).toHaveLength(1)
     expect(data.boards[0].id).toBe(board2.id)
-    expect(data.boards[0].user.id).toBe(user2.id)
+    expect(data.boards[0].createdBy.id).toBe(user2.id)
   })
 
   test('should omit deleted boards', async ({ expect, client, createUser }) => {
@@ -187,7 +187,7 @@ test.group('findBoardById', () => {
       id,
       title,
       description,
-      user: { id: user.id }
+      createdBy: { id: user.id }
     })
   })
 
