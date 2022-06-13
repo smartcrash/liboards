@@ -2,19 +2,17 @@ import { faker } from "@faker-js/faker"
 import { ApiResponse } from "@japa/api-client"
 import { Expect } from "@japa/expect"
 import { test } from "@japa/runner"
-import { dataSource } from "../dataSource"
 import { Board, Card, Column } from "../entity"
+import { BoardRepository, CardRepository, ColumnRepository } from "../repository"
 
 export const createRandomBoard = async (userId: number): Promise<Board> => {
-  const repository = dataSource.getRepository(Board)
-
   const board = new Board()
 
   board.title = faker.lorem.words()
   board.description = faker.lorem.paragraphs()
   board.createdById = userId
 
-  await repository.save(board)
+  await BoardRepository.save(board)
 
   return board
 }
@@ -26,7 +24,7 @@ export const createRandomColumn = async (boardId: number): Promise<Column> => {
   column.index = faker.datatype.number()
   column.boardId = boardId
 
-  await dataSource.getRepository(Column).save(column)
+  await ColumnRepository.save(column)
 
   return column
 }
@@ -39,7 +37,7 @@ export const createRandomCard = async (columnId: number): Promise<Card> => {
   card.index = faker.datatype.number()
   card.columnId = columnId
 
-  await dataSource.getRepository(Card).save(card)
+  await CardRepository.save(card)
 
   return card
 }

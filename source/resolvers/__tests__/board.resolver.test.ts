@@ -1,8 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import { SESSION_COOKIE } from '../../constants';
-import { dataSource } from '../../dataSource';
-import { Board } from '../../entity';
+import { BoardRepository } from '../../repository';
 import { createRandomBoard, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
 
 const CreateBoardMutation = `
@@ -93,7 +92,7 @@ test.group('createBoard', () => {
     expect(data.board.description).toBe(description)
 
     const { id } = data.board
-    const board = await dataSource.getRepository(Board).findOneBy({ id })
+    const board = await BoardRepository.findOneBy({ id })
 
     expect(board).toBeDefined()
     expect(board).toMatchObject({ title, description })
@@ -129,8 +128,7 @@ test.group('allBoards', () => {
     await createRandomBoard(user.id)
     await createRandomBoard(user.id)
     const { id } = await createRandomBoard(user.id)
-    await dataSource.getRepository(Board).softDelete({ id })
-
+    await BoardRepository.softDelete({ id })
 
     const queryData = { query: AllBoardsQuery };
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
@@ -153,7 +151,7 @@ test.group('allDeletedBoards', () => {
     await createRandomBoard(user.id)
     await createRandomBoard(user.id)
     const { id } = await createRandomBoard(user.id)
-    await dataSource.getRepository(Board).softDelete({ id })
+    await BoardRepository.softDelete({ id })
 
     const queryData = { query: AllDeletedBoardsQuery };
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
@@ -277,7 +275,7 @@ test.group('updateBoard', () => {
 
     expect(data.board).toBeNull()
 
-    const board = await dataSource.getRepository(Board).findOneBy({ id: board1.id })
+    const board = await BoardRepository.findOneBy({ id: board1.id })
 
     expect(board).toBeDefined()
     expect(board.description).toBe(board1.description) // It should not have changed
@@ -307,7 +305,7 @@ test.group('deletBoard', () => {
     expect(data.id).toBeDefined()
     expect(data.id).toBe(id)
 
-    const board = await dataSource.getRepository(Board).findOne({ where: { id }, withDeleted: true })
+    const board = await BoardRepository.findOne({ where: { id }, withDeleted: true })
 
     expect(board).not.toBeNull()
     expect(board.deletedAt).toBeDefined()
@@ -330,7 +328,7 @@ test.group('deletBoard', () => {
 
     expect(data.id).toBeNull()
 
-    const board = await dataSource.getRepository(Board).findOne({ where: { id }, withDeleted: true })
+    const board = await BoardRepository.findOne({ where: { id }, withDeleted: true })
 
     expect(board).toBeDefined()
     expect(board.deletedAt).toBeNull()
@@ -344,7 +342,7 @@ test.group('restoreBoard', () => {
   })
 
   test('should restore deleted board', async ({ expect, client, createUser }) => {
-    const repository = dataSource.getRepository(Board)
+    const repository = BoardRepository
     const [user, cookie] = await createUser(client)
 
     const { id } = await createRandomBoard(user.id)
@@ -374,7 +372,7 @@ test.group('restoreBoard', () => {
   })
 
   test('should only be able to restore owned boards', async ({ expect, client, createUser }) => {
-    const repository = dataSource.getRepository(Board)
+    const repository = BoardRepository
     const [user] = await createUser(client)
     const [, cookie] = await createUser(client)
 

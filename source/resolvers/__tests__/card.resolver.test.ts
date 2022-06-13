@@ -1,9 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { test } from "@japa/runner";
 import { SESSION_COOKIE } from "../../constants";
-import { dataSource } from "../../dataSource";
-import { Card } from "../../entity";
-import { assertIsUnauthorizedError, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
+import { CardRepository } from "../../repository";
+import { createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
 const CreateCardMutation = `
   mutation CreateCard($columnId: Int!, $title: String!, $content: String, $index: Int) {
@@ -74,7 +73,7 @@ test.group('createCard', () => {
     expect(data.card.index).toBe(index)
 
     const { id } = data.card
-    const card = await dataSource.getRepository(Card).findOneBy({ id })
+    const card = await CardRepository.findOneBy({ id })
 
     expect(card).toBeTruthy()
     expect(card.columnId).toBe(columnId)
@@ -142,7 +141,7 @@ test.group('updateCard', () => {
     expect(data.card.content).toBe(content)
     expect(data.card.index).toBe(index)
 
-    const card = await dataSource.getRepository(Card).findOneBy({ id })
+    const card = await CardRepository.findOneBy({ id })
 
     expect(card).toMatchObject({ title, index })
   })
@@ -168,7 +167,7 @@ test.group('updateCard', () => {
     expect(errors).toBeFalsy()
     expect(data.card).toBeFalsy()
 
-    const card = await dataSource.getRepository(Card).findOneBy({ id })
+    const card = await CardRepository.findOneBy({ id })
 
     expect(card.title).toBe(title)
   })
@@ -197,7 +196,7 @@ test.group('deleteCard', () => {
     expect(errors).toBeFalsy()
     expect(data.id).toBe(id)
 
-    const card = await dataSource.getRepository(Card).findOneBy({ id })
+    const card = await CardRepository.findOneBy({ id })
 
     expect(card).toBeFalsy()
   })
@@ -220,7 +219,7 @@ test.group('deleteCard', () => {
     expect(errors).toBeFalsy()
     expect(data.id).toBeFalsy()
 
-    const card = await dataSource.getRepository(Card).findOneBy({ id })
+    const card = await CardRepository.findOneBy({ id })
 
     expect(card).toBeTruthy()
   })

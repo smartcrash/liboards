@@ -2,8 +2,7 @@ import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import { In } from 'typeorm';
 import { SESSION_COOKIE } from '../../constants';
-import { dataSource } from '../../dataSource';
-import { Card, Column } from '../../entity';
+import { CardRepository, ColumnRepository } from '../../repository';
 import { createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
 
 const AddColumnMutation = `
@@ -67,7 +66,7 @@ test.group('addColumn', () => {
     expect(data.column.index).toBe(index)
 
     const { id } = data.column
-    const column = await dataSource.getRepository(Column).findOneBy({ id })
+    const column = await ColumnRepository.findOneBy({ id })
 
     expect(column).toBeTruthy()
     expect(column.boardId).toBe(boardId)
@@ -128,7 +127,7 @@ test.group('updateColumn', () => {
     expect(data.column.title).toBe(title)
     expect(data.column.index).toBe(index)
 
-    const column = await dataSource.getRepository(Column).findOneBy({ id })
+    const column = await ColumnRepository.findOneBy({ id })
 
     expect(column).toMatchObject({ title, index })
   })
@@ -154,7 +153,7 @@ test.group('updateColumn', () => {
     expect(data.errors).toBeFalsy()
     expect(data.column).toBeFalsy()
 
-    const column = await dataSource.getRepository(Column).findOneBy({ id })
+    const column = await ColumnRepository.findOneBy({ id })
 
     expect(column.title).toBe(title)
   })
@@ -182,7 +181,7 @@ test.group('deleteColumn', () => {
     expect(errors).toBeFalsy()
     expect(data.id).toBe(id)
 
-    const column = await dataSource.getRepository(Column).findOneBy({ id })
+    const column = await ColumnRepository.findOneBy({ id })
 
     expect(column).toBeFalsy()
   })
@@ -205,7 +204,7 @@ test.group('deleteColumn', () => {
     expect(data.errors).toBeFalsy()
     expect(data.id).toBeFalsy()
 
-    const column = await dataSource.getRepository(Column).findOneBy({ id })
+    const column = await ColumnRepository.findOneBy({ id })
 
     expect(column).toBeTruthy()
   })
@@ -227,7 +226,7 @@ test.group('deleteColumn', () => {
 
     await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
 
-    const cards = await dataSource.getRepository(Card).findBy({ id: In(cardIds) })
+    const cards = await CardRepository.findBy({ id: In(cardIds) })
 
     expect(cards).toHaveLength(0)
   })
