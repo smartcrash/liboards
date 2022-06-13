@@ -1,8 +1,8 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import { IsNull, Not } from "typeorm";
-import { dataSource } from "../dataSource";
 import { Board } from "../entity";
 import { Authenticate } from "../middlewares/Authenticate";
+import { BoardRepository } from "../repository";
 import { ContextType } from '../types';
 
 @Resolver(Board)
@@ -10,25 +10,22 @@ export class BoardResolver {
   @UseMiddleware(Authenticate)
   @Query(() => [Board])
   async allBoards(
-    @Ctx() { req }: ContextType
+    @Ctx() { user }: ContextType
   ): Promise<Board[]> {
-    const { userId } = req.session
+    const boards = await BoardRepository.findBy({ createdById: user.id })
 
-    return dataSource.getRepository(Board).findBy({ createdById: userId })
+    return boards
   }
 
   @UseMiddleware(Authenticate)
   @Query(() => [Board])
   async allDeletedBoards(
-    @Ctx() { req }: ContextType
+    @Ctx() { user }: ContextType
   ): Promise<Board[]> {
-    const { userId } = req.session
-
-    return dataSource
-      .getRepository(Board)
+    return BoardRepository
       .find({
         where: {
-          createdById: userId,
+          createdById: user.id,
           deletedAt: Not(IsNull()),
         },
         withDeleted: true
@@ -39,15 +36,12 @@ export class BoardResolver {
   @Query(() => Board, { nullable: true })
   async findBoardById(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req }: ContextType
+    @Ctx() { user }: ContextType
   ): Promise<Board> {
-    const { userId } = req.session
-
-    return dataSource
-      .getRepository(Board)
+    return BoardRepository
       .findOne({
         relations: { createdBy: true },
-        where: { id, createdById: userId }
+        where: { id, createdById: user.id }
       })
   }
 
@@ -56,18 +50,15 @@ export class BoardResolver {
   async createBoard(
     @Arg('title') title: string,
     @Arg('description', () => String, { nullable: true }) description: string,
-    @Ctx() { req }: ContextType
+    @Ctx() { user }: ContextType
   ): Promise<Board> {
-    const { userId } = req.session
-    const repository = dataSource.getRepository(Board)
-
     const board = new Board()
 
     board.title = title
     board.description = description
-    board.createdById = userId
+    board.createdById = user.id
 
-    await repository.save(board)
+    await BoardRepository.save(board)
 
     return board
   }
@@ -78,19 +69,16 @@ export class BoardResolver {
     @Arg('id', () => Int) id: number,
     @Arg('title', () => String, { nullable: true }) title: string | null,
     @Arg('description', () => String, { nullable: true }) description: string | null,
-    @Ctx() { req }: ContextType
+    @Ctx() { user }: ContextType
   ): Promise<Board | null> {
-    const { userId } = req.session
-    const repository = dataSource.getRepository(Board)
-
-    const board = await repository.findOneBy({ id, createdById: userId })
+    const board = await BoardRepository.findOneBy({ id, createdById: user.id })
 
     if (!board) return null
 
     board.title = title ?? board.title
     board.description = description ?? board.description
 
-    await repository.save(board)
+    await BoardRepository.save(board)
 
     return board
   }
@@ -99,13 +87,10 @@ export class BoardResolver {
   @Mutation(() => Int, { nullable: true })
   async deleteBoard(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req }: ContextType
+    @Ctx() { user }: ContextType
   ): Promise<number | null> {
-    const { userId } = req.session
-    const repository = dataSource.getRepository(Board)
-    const board = await repository.findOneBy({ id, createdById: userId })
-
-    await repository.softDelete({ id, createdById: userId })
+    const board = await BoardRepository.findOneBy({ id, createdById: user.id })
+    await BoardRepository.softDelete({ id, createdById: user.id })
 
     return board.id
   }
@@ -114,11 +99,9 @@ export class BoardResolver {
   @Mutation(() => Int, { nullable: true })
   async restoreBoard(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req }: ContextType
+    @Ctx() { user }: ContextType
   ): Promise<number | null> {
-    const { userId } = req.session
-
-    await dataSource.getRepository(Board).restore({ id, createdById: userId })
+    await BoardRepository.restore({ id, createdById: user.id })
 
     return id
   }

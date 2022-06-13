@@ -1,7 +1,7 @@
 import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
-import { dataSource } from "../dataSource";
-import { Card, Column } from "../entity";
+import { Card } from "../entity";
 import { Authenticate } from "../middlewares/Authenticate";
+import { CardRepository, ColumnRepository } from "../repository";
 import { ContextType } from "../types";
 
 @Resolver(Card)
@@ -13,16 +13,13 @@ export class CardResolver {
     @Arg('title') title: string,
     @Arg('content', { nullable: true }) content: string | null,
     @Arg('index', () => Int, { nullable: true }) index: number = 0,
-    @Ctx() { req }: ContextType): Promise<Card | null> {
-    const { userId } = req.session
-    const column = await dataSource
-      .getRepository(Column)
-      .findOne({
-        where: { id: columnId },
-        relations: ['board']
-      })
+    @Ctx() { user }: ContextType): Promise<Card | null> {
+    const column = await ColumnRepository.findOne({
+      where: { id: columnId },
+      relations: ['board']
+    })
 
-    if (column.board.createdById !== userId) return null
+    if (column.board.createdById !== user.id) return null
 
     const card = new Card()
 
@@ -31,7 +28,7 @@ export class CardResolver {
     card.index = index
     card.columnId = columnId
 
-    await dataSource.getRepository(Card).save(card)
+    await CardRepository.save(card)
 
     return card
   }
@@ -45,12 +42,11 @@ export class CardResolver {
     @Arg('index', () => Int, { nullable: true }) index: number | null,
     @Ctx() { req }: ContextType): Promise<Card | null> {
     const { userId } = req.session
-    const card = await dataSource.getRepository(Card).findOneBy({ id })
+    const card = await CardRepository.findOneBy({ id })
 
     if (!card) return null
 
-    const column = await dataSource
-      .getRepository(Column)
+    const column = await ColumnRepository
       .findOne({
         where: { id: card.columnId },
         relations: ['board']
@@ -62,7 +58,7 @@ export class CardResolver {
     card.content = content ?? card.content
     card.index = index ?? card.index
 
-    await dataSource.getRepository(Card).save(card)
+    await CardRepository.save(card)
 
     return card
   }
@@ -73,12 +69,11 @@ export class CardResolver {
     @Arg('id', () => Int) id: number,
     @Ctx() { req }: ContextType): Promise<number | null> {
     const { userId } = req.session
-    const card = await dataSource.getRepository(Card).findOneBy({ id })
+    const card = await CardRepository.findOneBy({ id })
 
     if (!card) return null
 
-    const column = await dataSource
-      .getRepository(Column)
+    const column = await ColumnRepository
       .findOne({
         where: { id: card.columnId },
         relations: ['board']
@@ -86,7 +81,7 @@ export class CardResolver {
 
     if (column.board.createdById !== userId) return null
 
-    await dataSource.getRepository(Card).delete({ id })
+    await CardRepository.delete({ id })
 
     return card.id
   }

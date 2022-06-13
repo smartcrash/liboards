@@ -6,6 +6,7 @@ import { SESSION_COOKIE } from '../constants';
 import { dataSource } from '../dataSource';
 import { User } from "../entity";
 import { redisClient } from '../redisClient';
+import { UserRepository } from '../repository';
 import { sendMail } from '../sendMail';
 import { ContextType } from '../types';
 
@@ -28,12 +29,8 @@ class AuthenticationResponse {
 @Resolver()
 export class AuthenticationResolver {
   @Query(() => User, { nullable: true })
-  currentUser(@Ctx() { req }: ContextType): Promise<User> {
-    const id = req.session.userId
-    const repository = dataSource.getRepository(User)
-
-    if (id) return repository.findOneBy({ id })
-    return null
+  async currentUser(@Ctx() { user }: ContextType): Promise<User> {
+    return user
   }
 
   @Mutation(() => AuthenticationResponse)
@@ -43,7 +40,6 @@ export class AuthenticationResolver {
     @Arg('password') password: string,
     @Ctx() { req }: ContextType
   ): Promise<AuthenticationResponse> {
-    const repository = dataSource.getRepository(User)
     const errors: FieldError[] = []
 
     try {
@@ -63,11 +59,11 @@ export class AuthenticationResolver {
       }
     }
 
-    if (await repository.findOneBy({ username })) {
+    if (await UserRepository.findOneBy({ username })) {
       errors.push({ field: 'username', message: 'This username already exists.' })
     }
 
-    if (await repository.findOneBy({ email })) {
+    if (await UserRepository.findOneBy({ email })) {
       errors.push({ field: 'email', message: 'This email is already in use.' })
     }
 
@@ -79,7 +75,7 @@ export class AuthenticationResolver {
     user.email = email
     user.password = password
 
-    await repository.save(user)
+    await UserRepository.save(user)
 
     req.session.userId = user.id
 
@@ -92,8 +88,7 @@ export class AuthenticationResolver {
     @Arg('password') password: string,
     @Ctx() { req }: ContextType
   ): Promise<AuthenticationResponse> {
-    const repository = dataSource.getRepository(User)
-    const user = await repository.findOne({ where: [{ email }, { username: email }] })
+    const user = await UserRepository.findOne({ where: [{ email }, { username: email }] })
 
     if (!user) {
       return { errors: [{ field: 'email', message: "This user does\'nt exists." }] }
@@ -112,8 +107,7 @@ export class AuthenticationResolver {
   async sendResetPasswordEmail(
     @Arg('email') email: string,
   ): Promise<Boolean> {
-    const repository = dataSource.getRepository(User)
-    const user = await repository.findOneBy({ email })
+    const user = await UserRepository.findOneBy({ email })
 
     if (!user) return false
 
@@ -148,8 +142,7 @@ export class AuthenticationResolver {
       }]
     }
 
-    const repository = dataSource.getRepository(User)
-    const user = await repository.findOneBy({ id: +userId })
+    const user = await UserRepository.findOneBy({ id: +userId })
 
     if (!user) return {
       errors: [{
@@ -160,7 +153,7 @@ export class AuthenticationResolver {
 
     user.password = newPassword
 
-    await repository.save(user)
+    await UserRepository.save(user)
     await redisClient.del(`password_resets:${token}`)
 
     return { user }
