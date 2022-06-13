@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
-import { SESSION_COOKIE } from '../constants';
-import { dataSource } from '../dataSource';
-import { Column } from '../entity';
-import { createRandomBoard } from '../utils/testUtils';
+import { SESSION_COOKIE } from '../../constants';
+import { dataSource } from '../../dataSource';
+import { Column } from '../../entity';
+import { createRandomBoard } from '../../utils/testUtils';
 
 const AddColumnMutation = `
   mutation AddColumn($boardId: Int!, $title: String!, $index: Int) {

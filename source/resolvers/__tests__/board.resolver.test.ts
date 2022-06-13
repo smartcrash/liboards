@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
-import { SESSION_COOKIE } from '../constants';
-import { dataSource } from '../dataSource';
-import { Board } from '../entity';
-import { createRandomBoard } from '../utils/testUtils';
+import { SESSION_COOKIE } from '../../constants';
+import { dataSource } from '../../dataSource';
+import { Board } from '../../entity';
+import { createRandomBoard } from '../../utils/testUtils';
 
 test.group('createBoard', () => {
   test('should throw error not authenticated', async ({ expect, client }) => {

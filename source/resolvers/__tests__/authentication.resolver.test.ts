@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
-import { SESSION_COOKIE } from '../constants';
-import { dataSource } from '../dataSource';
-import { User } from '../entity';
-import { redisClient } from '../redisClient';
+import { SESSION_COOKIE } from '../../constants';
+import { dataSource } from '../../dataSource';
+import { User } from '../../entity';
+import { redisClient } from '../../redisClient';
 import { verify } from 'argon2';
 import sinon from 'sinon'
 
