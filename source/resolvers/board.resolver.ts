@@ -1,6 +1,7 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import { IsNull, Not } from "typeorm";
 import { Board } from "../entity";
+import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
 import { BoardRepository } from "../repository";
 import { ContextType } from '../types';
@@ -64,6 +65,7 @@ export class BoardResolver {
   }
 
   @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('update-board'))
   @Mutation(() => Board, { nullable: true })
   async updateBoard(
     @Arg('id', () => Int) id: number,
@@ -84,18 +86,19 @@ export class BoardResolver {
   }
 
   @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('delete-board'))
   @Mutation(() => Int, { nullable: true })
   async deleteBoard(
     @Arg('id', () => Int) id: number,
     @Ctx() { user }: ContextType
   ): Promise<number | null> {
-    const board = await BoardRepository.findOneBy({ id, createdById: user.id })
     await BoardRepository.softDelete({ id, createdById: user.id })
 
-    return board.id
+    return id
   }
 
   @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('restore-board'))
   @Mutation(() => Int, { nullable: true })
   async restoreBoard(
     @Arg('id', () => Int) id: number,

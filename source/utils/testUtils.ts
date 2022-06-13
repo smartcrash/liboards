@@ -49,14 +49,15 @@ export const testThrowsIfNotAuthenticated = (queryData: string | object) => {
 
     expect(errors).toBeDefined()
     expect(errors).toHaveLength(1)
+    // TODO: Change maybe
     expect(errors[0].message).toBe('not authenticated')
   })
 }
 
-export const assertIsUnauthorizedError = ({ response, expect }: { response: ApiResponse, expect: Expect }) => {
+export const assertIsForbiddenExeption = ({ response, expect }: { response: ApiResponse, expect: Expect }) => {
   const { errors } = response.body()
 
   expect(errors).toBeDefined()
   expect(errors).toHaveLength(1)
-  expect(errors[0].message).toBe('Not authorized')
+  expect(errors[0].message).toBe('Forbidden')
 }

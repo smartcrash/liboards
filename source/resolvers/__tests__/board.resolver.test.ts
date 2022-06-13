@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import { SESSION_COOKIE } from '../../constants';
 import { BoardRepository } from '../../repository';
-import { createRandomBoard, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
+import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
 
 const CreateBoardMutation = `
   mutation CreateBoard($description: String, $title: String!) {
@@ -256,29 +256,28 @@ test.group('updateBoard', () => {
     expect(data.board.description).toBe(description)
   })
 
-  test('should only be allowed to update if is owner, return `null` otherwise', async ({ expect, client, createUser }) => {
+  test('should only be allowed to update if is owner', async ({ expect, client, createUser }) => {
     const [user1] = await createUser(client)
     const [, cookie] = await createUser(client)
 
-    const board1 = await createRandomBoard(user1.id)
+    const { id, description } = await createRandomBoard(user1.id)
 
     const queryData = {
       query: UpdateBoardMutation,
       variables: {
-        id: board1.id,
+        id,
         description: faker.lorem.paragraph()
       }
     };
 
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
-    const { data } = response.body()
 
-    expect(data.board).toBeNull()
+    assertIsForbiddenExeption({ response, expect })
 
-    const board = await BoardRepository.findOneBy({ id: board1.id })
+    const board = await BoardRepository.findOneBy({ id })
 
     expect(board).toBeDefined()
-    expect(board.description).toBe(board1.description) // It should not have changed
+    expect(board.description).toBe(description) // It should not have changed
   })
 })
 
@@ -324,9 +323,8 @@ test.group('deletBoard', () => {
     };
 
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
-    const { data } = response.body()
 
-    expect(data.id).toBeNull()
+    assertIsForbiddenExeption({ response, expect })
 
     const board = await BoardRepository.findOne({ where: { id }, withDeleted: true })
 
@@ -388,7 +386,9 @@ test.group('restoreBoard', () => {
       variables: { id }
     };
 
-    await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+
+    assertIsForbiddenExeption({ response, expect })
 
     const board = await BoardRepository.findOne({
       where: { id },

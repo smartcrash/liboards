@@ -94,12 +94,10 @@ test.group('createCard', () => {
     };
 
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
-    const { errors } = response.body()
-    console.log(errors);
-
+    const { data, errors } = response.body()
 
     expect(errors).toBeFalsy()
-    // expect(data.card).toBeFalsy()
+    expect(data.card).toBeFalsy()
   })
 })
 
