@@ -25,7 +25,7 @@ export class Card {
   @Property()
   columnId: number
 
-  @ManyToOne(() => Column, column => column.cards)
+  @ManyToOne(() => Column, column => column.cards, { onDelete: 'CASCADE' })
   @TypeormLoader()
   column: Column
 }

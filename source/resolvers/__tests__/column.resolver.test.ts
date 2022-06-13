@@ -1,9 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
+import { In } from 'typeorm';
 import { SESSION_COOKIE } from '../../constants';
 import { dataSource } from '../../dataSource';
-import { Column } from '../../entity';
-import { createRandomBoard, createRandomColumn } from '../../utils/testUtils';
+import { Card, Column } from '../../entity';
+import { createRandomBoard, createRandomCard, createRandomColumn } from '../../utils/testUtils';
 
 const AddColumnMutation = `
   mutation AddColumn($boardId: Int!, $title: String!, $index: Int) {
@@ -208,7 +209,27 @@ test.group('deleteColumn', () => {
     expect(column).toBeTruthy()
   })
 
-  test('cascades and deletes all related cards')
+  test('cascades and deletes all related cards', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const { id: boardId } = await createRandomBoard(user.id)
+    const { id } = await createRandomColumn(boardId)
+    const cardIds = [
+      await createRandomCard(id),
+      await createRandomCard(id),
+      await createRandomCard(id)
+    ].map((card) => card.id)
+
+    const queryData = {
+      query: DeleteColumnMutation,
+      variables: { id }
+    };
+
+    await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+
+    const cards = await dataSource.getRepository(Card).findBy({ id: In(cardIds) })
+
+    expect(cards).toHaveLength(0)
+  })
 })
 
 
