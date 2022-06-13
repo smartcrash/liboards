@@ -1,6 +1,6 @@
 import { Field, ObjectType } from "type-graphql";
 import { TypeormLoader } from "type-graphql-dataloader";
-import { Column as Propertie, Entity, ManyToOne, PrimaryGeneratedColumn, } from "typeorm";
+import { Column as Property, Entity, ManyToOne, PrimaryGeneratedColumn, } from "typeorm";
 import { Column } from "./Column";
 
 @ObjectType()
@@ -11,18 +11,18 @@ export class Card {
   id: number;
 
   @Field()
-  @Propertie()
+  @Property()
   title: string;
 
   @Field()
-  @Propertie({ default: '' })
+  @Property({ default: '' })
   content: string;
 
   @Field()
-  @Propertie()
+  @Property()
   index: number
 
-  @Propertie()
+  @Property()
   columnId: number
 
   @ManyToOne(() => Column, column => column.cards)

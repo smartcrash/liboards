@@ -1,6 +1,7 @@
 import { Field, ObjectType } from "type-graphql";
 import { TypeormLoader } from "type-graphql-dataloader";
-import { Column as Propertie, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column as Property, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Board } from "./Board";
 import { Card } from "./Card";
 
 @ObjectType()
@@ -11,14 +12,14 @@ export class Column {
   id: number;
 
   @Field()
-  @Propertie()
+  @Property()
   title: string;
 
   @Field()
-  @Propertie()
+  @Property()
   index: number
 
-  @Propertie()
+  @Property()
   boardId: number
 
   @Field(() => [Card])
