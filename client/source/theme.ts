@@ -25,6 +25,11 @@ const theme = extendTheme({
     },
   },
   components: {
+    Input: {
+      baseStyle: {
+        field: { borderColor: 'gray.100' }
+      },
+    },
     Button: {
       defaultProps: { colorScheme: 'primary' }
     },

@@ -1,6 +1,7 @@
 import { Field, ObjectType } from "type-graphql";
 import { TypeormLoader } from "type-graphql-dataloader";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column as Property, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column } from "./Column";
 import { User } from "./User";
 
 @ObjectType()
@@ -11,20 +12,25 @@ export class Board {
   id: number;
 
   @Field()
-  @Column()
+  @Property()
   title: string;
 
   @Field()
-  @Column({ default: '' })
+  @Property({ default: '' })
   description: string;
 
-  @Column()
-  userId: number
+  @Property()
+  createdById: number
 
   @Field(() => User)
   @ManyToOne(() => User, user => user.boards)
   @TypeormLoader()
-  user: User
+  createdBy: User
+
+  @Field(() => [Column])
+  @ManyToOne(() => Column, column => column.board)
+  @TypeormLoader()
+  columns: Column[]
 
   @Field()
   @CreateDateColumn()

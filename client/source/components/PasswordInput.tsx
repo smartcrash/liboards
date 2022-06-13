@@ -27,6 +27,7 @@ export function PasswordInput<T>({
   defaultValue,
   shouldUnregister,
   label,
+  size,
   ...props
 }: PasswordInputProps<T>) {
   const {
@@ -52,14 +53,14 @@ export function PasswordInput<T>({
   return (
     <FormControl isInvalid={!!error?.message}>
       <FormLabel htmlFor={name}>{label}</FormLabel>
-      <InputGroup>
+      <InputGroup size={size}>
         <InputRightElement>
           <IconButton
             variant="link"
             aria-label={isOpen ? "Mask password" : "Reveal password"}
             icon={isOpen ? <ViewOffIcon /> : <ViewIcon />}
-            size={"lg"}
             onClick={onClick}
+            size={size}
             tabIndex={-1}
           />
         </InputRightElement>

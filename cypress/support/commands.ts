@@ -18,6 +18,7 @@ Cypress.Commands.add("createUser", (username = chance.name(), email = chance.ema
   cy.getByTestId("username").clear().type(username);
   cy.getByTestId("email").clear().type(email);
   cy.getByTestId("password").clear().type(password);
+  cy.getByTestId("passwordConfirm").clear().type(password);
   cy.getByTestId("submit").click();
 });
 

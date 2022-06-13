@@ -9,11 +9,10 @@ import http from 'http';
 import { createClient as createRedisClient } from 'redis';
 import "reflect-metadata";
 import { buildSchema } from 'type-graphql';
+import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
 import { NODE_ENV, PORT, SESSION_COOKIE } from './constants';
 import { dataSource } from './dataSource';
-import { redisClient } from './redisClient';
-import { TContext } from './types';
-import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
+import { ContextType } from './types';
 
 async function createServer() {
   const app = express();
@@ -48,7 +47,7 @@ async function createServer() {
   )
 
   const schema = await buildSchema({
-    resolvers: [__dirname + "/resolver/*.resolver.ts"],
+    resolvers: [__dirname + "/resolvers/*.resolver.ts"],
     dateScalarMode: 'isoDate',
     validate: false
   })
@@ -59,7 +58,7 @@ async function createServer() {
       ApolloServerPluginDrainHttpServer({ httpServer }),
       ApolloServerLoaderPlugin({ typeormGetConnection: () => dataSource })
     ],
-    context: ({ req, res }) => ({ req, res, dataSource, redisClient } as TContext)
+    context: ({ req, res }) => ({ req, res } as ContextType)
   });
 
   await server.start()

@@ -31,7 +31,7 @@ export class User {
   }
 
   @Field(() => [Board])
-  @OneToMany(() => Board, board => board.user)
+  @OneToMany(() => Board, board => board.createdBy)
   @TypeormLoader()
   boards: Board[]
 

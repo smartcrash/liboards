@@ -1,14 +1,6 @@
-import {
-  Box,
-  Button,
-  Container,
-  Heading,
-  HStack,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Stack, VStack, Heading, Text } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { Input, Link, PasswordInput } from "../../components";
+import { Container, Input, Link, PasswordInput } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
 import { route } from "../../routes";
 
@@ -16,6 +8,7 @@ interface FieldValues {
   username: string;
   email: string;
   password: string;
+  passwordConfirm: string;
 }
 
 export const SignUp = () => {
@@ -26,78 +19,123 @@ export const SignUp = () => {
     control,
     formState: { isSubmitting },
   } = useForm<FieldValues>({});
-  const onSubmit = handleSubmit(async ({ username, email, password }) => {
-    const response = await createUser(username, email, password);
+  const onSubmit = handleSubmit(
+    async ({ username, email, password, passwordConfirm }) => {
+      if (password !== passwordConfirm) {
+        setError("passwordConfirm", { message: "Passwords must match." });
+        return;
+      }
 
-    if (response?.errors?.length) {
-      const { errors } = response;
-      errors.forEach(({ field, message }: any) => setError(field, { message }));
+      const response = await createUser(username, email, password);
+
+      if (response?.errors?.length) {
+        const { errors } = response;
+        errors.forEach(({ field, message }: any) =>
+          setError(field, { message })
+        );
+      }
     }
-  });
+  );
 
   return (
-    <Container
-      maxW={"lg"}
-      py={{ base: "12", md: "24" }}
-      px={{ base: "0", sm: "8" }}
-    >
-      <Stack spacing={"8"}>
-        <Stack spacing={"6"}>
-          <Stack spacing={{ base: "2", md: "3" }} textAlign={"center"}>
-            <Heading size={"lg"}>Create a new account</Heading>
-            <HStack spacing={2} justify={"center"}>
-              <Text color={"muted"}>Already have an account?</Text>
-              <Link to={route("login")}>Login</Link>
-            </HStack>
-          </Stack>
-        </Stack>
-        <Box
-          as={"form"}
-          onSubmit={onSubmit}
-          py={{ base: "0", sm: "8" }}
-          px={{ base: "4", sm: "10" }}
-        >
-          <Stack spacing={6}>
-            <Stack spacing={5}>
-              <Input
-                label={"Name"}
-                name={"username"}
-                autoComplete={"username"}
-                control={control}
-                rules={{ required: true }}
-                data-testid={"username"}
-              />
+    <Container pt={{ base: 16, sm: 24 }} pb={10} px={6}>
+      <VStack
+        alignItems={"stretch"}
+        flexGrow={1}
+        spacing={{ base: 12, sm: 20 }}
+      >
+        <VStack alignItems={{ base: "flex-start", sm: "center" }}>
+          <Heading fontSize={{ base: "5xl", sm: "5xl" }}>
+            Create new account
+          </Heading>
+          <Text>
+            Already have an account?{" "}
+            <Link color={"primary.500"} to={route("login")}>
+              Log in
+            </Link>
+          </Text>
+        </VStack>
 
-              <Input
-                label={"Email"}
-                name={"email"}
-                type={"email"}
-                autoComplete={"email"}
-                control={control}
-                rules={{ required: true }}
-                data-testid={"email"}
-              />
+        <Stack spacing={8}>
+          <Stack
+            as={"form"}
+            onSubmit={onSubmit}
+            justifyContent={"center"}
+            alignItems={"center"}
+            spacing={8}
+          >
+            <VStack alignItems={"stretch"} spacing={6} w={"full"} maxW={"3xl"}>
+              <Stack direction={{ base: "column", sm: "row" }} spacing={6}>
+                <Box flexGrow={1}>
+                  <Input
+                    label={"Username"}
+                    name={"username"}
+                    autoComplete={"username"}
+                    placeholder={"jhon doe"}
+                    size={"lg"}
+                    control={control}
+                    rules={{ required: true }}
+                    data-testid={"username"}
+                  />
+                </Box>
 
-              <PasswordInput
-                label={"Password"}
-                name={"password"}
-                autoComplete={"new-password"}
-                control={control}
-                rules={{ required: true }}
-                data-testid={"password"}
-              />
-            </Stack>
+                <Box flexGrow={1}>
+                  <Input
+                    label={"Email"}
+                    name={"email"}
+                    type={"email"}
+                    size={"lg"}
+                    placeholder={"jhondoe@example.com"}
+                    autoComplete={"email"}
+                    control={control}
+                    rules={{ required: true }}
+                    data-testid={"email"}
+                  />
+                </Box>
+              </Stack>
+
+              <Stack direction={{ base: "column", sm: "row" }} spacing={6}>
+                <Box flexGrow={1}>
+                  <PasswordInput
+                    label={"Password"}
+                    name={"password"}
+                    size={"lg"}
+                    placeholder={"At least +4 chars"}
+                    autoComplete={"new-password"}
+                    control={control}
+                    rules={{ required: true }}
+                    data-testid={"password"}
+                  />
+                </Box>
+
+                <Box flexGrow={1}>
+                  <PasswordInput
+                    label={"Confirm password"}
+                    name={"passwordConfirm"}
+                    size={"lg"}
+                    placeholder={"••••••"}
+                    autoComplete={"off"}
+                    control={control}
+                    rules={{ required: true }}
+                    data-testid={"passwordConfirm"}
+                  />
+                </Box>
+              </Stack>
+            </VStack>
 
             <Button
               isLoading={isSubmitting}
               type={"submit"}
               data-testid={"submit"}
+              size={"lg"}
+              w={"full"}
+              maxW={"lg"}
             >
-              Sign up
+              Create account
             </Button>
           </Stack>
-        </Box>
-      </Stack>
+        </Stack>
+      </VStack>
     </Container>
   );
 };

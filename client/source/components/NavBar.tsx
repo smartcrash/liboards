@@ -2,6 +2,7 @@ import { AddIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
+  Button,
   HStack,
   Menu,
   MenuButton,
@@ -10,6 +11,7 @@ import {
   MenuList,
   Text,
 } from "@chakra-ui/react";
+import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { route } from "../routes";
 import { Container } from "./";
@@ -26,14 +28,15 @@ function NavBar() {
         <Link to={route("index")}>Liboards</Link>
 
         <HStack spacing={10}>
-          <Link
+          <Button
+            as={RouterLink}
             to={route("projects.create")}
             variant={"solid"}
             leftIcon={<AddIcon fontSize={"xs"} />}
             data-testid={"new-project"}
           >
             Create
-          </Link>
+          </Button>
 
           <Menu>
             <MenuButton>

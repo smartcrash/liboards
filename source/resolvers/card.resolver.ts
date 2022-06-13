@@ -1,0 +1,61 @@
+import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import { Card } from "../entity";
+import { AllowIf } from "../middlewares/AllowIf";
+import { Authenticate } from "../middlewares/Authenticate";
+import { CardRepository } from "../repository";
+import { ContextType } from "../types";
+
+@Resolver(Card)
+export class CardResolver {
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('create-card'))
+  @Mutation(() => Card, { nullable: true })
+  async createCard(
+    @Arg('title') title: string,
+    @Arg('content', { nullable: true }) content: string | null,
+    @Arg('index', () => Int, { nullable: true }) index: number = 0,
+    @Arg('columnId', () => Int) columnId: number,
+    @Ctx() { }: ContextType): Promise<Card | null> {
+    const card = new Card()
+
+    card.title = title
+    card.content = content
+    card.index = index
+    card.columnId = columnId
+
+    await CardRepository.save(card)
+
+    return card
+  }
+
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('update-card'))
+  @Mutation(() => Card, { nullable: true })
+  async updateCard(
+    @Arg('id', () => Int) id: number,
+    @Arg('title', { nullable: true }) title: string | null,
+    @Arg('content', { nullable: true }) content: string | null,
+    @Arg('index', () => Int, { nullable: true }) index: number | null,
+    @Ctx() { }: ContextType): Promise<Card | null> {
+    const card = await CardRepository.findOneBy({ id })
+
+    card.title = title ?? card.title
+    card.content = content ?? card.content
+    card.index = index ?? card.index
+
+    await CardRepository.save(card)
+
+    return card
+  }
+
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('delete-card'))
+  @Mutation(() => Int, { nullable: true })
+  async deleteCard(
+    @Arg('id', () => Int) id: number,
+    @Ctx() { }: ContextType): Promise<number | null> {
+    await CardRepository.delete({ id })
+
+    return id
+  }
+}

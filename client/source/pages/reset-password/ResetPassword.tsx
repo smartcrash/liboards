@@ -1,17 +1,16 @@
 import {
   Alert,
   AlertIcon,
-  Box,
   Button,
-  Container,
   Heading,
   Stack,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import { PasswordInput } from "../../components";
+import { Container, PasswordInput } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
 import { route } from "../../routes";
 
@@ -43,18 +42,26 @@ export const ResetPassword = () => {
 
   return (
     <Container
-      maxW={"lg"}
-      py={{ base: "12", md: "24" }}
-      px={{ base: "4", sm: "8" }}
+      pt={{ base: "12", md: "24" }}
+      px={6}
+      w={"full"}
+      maxW={"2xl"}
+      mx={"auto"}
     >
-      <Stack spacing={6}>
-        <Stack spacing={3}>
-          <Heading size={"lg"}>Create new password</Heading>
+      <Stack spacing={10}>
+        <VStack
+          alignItems={"stretch"}
+          textAlign={{ base: "left", sm: "center" }}
+          spacing={6}
+        >
+          <Heading fontSize={{ base: "4xl", sm: "4xl" }}>
+            Create new password
+          </Heading>
           <Text color={"gray.500"}>
             Make sure that your new password is different from previous used
             passwords.
           </Text>
-        </Stack>
+        </VStack>
 
         {error && (
           <Alert status="error">
@@ -63,25 +70,26 @@ export const ResetPassword = () => {
           </Alert>
         )}
 
-        <Box as={"form"} onSubmit={onSubmit}>
-          <Stack spacing={6}>
-            <PasswordInput
-              label={"Password"}
-              autoComplete={"new-password"}
-              name={"newPassword"}
-              control={control}
-              data-testid={"newPassword"}
-            />
+        <Stack as={"form"} onSubmit={onSubmit} spacing={8}>
+          <PasswordInput
+            label={"Password"}
+            autoComplete={"new-password"}
+            name={"newPassword"}
+            control={control}
+            placeholder={"Must be least +4 chars"}
+            data-testid={"newPassword"}
+            size={"lg"}
+          />
 
-            <Button
-              isLoading={isSubmitting}
-              type={"submit"}
-              data-testid={"submit"}
-            >
-              Reset password
-            </Button>
-          </Stack>
-        </Box>
+          <Button
+            isLoading={isSubmitting}
+            type={"submit"}
+            data-testid={"submit"}
+            size={"lg"}
+          >
+            Reset password
+          </Button>
+        </Stack>
       </Stack>
     </Container>
   );

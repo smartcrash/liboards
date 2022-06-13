@@ -1,123 +1,110 @@
 import { Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import { IsNull, Not } from "typeorm";
 import { Board } from "../entity";
-import { isAuth } from "../middlewares/isAuth";
-import { TContext } from '../types';
+import { AllowIf } from "../middlewares/AllowIf";
+import { Authenticate } from "../middlewares/Authenticate";
+import { BoardRepository } from "../repository";
+import { ContextType } from '../types';
 
 @Resolver(Board)
 export class BoardResolver {
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Query(() => [Board])
   async allBoards(
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { user }: ContextType
   ): Promise<Board[]> {
-    const { userId } = req.session
+    const boards = await BoardRepository.findBy({ createdById: user.id })
 
-    return dataSource.getRepository(Board).findBy({ userId })
+    return boards
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Query(() => [Board])
   async allDeletedBoards(
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { user }: ContextType
   ): Promise<Board[]> {
-    const { userId } = req.session
-
-    return dataSource
-      .getRepository(Board)
+    return BoardRepository
       .find({
         where: {
-          userId,
+          createdById: user.id,
           deletedAt: Not(IsNull()),
         },
         withDeleted: true
       })
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Query(() => Board, { nullable: true })
   async findBoardById(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { user }: ContextType
   ): Promise<Board> {
-    return dataSource
-      .getRepository(Board)
+    return BoardRepository
       .findOne({
-        relations: { user: true },
-        where: {
-          id,
-          userId: req.session.userId
-        }
+        relations: { createdBy: true },
+        where: { id, createdById: user.id }
       })
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
   @Mutation(() => Board)
   async createBoard(
     @Arg('title') title: string,
     @Arg('description', () => String, { nullable: true }) description: string,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { user }: ContextType
   ): Promise<Board> {
-    const repository = dataSource.getRepository(Board)
-
     const board = new Board()
 
     board.title = title
     board.description = description
-    board.userId = req.session.userId
+    board.createdById = user.id
 
-    await repository.save(board)
+    await BoardRepository.save(board)
 
     return board
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('update-board'))
   @Mutation(() => Board, { nullable: true })
   async updateBoard(
     @Arg('id', () => Int) id: number,
     @Arg('title', () => String, { nullable: true }) title: string | null,
     @Arg('description', () => String, { nullable: true }) description: string | null,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { user }: ContextType
   ): Promise<Board | null> {
-    const { userId } = req.session
-    const repository = dataSource.getRepository(Board)
-
-    const board = await repository.findOneBy({ id, userId })
+    const board = await BoardRepository.findOneBy({ id, createdById: user.id })
 
     if (!board) return null
 
     board.title = title ?? board.title
     board.description = description ?? board.description
 
-    await repository.save(board)
+    await BoardRepository.save(board)
 
     return board
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('delete-board'))
   @Mutation(() => Int, { nullable: true })
   async deleteBoard(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { user }: ContextType
   ): Promise<number | null> {
-    const { userId } = req.session
-    const repository = dataSource.getRepository(Board)
-    const board = await repository.findOneBy({ id, userId })
+    await BoardRepository.softDelete({ id, createdById: user.id })
 
-    await repository.softDelete({ id, userId })
-
-    return board.id
+    return id
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('restore-board'))
   @Mutation(() => Int, { nullable: true })
   async restoreBoard(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { user }: ContextType
   ): Promise<number | null> {
-    const { userId } = req.session
-
-    await dataSource.getRepository(Board).restore({ id, userId })
+    await BoardRepository.restore({ id, createdById: user.id })
 
     return id
   }

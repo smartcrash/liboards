@@ -1,15 +1,15 @@
-import { Box } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { Outlet } from "react-router-dom";
 import { Container } from "../../components";
 import NavBar from "../../components/NavBar";
 
 export const Dashboard = () => {
   return (
-    <Box>
+    <Stack h={"100vh"}>
       <NavBar />
-      <Container>
+      <Container flexGrow={1}>
         <Outlet />
       </Container>
-    </Box>
+    </Stack>
   );
 };

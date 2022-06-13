@@ -1,10 +1,8 @@
 import { type Request, type Response } from "express"
-import { RedisClientType } from "redis"
-import { type DataSource } from "typeorm"
+import { User } from "./entity"
 
-export type TContext = {
+export type ContextType = {
   req: Request & { session: Request['session'] & { userId?: number } }
   res: Response
-  dataSource: DataSource
-  redisClient: RedisClientType
+  user?: User,
 }

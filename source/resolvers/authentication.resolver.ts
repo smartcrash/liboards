@@ -1,11 +1,14 @@
 import { verify } from 'argon2';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-graphql";
+import { v4 as uuid } from 'uuid';
 import { z, ZodError } from 'zod';
 import { SESSION_COOKIE } from '../constants';
+import { dataSource } from '../dataSource';
 import { User } from "../entity";
+import { redisClient } from '../redisClient';
+import { UserRepository } from '../repository';
 import { sendMail } from '../sendMail';
-import { TContext } from '../types';
-import { v4 as uuid } from 'uuid'
+import { ContextType } from '../types';
 
 @ObjectType()
 class FieldError {
@@ -26,12 +29,8 @@ class AuthenticationResponse {
 @Resolver()
 export class AuthenticationResolver {
   @Query(() => User, { nullable: true })
-  currentUser(@Ctx() { req, dataSource }: TContext): Promise<User> {
-    const id = req.session.userId
-    const repository = dataSource.getRepository(User)
-
-    if (id) return repository.findOneBy({ id })
-    return null
+  async currentUser(@Ctx() { user }: ContextType): Promise<User> {
+    return user
   }
 
   @Mutation(() => AuthenticationResponse)
@@ -39,9 +38,8 @@ export class AuthenticationResolver {
     @Arg('username') username: string,
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { req }: ContextType
   ): Promise<AuthenticationResponse> {
-    const repository = dataSource.getRepository(User)
     const errors: FieldError[] = []
 
     try {
@@ -61,11 +59,11 @@ export class AuthenticationResolver {
       }
     }
 
-    if (await repository.findOneBy({ username })) {
+    if (await UserRepository.findOneBy({ username })) {
       errors.push({ field: 'username', message: 'This username already exists.' })
     }
 
-    if (await repository.findOneBy({ email })) {
+    if (await UserRepository.findOneBy({ email })) {
       errors.push({ field: 'email', message: 'This email is already in use.' })
     }
 
@@ -77,7 +75,7 @@ export class AuthenticationResolver {
     user.email = email
     user.password = password
 
-    await repository.save(user)
+    await UserRepository.save(user)
 
     req.session.userId = user.id
 
@@ -88,12 +86,12 @@ export class AuthenticationResolver {
   async loginWithPassword(
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { req, dataSource }: TContext
+    @Ctx() { req }: ContextType
   ): Promise<AuthenticationResponse> {
-    const user = await dataSource.getRepository(User).findOneBy({ email })
+    const user = await UserRepository.findOne({ where: [{ email }, { username: email }] })
 
     if (!user) {
-      return { errors: [{ field: 'email', message: "This email does\'nt exists." }] }
+      return { errors: [{ field: 'email', message: "This user does\'nt exists." }] }
     }
 
     if (!(await verify(user.password, password))) {
@@ -108,10 +106,8 @@ export class AuthenticationResolver {
   @Mutation(() => Boolean)
   async sendResetPasswordEmail(
     @Arg('email') email: string,
-    @Ctx() { redisClient, dataSource }: TContext
   ): Promise<Boolean> {
-    const repository = dataSource.getRepository(User)
-    const user = await repository.findOneBy({ email })
+    const user = await UserRepository.findOneBy({ email })
 
     if (!user) return false
 
@@ -136,7 +132,6 @@ export class AuthenticationResolver {
   async resetPassword(
     @Arg('token') token: string,
     @Arg('newPassword') newPassword: string,
-    @Ctx() { redisClient, dataSource }: TContext
   ): Promise<AuthenticationResponse> {
     const userId = await redisClient.get(`password_resets:${token}`)
 
@@ -147,8 +142,7 @@ export class AuthenticationResolver {
       }]
     }
 
-    const repository = dataSource.getRepository(User)
-    const user = await repository.findOneBy({ id: +userId })
+    const user = await UserRepository.findOneBy({ id: +userId })
 
     if (!user) return {
       errors: [{
@@ -159,7 +153,7 @@ export class AuthenticationResolver {
 
     user.password = newPassword
 
-    await repository.save(user)
+    await UserRepository.save(user)
     await redisClient.del(`password_resets:${token}`)
 
     return { user }
@@ -167,7 +161,7 @@ export class AuthenticationResolver {
 
   @Mutation(() => Boolean)
   async logout(
-    @Ctx() { req, res }: TContext
+    @Ctx() { req, res }: ContextType
   ): Promise<boolean> {
     await new Promise<any>((resolve) => req.session.destroy(resolve))
     res.clearCookie(SESSION_COOKIE)
