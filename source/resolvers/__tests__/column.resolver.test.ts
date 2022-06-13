@@ -3,7 +3,7 @@ import { test } from '@japa/runner';
 import { In } from 'typeorm';
 import { SESSION_COOKIE } from '../../constants';
 import { CardRepository, ColumnRepository } from '../../repository';
-import { createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
+import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
 
 const AddColumnMutation = `
   mutation AddColumn($boardId: Int!, $title: String!, $index: Int) {
@@ -87,9 +87,8 @@ test.group('addColumn', () => {
     };
 
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
-    const { data } = response.body()
 
-    expect(data.column).toBeFalsy()
+    assertIsForbiddenExeption({ response, expect })
   })
 })
 
@@ -148,10 +147,8 @@ test.group('updateColumn', () => {
     };
 
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
-    const { data } = response.body()
 
-    expect(data.errors).toBeFalsy()
-    expect(data.column).toBeFalsy()
+    assertIsForbiddenExeption({ response, expect })
 
     const column = await ColumnRepository.findOneBy({ id })
 
@@ -199,10 +196,8 @@ test.group('deleteColumn', () => {
     };
 
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
-    const { data } = response.body()
 
-    expect(data.errors).toBeFalsy()
-    expect(data.id).toBeFalsy()
+    assertIsForbiddenExeption({ response, expect })
 
     const column = await ColumnRepository.findOneBy({ id })
 

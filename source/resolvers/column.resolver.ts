@@ -1,23 +1,21 @@
 
 import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import { Column } from "../entity";
+import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
-import { BoardRepository, ColumnRepository } from "../repository";
+import { ColumnRepository } from "../repository";
 import { ContextType } from "../types";
 
 @Resolver(Column)
 export class ColumnResolver {
   @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('create-column'))
   @Mutation(() => Column, { nullable: true })
   async addColumn(
-    @Arg('boardId', () => Int) boardId: number,
     @Arg('title') title: string,
     @Arg('index', () => Int, { nullable: true }) index: number = 0,
-    @Ctx() { user }: ContextType): Promise<Column | null> {
-    const board = await BoardRepository.findOneBy({ id: boardId, createdById: user.id })
-
-    if (!board) return null
-
+    @Arg('boardId', () => Int) boardId: number,
+    @Ctx() { }: ContextType): Promise<Column | null> {
     const column = new Column()
 
     column.title = title
@@ -30,13 +28,14 @@ export class ColumnResolver {
   }
 
   @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('update-column'))
   @Mutation(() => Column, { nullable: true })
   async updateColumn(
     @Arg('id', () => Int) id: number,
     @Arg('title', { nullable: true }) title: string | null,
     @Arg('index', () => Int, { nullable: true }) index: number | null,
     @Ctx() { user }: ContextType): Promise<Column | null> {
-    const column = await ColumnRepository.findOne({ where: { id }, relations: ['board'] })
+    const column = await ColumnRepository.findOneBy({ id })
 
     if (column.board.createdById !== user.id) return null
 
@@ -50,15 +49,12 @@ export class ColumnResolver {
 
   @UseMiddleware(Authenticate)
   @Mutation(() => Int, { nullable: null })
+  @UseMiddleware(AllowIf('delete-column'))
   async deleteColumn(
     @Arg('id', () => Int) id: number,
-    @Ctx() { user }: ContextType): Promise<number | null> {
-    const column = await ColumnRepository.findOne({ where: { id }, relations: ['board'] })
-
-    if (column.board.createdById !== user.id) return null
-
+    @Ctx() { }: ContextType): Promise<number | null> {
     await ColumnRepository.delete({ id })
 
-    return column.id
+    return id
   }
 }
