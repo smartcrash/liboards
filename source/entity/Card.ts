@@ -16,7 +16,7 @@ export class Card {
 
   @Field()
   @Property({ default: '' })
-  content: string;
+  description: string;
 
   @Field()
   @Property()

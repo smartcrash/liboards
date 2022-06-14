@@ -38,7 +38,7 @@ export const Board = ({ columns }: BoardProps) => {
                 {cards.map((card) => (
                   <Card
                     title={card.title}
-                    content={card.content}
+                    description={card.description}
                     draggableId={`${card.id}`}
                     index={card.index}
                     key={card.id}

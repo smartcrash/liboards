@@ -5,22 +5,22 @@ import { CardRepository } from "../../repository";
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
 const CreateCardMutation = `
-  mutation CreateCard($columnId: Int!, $title: String!, $content: String, $index: Int) {
-    card: createCard(columnId: $columnId, title: $title, content: $content, index: $index) {
+  mutation CreateCard($columnId: Int!, $title: String!, $description: String, $index: Int) {
+    card: createCard(columnId: $columnId, title: $title, description: $description, index: $index) {
       id
       title
-      content
+      description
       index
     }
   }
 `
 
 const UpdateCardMutation = `
-  mutation UpdateCard($id: Int!, $title: String, $content: String, $index: Int) {
-    card: updateCard(id: $id, title: $title, content: $content, index: $index) {
+  mutation UpdateCard($id: Int!, $title: String, $description: String, $index: Int) {
+    card: updateCard(id: $id, title: $title, description: $description, index: $index) {
       id
       title
-      content
+      description
       index
     }
   }
@@ -48,7 +48,7 @@ test.group('createCard', () => {
     const { id: columnId } = await createRandomColumn(boardId)
 
     const title = faker.lorem.words()
-    const content = faker.lorem.sentences()
+    const description = faker.lorem.sentences()
     const index = faker.datatype.number()
 
     const queryData = {
@@ -56,7 +56,7 @@ test.group('createCard', () => {
       variables: {
         columnId,
         title,
-        content,
+        description,
         index
       }
     };
@@ -69,7 +69,7 @@ test.group('createCard', () => {
     expect(data.card).toBeTruthy()
     expect(typeof data.card.id).toBe('number')
     expect(data.card.title).toBe(title)
-    expect(data.card.content).toBe(content)
+    expect(data.card.description).toBe(description)
     expect(data.card.index).toBe(index)
 
     const { id } = data.card
@@ -113,7 +113,7 @@ test.group('updateCard', () => {
     const { id } = await createRandomCard(columnId)
 
     const title = faker.lorem.words()
-    const content = faker.lorem.sentences()
+    const description = faker.lorem.sentences()
     const index = faker.datatype.number()
 
     const queryData = {
@@ -121,7 +121,7 @@ test.group('updateCard', () => {
       variables: {
         id,
         title,
-        content,
+        description,
         index
       }
     };
@@ -134,7 +134,7 @@ test.group('updateCard', () => {
     expect(data.card).toBeTruthy()
     expect(data.card.id).toBe(id)
     expect(data.card.title).toBe(title)
-    expect(data.card.content).toBe(content)
+    expect(data.card.description).toBe(description)
     expect(data.card.index).toBe(index)
 
     const card = await CardRepository.findOneBy({ id })

@@ -12,14 +12,14 @@ export class CardResolver {
   @Mutation(() => Card, { nullable: true })
   async createCard(
     @Arg('title') title: string,
-    @Arg('content', { nullable: true }) content: string | null,
+    @Arg('description', { nullable: true }) description: string | null,
     @Arg('index', () => Int, { nullable: true }) index: number = 0,
     @Arg('columnId', () => Int) columnId: number,
     @Ctx() { }: ContextType): Promise<Card | null> {
     const card = new Card()
 
     card.title = title
-    card.content = content
+    card.description = description
     card.index = index
     card.columnId = columnId
 
@@ -34,13 +34,13 @@ export class CardResolver {
   async updateCard(
     @Arg('id', () => Int) id: number,
     @Arg('title', { nullable: true }) title: string | null,
-    @Arg('content', { nullable: true }) content: string | null,
+    @Arg('description', { nullable: true }) description: string | null,
     @Arg('index', () => Int, { nullable: true }) index: number | null,
     @Ctx() { }: ContextType): Promise<Card | null> {
     const card = await CardRepository.findOneBy({ id })
 
     card.title = title ?? card.title
-    card.content = content ?? card.content
+    card.description = description ?? card.description
     card.index = index ?? card.index
 
     await CardRepository.save(card)

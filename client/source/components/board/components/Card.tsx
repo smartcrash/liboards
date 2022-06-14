@@ -3,12 +3,12 @@ import { Draggable } from "react-beautiful-dnd";
 
 interface CardProps {
   title: string;
-  content: string;
+  description: string;
   index: number;
   draggableId: string;
 }
 
-export const Card = ({ title, content, index, draggableId }: CardProps) => {
+export const Card = ({ title, description, index, draggableId }: CardProps) => {
   return (
     <Draggable draggableId={draggableId} index={index}>
       {({ innerRef, draggableProps, dragHandleProps }) => (
@@ -24,7 +24,7 @@ export const Card = ({ title, content, index, draggableId }: CardProps) => {
           <Stack>
             <Heading fontSize={"md"}>{title}</Heading>
             <Text fontSize={"sm"} color={"gray.500"}>
-              {content}
+              {description}
             </Text>
           </Stack>
         </Box>

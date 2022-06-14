@@ -37,7 +37,7 @@ export type Board = {
 
 export type Card = {
   __typename?: 'Card';
-  content: Scalars['String'];
+  description: Scalars['String'];
   id: Scalars['Float'];
   index: Scalars['Float'];
   title: Scalars['String'];
@@ -92,7 +92,7 @@ export type MutationCreateBoardArgs = {
 
 export type MutationCreateCardArgs = {
   columnId: Scalars['Int'];
-  content?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
   index?: InputMaybe<Scalars['Int']>;
   title: Scalars['String'];
 };
@@ -150,7 +150,7 @@ export type MutationUpdateBoardArgs = {
 
 
 export type MutationUpdateCardArgs = {
-  content?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
   id: Scalars['Int'];
   index?: InputMaybe<Scalars['Int']>;
   title?: InputMaybe<Scalars['String']>;
@@ -188,9 +188,9 @@ export type User = {
 
 export type BoardFragmentFragment = { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any };
 
-export type CardFragmentFragment = { __typename?: 'Card', id: number, title: string, content: string, index: number };
+export type CardFragmentFragment = { __typename?: 'Card', id: number, title: string, description: string, index: number };
 
-export type ColumnFragmentFragment = { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, content: string, index: number }> };
+export type ColumnFragmentFragment = { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> };
 
 export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string };
 
@@ -201,7 +201,7 @@ export type AddColumnMutationVariables = Exact<{
 }>;
 
 
-export type AddColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, content: string, index: number }> } | null };
+export type AddColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } | null };
 
 export type CreateBoardMutationVariables = Exact<{
   title: Scalars['String'];
@@ -291,7 +291,7 @@ export type FindBoardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, content: string, index: number }> }> } | null };
+export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> }> } | null };
 
 export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
@@ -306,7 +306,7 @@ export const CardFragmentFragmentDoc = gql`
     fragment CardFragment on Card {
   id
   title
-  content
+  description
   index
 }
     `;
