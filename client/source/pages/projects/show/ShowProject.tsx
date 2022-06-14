@@ -18,6 +18,7 @@ import {
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { Board } from "../../../components";
 import {
+  useAddColumnMutation,
   useDeleteBoardMutation,
   useFindBoardByIdQuery,
   useUpdateBoardMutation,
@@ -32,6 +33,7 @@ export const ShowProject = () => {
   const [{ data, fetching }] = useFindBoardByIdQuery({ variables: { id } });
   const [, update] = useUpdateBoardMutation();
   const [, deleteBoard] = useDeleteBoardMutation();
+  const [, addColumn] = useAddColumnMutation();
 
   if (fetching) return <>loading...</>; // TODO: Add skeleton
   if (!data?.board) return <>Something went wrong! :O</>;
@@ -41,6 +43,14 @@ export const ShowProject = () => {
   const onDelete = async () => {
     await deleteBoard({ id });
     navigate(route("index"), { replace: true });
+  };
+
+  const onColumnNew = async (newColumn: string) => {
+    await addColumn({
+      title: newColumn,
+      index: 9999,
+      boardId: id,
+    });
   };
 
   return (
@@ -95,7 +105,7 @@ export const ShowProject = () => {
       </HStack>
 
       <Box>
-        <Board columns={columns} />
+        <Board columns={columns} onColumnNew={onColumnNew} />
       </Box>
     </Stack>
   );

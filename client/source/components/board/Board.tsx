@@ -2,12 +2,14 @@ import { Box, HStack } from "@chakra-ui/react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { Column as ColumnType } from "../../generated/graphql";
 import { Card, Column } from "./components";
+import { ColumnAdder } from "./components/ColumnAdder";
 
 interface BoardProps {
   columns: ColumnType[];
+  onColumnNew?: (newColumn: string) => void;
 }
 
-export const Board = ({ columns }: BoardProps) => {
+export const Board = ({ columns, onColumnNew = () => {} }: BoardProps) => {
   const columnWidth = "2xs";
 
   const onDragEnd = ({ draggableId, source, destination }: DropResult) => {
@@ -48,6 +50,10 @@ export const Board = ({ columns }: BoardProps) => {
             </Box>
           );
         })}
+
+        <Box minW={columnWidth}>
+          <ColumnAdder onConfirm={onColumnNew} />
+        </Box>
       </DragDropContext>
     </HStack>
   );
