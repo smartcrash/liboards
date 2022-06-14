@@ -10,7 +10,7 @@ import { ContextType } from "../types";
 export class ColumnResolver {
   @UseMiddleware(Authenticate)
   @UseMiddleware(AllowIf('create-column'))
-  @Mutation(() => Column, { nullable: true })
+  @Mutation(() => Column)
   async addColumn(
     @Arg('title') title: string,
     @Arg('index', () => Int, { nullable: true }) index: number = 0,

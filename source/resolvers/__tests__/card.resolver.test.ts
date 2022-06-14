@@ -79,6 +79,31 @@ test.group('addCard', () => {
     expect(card.columnId).toBe(columnId)
   })
 
+  test('assigns correct `index` by default if was not provided', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const { id: boardId } = await createRandomBoard(user.id)
+    const { id: columnId } = await createRandomColumn(boardId)
+
+    await createRandomCard(columnId, 0)
+    await createRandomCard(columnId, 1)
+    await createRandomCard(columnId, 2)
+
+    const queryData = {
+      query: AddCardMutation,
+      variables: {
+        columnId,
+        title: faker.lorem.words(),
+        description: faker.lorem.sentences(),
+      }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.card).toBeTruthy()
+    expect(data.card.index).toBe(3)
+  })
+
   test('should not allow to create a card on someone else\'s board', async ({ expect, client, createUser }) => {
     const [user] = await createUser(client)
     const [, cookie] = await createUser(client)

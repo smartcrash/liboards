@@ -2,25 +2,25 @@ import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import { Card } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
-import { CardRepository } from "../repository";
+import { CardRepository, ColumnRepository } from "../repository";
 import { ContextType } from "../types";
 
 @Resolver(Card)
 export class CardResolver {
   @UseMiddleware(Authenticate)
   @UseMiddleware(AllowIf('create-card'))
-  @Mutation(() => Card, { nullable: true })
+  @Mutation(() => Card)
   async addCard(
     @Arg('title') title: string,
     @Arg('description', { nullable: true }) description: string | null,
-    @Arg('index', () => Int, { nullable: true }) index: number = 0,
+    @Arg('index', () => Int, { nullable: true }) index: number | null,
     @Arg('columnId', () => Int) columnId: number,
     @Ctx() { }: ContextType): Promise<Card | null> {
     const card = new Card()
 
     card.title = title
     card.description = description
-    card.index = index
+    card.index = index ?? ((await CardRepository.countBy({ columnId })))
     card.columnId = columnId
 
     await CardRepository.save(card)

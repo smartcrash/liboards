@@ -29,12 +29,12 @@ export const createRandomColumn = async (boardId: number): Promise<Column> => {
   return column
 }
 
-export const createRandomCard = async (columnId: number): Promise<Card> => {
+export const createRandomCard = async (columnId: number, index = faker.datatype.number()): Promise<Card> => {
   const card = new Card()
 
   card.title = faker.lorem.words()
-  card.content = faker.lorem.sentences()
-  card.index = faker.datatype.number()
+  card.description = faker.lorem.sentences()
+  card.index = index
   card.columnId = columnId
 
   await CardRepository.save(card)
