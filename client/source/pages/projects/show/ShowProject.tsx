@@ -11,10 +11,12 @@ import {
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
+  Stack,
   Text,
   VStack,
 } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
+import { Board } from "../../../components";
 import {
   useDeleteBoardMutation,
   useFindBoardByIdQuery,
@@ -34,7 +36,7 @@ export const ShowProject = () => {
   if (fetching) return <>loading...</>; // TODO: Add skeleton
   if (!data?.board) return <>Something went wrong! :O</>;
 
-  const { title, description } = data.board;
+  const { title, description, columns } = data.board;
 
   const onDelete = async () => {
     await deleteBoard({ id });
@@ -42,7 +44,7 @@ export const ShowProject = () => {
   };
 
   return (
-    <Box>
+    <Stack spacing={6}>
       <HStack justifyContent={"space-between"}>
         <EditableTitleAndDesc
           defaultValues={{ title, description }}
@@ -91,6 +93,10 @@ export const ShowProject = () => {
           </PopoverContent>
         </Popover>
       </HStack>
-    </Box>
+
+      <Box>
+        <Board columns={columns} />
+      </Box>
+    </Stack>
   );
 };

@@ -1,14 +1,16 @@
 import { Box, Heading, Stack, Text } from "@chakra-ui/react";
-import { TCard } from "../types";
 import { Draggable } from "react-beautiful-dnd";
 
-interface CardProps extends TCard {
+interface CardProps {
+  title: string;
+  content: string;
   index: number;
+  draggableId: string;
 }
 
-export const Card = ({ id, description, title, index }: CardProps) => {
+export const Card = ({ title, content, index, draggableId }: CardProps) => {
   return (
-    <Draggable draggableId={`${id}`} index={index}>
+    <Draggable draggableId={draggableId} index={index}>
       {({ innerRef, draggableProps, dragHandleProps }) => (
         <Box
           py={3}
@@ -22,7 +24,7 @@ export const Card = ({ id, description, title, index }: CardProps) => {
           <Stack>
             <Heading fontSize={"md"}>{title}</Heading>
             <Text fontSize={"sm"} color={"gray.500"}>
-              {description}
+              {content}
             </Text>
           </Stack>
         </Box>

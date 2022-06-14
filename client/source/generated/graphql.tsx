@@ -291,7 +291,7 @@ export type FindBoardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string } } | null };
+export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, content: string, index: number }> }> } | null };
 
 export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
@@ -492,11 +492,14 @@ export const FindBoardByIdDocument = gql`
       id
       username
     }
+    columns {
+      ...ColumnFragment
+    }
     createdAt
     updatedAt
   }
 }
-    `;
+    ${ColumnFragmentFragmentDoc}`;
 
 export function useFindBoardByIdQuery(options: Omit<Urql.UseQueryArgs<FindBoardByIdQueryVariables>, 'query'>) {
   return Urql.useQuery<FindBoardByIdQuery>({ query: FindBoardByIdDocument, ...options });

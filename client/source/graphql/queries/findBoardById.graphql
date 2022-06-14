@@ -7,10 +7,9 @@ query FindBoardById($id: Int!) {
       id
       username
     }
-    # TODO: Fix dataLoader
-    # columns {
-    #   ...ColumnFragment
-    # }
+    columns {
+      ...ColumnFragment
+    }
     createdAt
     updatedAt
   }

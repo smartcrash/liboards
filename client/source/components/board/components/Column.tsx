@@ -1,16 +1,15 @@
 import { Box, Heading, VStack } from "@chakra-ui/react";
 import { Droppable } from "react-beautiful-dnd";
-import { TCard, TColumn } from "../types";
-import { Card } from "./Card";
 
 interface ColumnProps {
-  column: TColumn;
-  cards: TCard[];
+  title: string;
+  droppableId: string;
+  children: any;
 }
 
-export const Column = ({ column, cards }: ColumnProps) => {
+export const Column = ({ title, droppableId, children }: ColumnProps) => {
   return (
-    <Box minW={"2xs"}>
+    <Box>
       <Heading
         fontSize={"lg"}
         mb={3}
@@ -19,10 +18,10 @@ export const Column = ({ column, cards }: ColumnProps) => {
         py={2}
         borderRadius={"sm"}
       >
-        {column.title}
+        {title}
       </Heading>
 
-      <Droppable droppableId={`${column.id}`}>
+      <Droppable droppableId={droppableId}>
         {({ innerRef, droppableProps, placeholder }) => (
           <VStack
             spacing={3}
@@ -31,10 +30,7 @@ export const Column = ({ column, cards }: ColumnProps) => {
             ref={innerRef}
             {...droppableProps}
           >
-            {cards.map((card, index) => (
-              <Card {...card} index={index} key={card.id} />
-            ))}
-
+            {children}
             {placeholder}
           </VStack>
         )}
