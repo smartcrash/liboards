@@ -4,9 +4,9 @@ import { SESSION_COOKIE } from "../../constants";
 import { CardRepository } from "../../repository";
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
-const CreateCardMutation = `
-  mutation CreateCard($columnId: Int!, $title: String!, $description: String, $index: Int) {
-    card: createCard(columnId: $columnId, title: $title, description: $description, index: $index) {
+const AddCardMutation = `
+  mutation AddCard($columnId: Int!, $title: String!, $description: String, $index: Int) {
+    card: addCard(columnId: $columnId, title: $title, description: $description, index: $index) {
       id
       title
       description
@@ -26,16 +26,16 @@ const UpdateCardMutation = `
   }
 `
 
-const DeleteCardMutation = `
+const RemoveCardMutation = `
   mutation RemoveCard($id: Int!) {
     id: removeCard(id: $id)
   }
 `
 
 
-test.group('createCard', () => {
+test.group('addCard', () => {
   testThrowsIfNotAuthenticated({
-    query: CreateCardMutation,
+    query: AddCardMutation,
     variables: {
       columnId: -1,
       title: '',
@@ -52,7 +52,7 @@ test.group('createCard', () => {
     const index = faker.datatype.number()
 
     const queryData = {
-      query: CreateCardMutation,
+      query: AddCardMutation,
       variables: {
         columnId,
         title,
@@ -86,7 +86,7 @@ test.group('createCard', () => {
     const { id: columnId } = await createRandomColumn(boardId)
 
     const queryData = {
-      query: CreateCardMutation,
+      query: AddCardMutation,
       variables: {
         columnId,
         title: faker.lorem.words(),
@@ -169,7 +169,7 @@ test.group('updateCard', () => {
 
 test.group('removeCard', () => {
   testThrowsIfNotAuthenticated({
-    query: DeleteCardMutation,
+    query: RemoveCardMutation,
     variables: { id: -1 }
   })
 
@@ -180,7 +180,7 @@ test.group('removeCard', () => {
     const { id } = await createRandomCard(columnId)
 
     const queryData = {
-      query: DeleteCardMutation,
+      query: RemoveCardMutation,
       variables: { id }
     };
 

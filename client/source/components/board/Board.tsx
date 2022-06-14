@@ -2,18 +2,26 @@ import { Box, HStack } from "@chakra-ui/react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { Column as ColumnType } from "../../generated/graphql";
 import { Card, Column } from "./components";
+import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
+
+export type ColumnNewHandler = (newColumn: { title: string }) => void;
+export type CardNewHandler = (newCard: {
+  title: string;
+  columnId: number;
+}) => void;
 
 interface BoardProps {
   columns: ColumnType[];
-  onColumnNew?: (newColumn: string) => void;
+  onColumnNew: ColumnNewHandler;
+  onCardNew: CardNewHandler;
 }
 
-export const Board = ({ columns, onColumnNew = () => {} }: BoardProps) => {
+export const Board = ({ columns, onColumnNew, onCardNew }: BoardProps) => {
   const columnWidth = "2xs";
 
   const onDragEnd = ({ draggableId, source, destination }: DropResult) => {
-    console.log({ draggableId, source, destination });
+    // console.log({ draggableId, source, destination });
 
     if (!destination) return;
 
@@ -46,13 +54,22 @@ export const Board = ({ columns, onColumnNew = () => {} }: BoardProps) => {
                     key={card.id}
                   />
                 ))}
+
+                <CardAdder
+                  onConfirm={(title) =>
+                    onCardNew({
+                      title,
+                      columnId: column.id,
+                    })
+                  }
+                />
               </Column>
             </Box>
           );
         })}
 
         <Box minW={columnWidth}>
-          <ColumnAdder onConfirm={onColumnNew} />
+          <ColumnAdder onConfirm={(title) => onColumnNew({ title })} />
         </Box>
       </DragDropContext>
     </HStack>

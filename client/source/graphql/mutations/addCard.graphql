@@ -1,0 +1,15 @@
+mutation AddCard(
+  $title: String!
+  $description: String
+  $index: Int
+  $columnId: Int!
+) {
+  card: addCard(
+    title: $title
+    description: $description
+    index: $index
+    columnId: $columnId
+  ) {
+    ...CardFragment
+  }
+}

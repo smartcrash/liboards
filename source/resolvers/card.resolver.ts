@@ -10,7 +10,7 @@ export class CardResolver {
   @UseMiddleware(Authenticate)
   @UseMiddleware(AllowIf('create-card'))
   @Mutation(() => Card, { nullable: true })
-  async createCard(
+  async addCard(
     @Arg('title') title: string,
     @Arg('description', { nullable: true }) description: string | null,
     @Arg('index', () => Int, { nullable: true }) index: number = 0,

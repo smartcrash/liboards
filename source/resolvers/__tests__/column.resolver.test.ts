@@ -25,7 +25,7 @@ const UpdateColumnMutation = `
   }
 `
 
-const DeleteColumnMutation = `
+const RemoveColumnMutation = `
   mutation RemoveColumn($id: Int!) {
     id: removeColumn(id: $id)
   }
@@ -158,7 +158,7 @@ test.group('updateColumn', () => {
 
 test.group('removeColumn', () => {
   testThrowsIfNotAuthenticated({
-    query: DeleteColumnMutation,
+    query: RemoveColumnMutation,
     variables: { id: 1 }
   })
 
@@ -168,7 +168,7 @@ test.group('removeColumn', () => {
     const { id } = await createRandomColumn(boardId)
 
     const queryData = {
-      query: DeleteColumnMutation,
+      query: RemoveColumnMutation,
       variables: { id }
     };
 
@@ -191,7 +191,7 @@ test.group('removeColumn', () => {
     const { id } = await createRandomColumn(boardId)
 
     const queryData = {
-      query: DeleteColumnMutation,
+      query: RemoveColumnMutation,
       variables: { id, }
     };
 
@@ -215,7 +215,7 @@ test.group('removeColumn', () => {
     ].map((card) => card.id)
 
     const queryData = {
-      query: DeleteColumnMutation,
+      query: RemoveColumnMutation,
       variables: { id }
     };
 

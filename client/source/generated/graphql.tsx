@@ -59,21 +59,29 @@ export type FieldError = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addCard?: Maybe<Card>;
   addColumn?: Maybe<Column>;
   createBoard: Board;
-  createCard?: Maybe<Card>;
   createUser: AuthenticationResponse;
   deleteBoard?: Maybe<Scalars['Int']>;
-  deleteCard?: Maybe<Scalars['Int']>;
-  deleteColumn?: Maybe<Scalars['Int']>;
   loginWithPassword: AuthenticationResponse;
   logout: Scalars['Boolean'];
+  removeCard?: Maybe<Scalars['Int']>;
+  removeColumn?: Maybe<Scalars['Int']>;
   resetPassword: AuthenticationResponse;
   restoreBoard?: Maybe<Scalars['Int']>;
   sendResetPasswordEmail: Scalars['Boolean'];
   updateBoard?: Maybe<Board>;
   updateCard?: Maybe<Card>;
   updateColumn?: Maybe<Column>;
+};
+
+
+export type MutationAddCardArgs = {
+  columnId: Scalars['Int'];
+  description?: InputMaybe<Scalars['String']>;
+  index?: InputMaybe<Scalars['Int']>;
+  title: Scalars['String'];
 };
 
 
@@ -90,14 +98,6 @@ export type MutationCreateBoardArgs = {
 };
 
 
-export type MutationCreateCardArgs = {
-  columnId: Scalars['Int'];
-  description?: InputMaybe<Scalars['String']>;
-  index?: InputMaybe<Scalars['Int']>;
-  title: Scalars['String'];
-};
-
-
 export type MutationCreateUserArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
@@ -110,19 +110,19 @@ export type MutationDeleteBoardArgs = {
 };
 
 
-export type MutationDeleteCardArgs = {
-  id: Scalars['Int'];
-};
-
-
-export type MutationDeleteColumnArgs = {
-  id: Scalars['Int'];
-};
-
-
 export type MutationLoginWithPasswordArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationRemoveCardArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationRemoveColumnArgs = {
+  id: Scalars['Int'];
 };
 
 
@@ -193,6 +193,16 @@ export type CardFragmentFragment = { __typename?: 'Card', id: number, title: str
 export type ColumnFragmentFragment = { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> };
 
 export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string };
+
+export type AddCardMutationVariables = Exact<{
+  title: Scalars['String'];
+  description?: InputMaybe<Scalars['String']>;
+  index?: InputMaybe<Scalars['Int']>;
+  columnId: Scalars['Int'];
+}>;
+
+
+export type AddCardMutation = { __typename?: 'Mutation', card?: { __typename?: 'Card', id: number, title: string, description: string, index: number } | null };
 
 export type AddColumnMutationVariables = Exact<{
   boardId: Scalars['Int'];
@@ -329,6 +339,22 @@ export const UserFragmentFragmentDoc = gql`
   updatedAt
 }
     `;
+export const AddCardDocument = gql`
+    mutation AddCard($title: String!, $description: String, $index: Int, $columnId: Int!) {
+  card: addCard(
+    title: $title
+    description: $description
+    index: $index
+    columnId: $columnId
+  ) {
+    ...CardFragment
+  }
+}
+    ${CardFragmentFragmentDoc}`;
+
+export function useAddCardMutation() {
+  return Urql.useMutation<AddCardMutation, AddCardMutationVariables>(AddCardDocument);
+};
 export const AddColumnDocument = gql`
     mutation AddColumn($boardId: Int!, $title: String!, $index: Int) {
   column: addColumn(boardId: $boardId, title: $title, index: $index) {

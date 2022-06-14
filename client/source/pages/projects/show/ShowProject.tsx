@@ -16,8 +16,9 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
-import { Board } from "../../../components";
+import { Board, CardNewHandler, ColumnNewHandler } from "../../../components";
 import {
+  useAddCardMutation,
   useAddColumnMutation,
   useDeleteBoardMutation,
   useFindBoardByIdQuery,
@@ -34,6 +35,7 @@ export const ShowProject = () => {
   const [, update] = useUpdateBoardMutation();
   const [, deleteBoard] = useDeleteBoardMutation();
   const [, addColumn] = useAddColumnMutation();
+  const [, addCard] = useAddCardMutation();
 
   if (fetching) return <>loading...</>; // TODO: Add skeleton
   if (!data?.board) return <>Something went wrong! :O</>;
@@ -45,12 +47,15 @@ export const ShowProject = () => {
     navigate(route("index"), { replace: true });
   };
 
-  const onColumnNew = async (newColumn: string) => {
+  const onColumnNew: ColumnNewHandler = async (newColumn) => {
     await addColumn({
-      title: newColumn,
-      index: 9999,
+      ...newColumn,
       boardId: id,
     });
+  };
+
+  const onCardNew: CardNewHandler = async (newCard) => {
+    await addCard({ ...newCard });
   };
 
   return (
@@ -105,7 +110,11 @@ export const ShowProject = () => {
       </HStack>
 
       <Box>
-        <Board columns={columns} onColumnNew={onColumnNew} />
+        <Board
+          columns={columns}
+          onColumnNew={onColumnNew}
+          onCardNew={onCardNew}
+        />
       </Box>
     </Stack>
   );
