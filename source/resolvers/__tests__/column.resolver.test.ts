@@ -90,6 +90,30 @@ test.group('addColumn', () => {
 
     assertIsForbiddenExeption({ response, expect })
   })
+
+  test('assigns correct `index` by default if was not provided', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const { id: boardId } = await createRandomBoard(user.id)
+
+    await createRandomColumn(boardId, 0)
+    await createRandomColumn(boardId, 1)
+    await createRandomColumn(boardId, 2)
+
+
+    const queryData = {
+      query: AddColumnMutation,
+      variables: {
+        boardId,
+        title: faker.lorem.word(),
+      }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.column).toBeTruthy()
+    expect(data.column.index).toBe(3)
+  })
 })
 
 test.group('updateColumn', () => {

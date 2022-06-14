@@ -17,11 +17,11 @@ export const createRandomBoard = async (userId: number): Promise<Board> => {
   return board
 }
 
-export const createRandomColumn = async (boardId: number): Promise<Column> => {
+export const createRandomColumn = async (boardId: number, index = faker.datatype.number()): Promise<Column> => {
   const column = new Column()
 
   column.title = faker.lorem.words()
-  column.index = faker.datatype.number()
+  column.index = index
   column.boardId = boardId
 
   await ColumnRepository.save(column)
