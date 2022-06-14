@@ -48,7 +48,7 @@ export class ColumnResolver {
   @UseMiddleware(Authenticate)
   @Mutation(() => Int, { nullable: null })
   @UseMiddleware(AllowIf('delete-column'))
-  async deleteColumn(
+  async removeColumn(
     @Arg('id', () => Int) id: number,
     @Ctx() { }: ContextType): Promise<number | null> {
     await ColumnRepository.delete({ id })

@@ -27,8 +27,8 @@ const UpdateCardMutation = `
 `
 
 const DeleteCardMutation = `
-  mutation DeleteCard($id: Int!) {
-    id: deleteCard(id: $id)
+  mutation RemoveCard($id: Int!) {
+    id: removeCard(id: $id)
   }
 `
 
@@ -167,7 +167,7 @@ test.group('updateCard', () => {
   })
 })
 
-test.group('deleteCard', () => {
+test.group('removeCard', () => {
   testThrowsIfNotAuthenticated({
     query: DeleteCardMutation,
     variables: { id: -1 }

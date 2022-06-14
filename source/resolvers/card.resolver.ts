@@ -51,7 +51,7 @@ export class CardResolver {
   @UseMiddleware(Authenticate)
   @UseMiddleware(AllowIf('delete-card'))
   @Mutation(() => Int, { nullable: true })
-  async deleteCard(
+  async removeCard(
     @Arg('id', () => Int) id: number,
     @Ctx() { }: ContextType): Promise<number | null> {
     await CardRepository.delete({ id })

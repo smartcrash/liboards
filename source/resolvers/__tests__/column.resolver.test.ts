@@ -26,8 +26,8 @@ const UpdateColumnMutation = `
 `
 
 const DeleteColumnMutation = `
-  mutation DeleteColumn($id: Int!) {
-    id: deleteColumn(id: $id)
+  mutation RemoveColumn($id: Int!) {
+    id: removeColumn(id: $id)
   }
 `
 
@@ -156,7 +156,7 @@ test.group('updateColumn', () => {
   })
 })
 
-test.group('deleteColumn', () => {
+test.group('removeColumn', () => {
   testThrowsIfNotAuthenticated({
     query: DeleteColumnMutation,
     variables: { id: 1 }
