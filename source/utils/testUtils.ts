@@ -29,10 +29,10 @@ export const createRandomColumn = async (boardId: number, index = faker.datatype
   return column
 }
 
-export const createRandomCard = async (columnId: number, index = faker.datatype.number()): Promise<Card> => {
+export const createRandomCard = async (columnId: number, index = faker.datatype.number(), title = faker.lorem.words()): Promise<Card> => {
   const card = new Card()
 
-  card.title = faker.lorem.words()
+  card.title = title
   card.description = faker.lorem.sentences()
   card.index = index
   card.columnId = columnId

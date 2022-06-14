@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { test } from "@japa/runner";
+import { In } from "typeorm";
 import { SESSION_COOKIE } from "../../constants";
 import { CardRepository } from "../../repository";
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
@@ -16,12 +17,11 @@ const AddCardMutation = `
 `
 
 const UpdateCardMutation = `
-  mutation UpdateCard($id: Int!, $title: String, $description: String, $index: Int) {
-    card: updateCard(id: $id, title: $title, description: $description, index: $index) {
+  mutation UpdateCard($id: Int!, $title: String, $description: String) {
+    card: updateCard(id: $id, title: $title, description: $description) {
       id
       title
       description
-      index
     }
   }
 `
@@ -29,6 +29,15 @@ const UpdateCardMutation = `
 const RemoveCardMutation = `
   mutation RemoveCard($id: Int!) {
     id: removeCard(id: $id)
+  }
+`
+
+const MoveCardMutation = `
+  mutation MoveCard($toIndex: Int!, $toColumnId: Int!, $id: Int!) {
+    card: moveCard(toIndex: $toIndex, toColumnId: $toColumnId, id: $id) {
+      id
+      index
+    }
   }
 `
 
@@ -139,7 +148,6 @@ test.group('updateCard', () => {
 
     const title = faker.lorem.words()
     const description = faker.lorem.sentences()
-    const index = faker.datatype.number()
 
     const queryData = {
       query: UpdateCardMutation,
@@ -147,7 +155,6 @@ test.group('updateCard', () => {
         id,
         title,
         description,
-        index
       }
     };
 
@@ -160,11 +167,10 @@ test.group('updateCard', () => {
     expect(data.card.id).toBe(id)
     expect(data.card.title).toBe(title)
     expect(data.card.description).toBe(description)
-    expect(data.card.index).toBe(index)
 
     const card = await CardRepository.findOneBy({ id })
 
-    expect(card).toMatchObject({ title, index })
+    expect(card).toMatchObject({ title, description })
   })
 
   test('should not allow update someone else\'s card', async ({ expect, client, createUser }) => {
@@ -189,6 +195,92 @@ test.group('updateCard', () => {
     const card = await CardRepository.findOneBy({ id })
 
     expect(card.title).toBe(title)
+  })
+})
+
+
+test.group('moveCard', () => {
+  testThrowsIfNotAuthenticated({
+    query: MoveCardMutation,
+    variables: {
+      id: 0,
+      toIndex: 0,
+      toColumnId: 0,
+    }
+  })
+
+  test('moves the card up to the specified position in same column', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const { id: boardId } = await createRandomBoard(user.id)
+    const { id: columnId } = await createRandomColumn(boardId)
+
+    const card1 = await createRandomCard(columnId, 0, 'card-1')
+    const card2 = await createRandomCard(columnId, 1, 'card-2')
+    const card3 = await createRandomCard(columnId, 2, 'card-3')
+
+    const toIndex = 2
+    const toColumnId = columnId
+
+    const queryData = {
+      query: MoveCardMutation,
+      variables: {
+        id: card1.id,
+        toIndex,
+        toColumnId,
+      }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.card).toBeTruthy()
+    expect(data.card.id).toBe(card1.id)
+    expect(data.card.index).toBe(toIndex)
+
+    const cards = await CardRepository.find({
+      select: { id: true, index: true, title: true },
+      where: { id: In([card1.id, card2.id, card3.id]) },
+      order: { index: 'ASC' },
+    })
+
+    expect(cards).toMatchObject([{ id: card2.id }, { id: card3.id }, { id: card1.id }])
+  })
+
+  test('moves the card down to the specified position in same column', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const { id: boardId } = await createRandomBoard(user.id)
+    const { id: columnId } = await createRandomColumn(boardId)
+
+    const card1 = await createRandomCard(columnId, 0, 'card-1')
+    const card2 = await createRandomCard(columnId, 1, 'card-2')
+    const card3 = await createRandomCard(columnId, 2, 'card-3')
+
+    const toIndex = 0
+    const toColumnId = columnId
+
+    const queryData = {
+      query: MoveCardMutation,
+      variables: {
+        id: card3.id,
+        toIndex,
+        toColumnId,
+      }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.card).toBeTruthy()
+    expect(data.card.id).toBe(card3.id)
+    expect(data.card.index).toBe(toIndex)
+
+    const cards = await CardRepository.find({
+      select: { id: true, index: true, title: true },
+      where: { id: In([card1.id, card2.id, card3.id]) },
+      order: { index: 'ASC' },
+    })
+
+    expect(cards).toMatchObject([{ id: card3.id }, { id: card1.id }, { id: card2.id }])
   })
 })
 
