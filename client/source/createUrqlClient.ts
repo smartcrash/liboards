@@ -10,6 +10,8 @@ import {
   dedupExchange, errorExchange, fetchExchange
 } from "urql";
 import {
+  AddColumnMutation,
+  AddColumnMutationVariables,
   AllBoardsDocument,
   AllBoardsQuery,
   AllDeletedBoardsDocument,
@@ -18,9 +20,10 @@ import {
   CreateUserMutation,
   CurrentUserDocument,
   CurrentUserQuery,
-  DeleteBoardMutation, DeleteBoardMutationVariables, FindBoardByIdDocument, LoginWithPasswordMutation,
+  DeleteBoardMutation, DeleteBoardMutationVariables, FindBoardByIdDocument, FindBoardByIdQuery, LoginWithPasswordMutation,
   LogoutMutation,
-  RestoreBoardMutation
+  RestoreBoardMutation,
+  RestoreBoardMutationVariables
 } from "./generated/graphql";
 
 function updateQuery<R extends DataFields, Q>(
@@ -89,7 +92,7 @@ export const createUrqlClient = () => createClient({
             )
           },
 
-          deleteBoard: (result, args, cache, info) => {
+          deleteBoard: (result, args: DeleteBoardMutationVariables, cache, info) => {
             cache.invalidate('Query', 'findBoardById', { id: args.id })
             cache.invalidate('Query', 'allDeletedBoards')
 
@@ -100,13 +103,34 @@ export const createUrqlClient = () => createClient({
             )
           },
 
-          restoreBoard: (result, args, cache, info) => {
+          restoreBoard: (result, args: RestoreBoardMutationVariables, cache, info) => {
             cache.invalidate('Query', 'allBoards')
 
             updateQuery<RestoreBoardMutation, AllDeletedBoardsQuery>(
               cache,
               { query: AllDeletedBoardsDocument },
               result, (result, data) => ({ boards: (data?.boards || []).filter((board) => board.id !== args.id) })
+            )
+          },
+
+          addColumn: (result, args: AddColumnMutationVariables, cache, info) => {
+            updateQuery<AddColumnMutation, FindBoardByIdQuery>(
+              cache,
+              { query: FindBoardByIdDocument, variables: { id: args.boardId } },
+              result, (result, data) => {
+                // If there is no cache or the mutaton didn't resolve correctly
+                // just leave the query cache as it is.
+                if (!data?.board || !result.column) return data
+
+                // TODO: Use merge function
+                return {
+                  ...data,
+                  board: {
+                    ...data.board,
+                    columns: [...data.board.columns, result.column]
+                  }
+                }
+              }
             )
           },
         },
