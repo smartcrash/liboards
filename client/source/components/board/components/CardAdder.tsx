@@ -24,6 +24,7 @@ export const CardAdder = ({ onConfirm }: CardAdderProps) => {
       leftIcon={<AddIcon />}
       fontSize={"sm"}
       size={"sm"}
+      w={"full"}
     >
       Add a card
     </Button>

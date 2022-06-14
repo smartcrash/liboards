@@ -5,9 +5,14 @@ import { Card, Column } from "./components";
 import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
 
-export type ColumnNewHandler = (newColumn: { title: string }) => void;
+export type ColumnNewHandler = (newColumn: {
+  title: string;
+  index: number;
+}) => void;
+
 export type CardNewHandler = (newCard: {
   title: string;
+  index: number;
   columnId: number;
 }) => void;
 
@@ -21,8 +26,6 @@ export const Board = ({ columns, onColumnNew, onCardNew }: BoardProps) => {
   const columnWidth = "2xs";
 
   const onDragEnd = ({ draggableId, source, destination }: DropResult) => {
-    // console.log({ draggableId, source, destination });
-
     if (!destination) return;
 
     // If this expression is true means that the user
@@ -54,22 +57,25 @@ export const Board = ({ columns, onColumnNew, onCardNew }: BoardProps) => {
                     key={card.id}
                   />
                 ))}
-
-                <CardAdder
-                  onConfirm={(title) =>
-                    onCardNew({
-                      title,
-                      columnId: column.id,
-                    })
-                  }
-                />
               </Column>
+
+              <CardAdder
+                onConfirm={(title) =>
+                  onCardNew({
+                    title,
+                    index: cards.length,
+                    columnId: column.id,
+                  })
+                }
+              />
             </Box>
           );
         })}
 
         <Box minW={columnWidth}>
-          <ColumnAdder onConfirm={(title) => onColumnNew({ title })} />
+          <ColumnAdder
+            onConfirm={(title) => onColumnNew({ title, index: columns.length })}
+          />
         </Box>
       </DragDropContext>
     </HStack>

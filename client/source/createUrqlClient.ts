@@ -10,6 +10,7 @@ import {
   dedupExchange, errorExchange, fetchExchange
 } from "urql";
 import {
+  AddCardMutationVariables,
   AddColumnMutation,
   AddColumnMutationVariables,
   AllBoardsDocument,
@@ -132,6 +133,18 @@ export const createUrqlClient = () => createClient({
                 }
               }
             )
+          },
+
+          addCard: (result, args: AddCardMutationVariables, cache, info) => {
+            // TODO: Optimize be directly adding card to column
+            // NOTE: This works for updating the UI when a card is added
+            //       but it forces a re-fetch. A better way would be to add
+            //       the card to the Board's `columns[].cards` array.
+            //       But from here we don't have to Board's ID.
+            cache.invalidate({
+              __typename: 'Column',
+              id: args.columnId,
+            });
           },
         },
       },
