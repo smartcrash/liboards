@@ -16,29 +16,46 @@ export type CardNewHandler = (newCard: {
   columnId: number;
 }) => void;
 
+export type CardDragEndHandler = (result: {
+  cardId: number;
+  fromColumnId: number;
+  toColumnId: number;
+  fromIndex: number;
+  toIndex: number;
+}) => void;
+
 interface BoardProps {
   columns: ColumnType[];
   onColumnNew: ColumnNewHandler;
   onCardNew: CardNewHandler;
+  onCardDragEnd: CardDragEndHandler;
 }
 
-export const Board = ({ columns, onColumnNew, onCardNew }: BoardProps) => {
+export const Board = ({
+  columns,
+  onColumnNew,
+  onCardNew,
+  onCardDragEnd,
+}: BoardProps) => {
   const columnWidth = "2xs";
 
   const onDragEnd = ({ draggableId, source, destination }: DropResult) => {
+    // Sometimes the destination may be `null` such as when the user
+    // drops outside of a list.
     if (!destination) return;
+
+    const cardId = parseInt(draggableId);
+    const fromColumnId = parseInt(source.droppableId);
+    const toColumnId = parseInt(destination.droppableId);
+    const fromIndex = source.index;
+    const toIndex = destination.index;
 
     // If this expression is true means that the user
     // dropped the draggable on the same place that started.
     // So we do not need to do anithing.
-    if (
-      source.droppableId === destination.droppableId &&
-      source.index === destination.index
-    )
-      return;
+    if (fromColumnId === toColumnId && fromIndex === toIndex) return;
 
-    // TODO: Persist card reorder
-    const column = ``;
+    onCardDragEnd({ cardId, fromColumnId, toColumnId, fromIndex, toIndex });
   };
 
   return (

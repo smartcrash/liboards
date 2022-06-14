@@ -16,7 +16,12 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
-import { Board, CardNewHandler, ColumnNewHandler } from "../../../components";
+import {
+  Board,
+  CardDragEndHandler,
+  CardNewHandler,
+  ColumnNewHandler,
+} from "../../../components";
 import {
   useAddCardMutation,
   useAddColumnMutation,
@@ -56,6 +61,10 @@ export const ShowProject = () => {
 
   const onCardNew: CardNewHandler = async (newCard) => {
     await addCard({ ...newCard });
+  };
+
+  const onCardDragEnd: CardDragEndHandler = async () => {
+    // TODO: Implement
   };
 
   return (
@@ -114,6 +123,7 @@ export const ShowProject = () => {
           columns={columns}
           onColumnNew={onColumnNew}
           onCardNew={onCardNew}
+          onCardDragEnd={onCardDragEnd}
         />
       </Box>
     </Stack>
