@@ -16,13 +16,14 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
-import { Board, CardDragEndHandler, CardNewHandler, ColumnNewHandler } from "../../../components";
+import { Board, CardDragEndHandler, CardNewHandler, ColumnNewHandler, ColumnRemoveHandler } from "../../../components";
 import {
   useAddCardMutation,
   useAddColumnMutation,
   useDeleteBoardMutation,
   useFindBoardByIdQuery,
   useMoveCardMutation,
+  useRemoveColumnMutation,
   useUpdateBoardMutation,
 } from "../../../generated/graphql";
 import { route } from "../../../routes";
@@ -37,6 +38,7 @@ export const ShowProject = () => {
   const [, deleteBoard] = useDeleteBoardMutation();
   const [, addColumn] = useAddColumnMutation();
   const [, addCard] = useAddCardMutation();
+  const [, removeColumn] = useRemoveColumnMutation();
   const [, moveCard] = useMoveCardMutation();
 
   if (fetching) return <>loading...</>; // TODO: Add skeleton
@@ -60,6 +62,10 @@ export const ShowProject = () => {
     }
 
     return data.column;
+  };
+
+  const onColumnRemove: ColumnRemoveHandler = async ({ id }) => {
+    await removeColumn({ id });
   };
 
   const onCardNew: CardNewHandler = async (newCard) => {
@@ -113,7 +119,12 @@ export const ShowProject = () => {
       </HStack>
 
       <Box>
-        <Board onColumnNew={onColumnNew} onCardNew={onCardNew} onCardDragEnd={onCardDragEnd}>
+        <Board
+          onColumnNew={onColumnNew}
+          onColumnRemove={onColumnRemove}
+          onCardNew={onCardNew}
+          onCardDragEnd={onCardDragEnd}
+        >
           {data.board}
         </Board>
       </Box>

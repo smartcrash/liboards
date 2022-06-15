@@ -1,0 +1,3 @@
+mutation RemoveColumn($id: Int!) {
+  id: removeColumn(id: $id)
+}

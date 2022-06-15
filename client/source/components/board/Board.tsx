@@ -1,14 +1,17 @@
-import { Box, HStack, Stack, VStack } from "@chakra-ui/react";
+import { HamburgerIcon } from "@chakra-ui/icons";
+import { Box, HStack, IconButton, Menu, MenuButton, MenuItem, MenuList, Stack } from "@chakra-ui/react";
 import { cloneDeep } from "lodash-es";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import useRefState from "../../hooks/useRefState";
 import { Card, Column } from "./components";
 import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
-import { addCard, addColumn, moveCard } from "./helpers";
+import { addCard, addColumn, moveCard, removeColumn } from "./helpers";
 import { BoardType, CardType, ColumnType } from "./types";
 
 export type ColumnNewHandler = (newColumn: { title: string }) => Promise<ColumnType>;
+
+export type ColumnRemoveHandler = (column: ColumnType) => void;
 
 export type CardNewHandler = (newCard: { title: string; columnId: number }) => Promise<CardType>;
 
@@ -23,11 +26,18 @@ export type CardDragEndHandler = (result: {
 interface BoardProps {
   children: BoardType;
   onColumnNew: ColumnNewHandler;
+  onColumnRemove: ColumnRemoveHandler;
   onCardNew: CardNewHandler;
   onCardDragEnd: CardDragEndHandler;
 }
 
-export const Board = ({ children: initialBoard, onColumnNew, onCardNew, onCardDragEnd }: BoardProps) => {
+export const Board = ({
+  children: initialBoard,
+  onColumnNew,
+  onCardNew,
+  onColumnRemove,
+  onCardDragEnd,
+}: BoardProps) => {
   const columnWidth = "2xs";
 
   const [boardRef, setBoardRef] = useRefState(() => {
@@ -48,6 +58,13 @@ export const Board = ({ children: initialBoard, onColumnNew, onCardNew, onCardDr
     const card = await onCardNew({ title, columnId: column.id });
     const boardWithNewCard = addCard(board, column, card);
     setBoardRef(boardWithNewCard);
+  };
+
+  const handleColumnRemove = async (column: ColumnType) => {
+    const board = boardRef.current;
+    const filteredBoard = removeColumn(board, column);
+    onColumnRemove(column);
+    setBoardRef(filteredBoard);
   };
 
   const onDragEnd = ({ draggableId, source, destination }: DropResult) => {
@@ -84,7 +101,25 @@ export const Board = ({ children: initialBoard, onColumnNew, onCardNew, onCardDr
         {boardRef.current.columns.map((column, columnIndex) => {
           return (
             <Stack minW={columnWidth} key={column.id}>
-              <Column title={column.title} droppableId={`${column.id}`} data-testid={`column-${columnIndex}`}>
+              <Column
+                title={column.title}
+                droppableId={`${column.id}`}
+                data-testid={`column-${columnIndex}`}
+                contextMenu={
+                  <Menu>
+                    <MenuButton
+                      as={IconButton}
+                      icon={<HamburgerIcon />}
+                      variant={"ghost"}
+                      size={"sm"}
+                      colorScheme={"gray"}
+                    />
+                    <MenuList>
+                      <MenuItem onClick={() => handleColumnRemove(column)}>Delete this column</MenuItem>
+                    </MenuList>
+                  </Menu>
+                }
+              >
                 {column.cards.map((card, cardIndex) => (
                   <Card
                     title={card.title}

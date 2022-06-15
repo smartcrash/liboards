@@ -32,10 +32,15 @@ export const addColumn = (board: BoardType, column: ColumnType): BoardType => ({
   columns: [...board.columns, column],
 });
 
+export const removeColumn = (board: BoardType, column: ColumnType): BoardType => ({
+  ...board,
+  columns: board.columns.filter(({ id }) => id !== column.id)
+});
+
 export const addCard = (board: BoardType, inColumn: ColumnType, card: CardType): BoardType => {
   const columnToAdd = board.columns.find(({ id }) => id === inColumn.id)!;
   const cards = [...columnToAdd.cards, card];
   columnToAdd.cards = cards;
 
-  return { ...board };
+  return board;
 };
