@@ -126,7 +126,9 @@ export const Board = ({
                       colorScheme={"gray"}
                     />
                     <MenuList>
-                      <MenuItem onClick={() => handleColumnRemove(column)}>Delete this column</MenuItem>
+                      <MenuItem data-testid={"remove-column"} onClick={() => handleColumnRemove(column)}>
+                        Delete this column
+                      </MenuItem>
                     </MenuList>
                   </Menu>
                 }
@@ -147,7 +149,9 @@ export const Board = ({
                           colorScheme={"gray"}
                         />
                         <MenuList>
-                          <MenuItem onClick={() => handleCardRemove(column, card)}>Delete</MenuItem>
+                          <MenuItem data-testid={"remove-card"} onClick={() => handleCardRemove(column, card)}>
+                            Delete
+                          </MenuItem>
                         </MenuList>
                       </Menu>
                     }
