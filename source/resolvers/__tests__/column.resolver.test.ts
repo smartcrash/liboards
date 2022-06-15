@@ -10,6 +10,7 @@ const AddColumnMutation = `
     column: addColumn(boardId: $boardId, title: $title) {
       id
       title
+      index
     }
   }
 `
@@ -196,6 +197,30 @@ test.group('removeColumn', () => {
     const column = await ColumnRepository.findOneBy({ id })
 
     expect(column).toBeFalsy()
+  })
+
+  test('shift remaining columm\'s indexes to keep sequense', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const { id: boardId } = await createRandomBoard(user.id)
+    const column1 = await createRandomColumn(boardId, 0)
+    const column2 = await createRandomColumn(boardId, 1)
+    const column3 = await createRandomColumn(boardId, 2)
+
+    const queryData = {
+      query: RemoveColumnMutation,
+      variables: { id: column2.id }
+    };
+
+    await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+
+    const columns = await ColumnRepository.find({
+      select: { id: true, index: true },
+      where: { boardId },
+      order: { index: "ASC" }
+    })
+
+    expect(columns).toHaveLength(2)
+    expect(columns).toMatchObject([{ id: column1.id, index: 0 }, { id: column3.id, index: 1 }])
   })
 
   test('can\'t delete someone else board\'s column', async ({ expect, client, createUser }) => {

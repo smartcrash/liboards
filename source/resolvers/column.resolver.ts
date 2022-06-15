@@ -1,5 +1,7 @@
 
 import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import { MoreThan } from "typeorm";
+import { dataSource } from "../dataSource";
 import { Column } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
@@ -48,7 +50,14 @@ export class ColumnResolver {
   async removeColumn(
     @Arg('id', () => Int) id: number,
     @Ctx() { }: ContextType): Promise<number | null> {
-    await ColumnRepository.delete({ id })
+    const { index, boardId } = await ColumnRepository.findOneBy({ id })
+
+    await dataSource.transaction(async (manager) => {
+      const repository = manager.getRepository(Column)
+
+      await repository.decrement({ index: MoreThan(index), boardId }, 'index', 1)
+      await repository.delete({ id })
+    })
 
     return id
   }

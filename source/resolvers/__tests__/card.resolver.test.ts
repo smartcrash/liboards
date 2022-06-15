@@ -11,6 +11,7 @@ const AddCardMutation = `
       id
       title
       description
+      index
     }
   }
 `
@@ -306,6 +307,32 @@ test.group('removeCard', () => {
     const card = await CardRepository.findOneBy({ id })
 
     expect(card).toBeFalsy()
+  })
+
+  test('shift remaining cards\'s indexes to keep sequense', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const { id: boardId } = await createRandomBoard(user.id)
+    const { id: columnId } = await createRandomColumn(boardId, 0)
+
+    const card1 = await createRandomCard(columnId, 0)
+    const card2 = await createRandomCard(columnId, 1)
+    const card3 = await createRandomCard(columnId, 2)
+
+    const queryData = {
+      query: RemoveCardMutation,
+      variables: { id: card2.id }
+    };
+
+    await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+
+    const cards = await CardRepository.find({
+      select: { id: true, index: true },
+      where: { columnId },
+      order: { index: "ASC" }
+    })
+
+    expect(cards).toHaveLength(2)
+    expect(cards).toMatchObject([{ id: card1.id, index: 0 }, { id: card3.id, index: 1 }])
   })
 
   test('should not allow delete someone else\'s card', async ({ expect, client, createUser }) => {

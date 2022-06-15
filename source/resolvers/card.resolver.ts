@@ -1,5 +1,5 @@
 import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
-import { Between, FindOperator, MoreThanOrEqual } from "typeorm";
+import { Between, FindOperator, MoreThan, MoreThanOrEqual } from "typeorm";
 import { dataSource } from "../dataSource";
 import { Card } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
@@ -86,7 +86,14 @@ export class CardResolver {
   async removeCard(
     @Arg('id', () => Int) id: number,
     @Ctx() { }: ContextType): Promise<number | null> {
-    await CardRepository.delete({ id })
+    const { index, columnId } = await CardRepository.findOneBy({ id })
+
+    await dataSource.transaction(async (manager) => {
+      const repository = manager.getRepository(Card)
+
+      await repository.decrement({ index: MoreThan(index), columnId }, 'index', 1)
+      await repository.delete({ id })
+    })
 
     return id
   }
