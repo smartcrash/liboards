@@ -1,15 +1,16 @@
 
-import { DataSource } from "typeorm";
-import { User, Board, Column, Card } from "./entity";
+import { DataSource, DataSourceOptions } from "typeorm";
 
-export const dataSource = new DataSource({
+const config: DataSourceOptions = {
   type: "sqlite", // TODO: Move to .env
   database: "database.sqlite",
   logging: false,
   synchronize: true,
   dropSchema: false,
   migrationsRun: true,
-  entities: [User, Board, Column, Card],
-  // migrations: ["source/migrations/**/*.ts"],
-  // subscribers: ["source/subscribers/**/*.ts"],
-})
+  entities: ["source/entity/*.ts"],
+  migrations: ["source/migrations/*.ts"],
+  subscribers: ["source/subscribers/*.ts"],
+}
+
+export const dataSource = new DataSource(config)
