@@ -81,14 +81,12 @@ export type Mutation = {
 export type MutationAddCardArgs = {
   columnId: Scalars['Int'];
   description?: InputMaybe<Scalars['String']>;
-  index?: InputMaybe<Scalars['Int']>;
   title: Scalars['String'];
 };
 
 
 export type MutationAddColumnArgs = {
   boardId: Scalars['Int'];
-  index?: InputMaybe<Scalars['Int']>;
   title: Scalars['String'];
 };
 
@@ -166,7 +164,6 @@ export type MutationUpdateCardArgs = {
 
 export type MutationUpdateColumnArgs = {
   id: Scalars['Int'];
-  index?: InputMaybe<Scalars['Int']>;
   title?: InputMaybe<Scalars['String']>;
 };
 
@@ -204,7 +201,6 @@ export type UserFragmentFragment = { __typename?: 'User', id: number, username: 
 export type AddCardMutationVariables = Exact<{
   title: Scalars['String'];
   description?: InputMaybe<Scalars['String']>;
-  index?: InputMaybe<Scalars['Int']>;
   columnId: Scalars['Int'];
 }>;
 
@@ -214,7 +210,6 @@ export type AddCardMutation = { __typename?: 'Mutation', card: { __typename?: 'C
 export type AddColumnMutationVariables = Exact<{
   boardId: Scalars['Int'];
   title: Scalars['String'];
-  index?: InputMaybe<Scalars['Int']>;
 }>;
 
 
@@ -356,13 +351,8 @@ export const UserFragmentFragmentDoc = gql`
 }
     `;
 export const AddCardDocument = gql`
-    mutation AddCard($title: String!, $description: String, $index: Int, $columnId: Int!) {
-  card: addCard(
-    title: $title
-    description: $description
-    index: $index
-    columnId: $columnId
-  ) {
+    mutation AddCard($title: String!, $description: String, $columnId: Int!) {
+  card: addCard(title: $title, description: $description, columnId: $columnId) {
     ...CardFragment
   }
 }
@@ -372,8 +362,8 @@ export function useAddCardMutation() {
   return Urql.useMutation<AddCardMutation, AddCardMutationVariables>(AddCardDocument);
 };
 export const AddColumnDocument = gql`
-    mutation AddColumn($boardId: Int!, $title: String!, $index: Int) {
-  column: addColumn(boardId: $boardId, title: $title, index: $index) {
+    mutation AddColumn($boardId: Int!, $title: String!) {
+  column: addColumn(boardId: $boardId, title: $title) {
     ...ColumnFragment
   }
 }
