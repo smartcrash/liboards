@@ -11,6 +11,7 @@ export const ColumnForm = ({ onConfirm, onCancel }: ColumnFormProps) => {
       onConfirm={onConfirm}
       onCancel={onCancel}
       confirmText={"Add column"}
+      data-testid={"column-form"}
       inputProps={{ placeholder: "Enter column title..." }}
     />
   );

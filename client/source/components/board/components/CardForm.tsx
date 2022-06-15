@@ -12,6 +12,7 @@ export const CardForm = ({ onConfirm, onCancel }: CardFormProps) => {
       onCancel={onCancel}
       confirmText={"Add card"}
       inputProps={{ placeholder: "Enter a title for this card..." }}
+      data-testid={"card-form"}
     />
   );
 };

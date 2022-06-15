@@ -16,10 +16,7 @@ export const ColumnAdder = ({ onConfirm }: ColumnAdderProps) => {
   }
 
   return isAddingColumn ? (
-    <ColumnForm
-      onConfirm={confirmColumn}
-      onCancel={() => setAddingColumn(false)}
-    />
+    <ColumnForm onConfirm={confirmColumn} onCancel={() => setAddingColumn(false)} />
   ) : (
     <Button
       colorScheme={"primary"}
@@ -27,6 +24,7 @@ export const ColumnAdder = ({ onConfirm }: ColumnAdderProps) => {
       leftIcon={<AddIcon />}
       w={"full"}
       fontSize={"sm"}
+      data-testid={"add-column"}
     >
       Add another column
     </Button>

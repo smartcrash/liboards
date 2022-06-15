@@ -25,6 +25,7 @@ export const CardAdder = ({ onConfirm }: CardAdderProps) => {
       fontSize={"sm"}
       size={"sm"}
       w={"full"}
+      data-testid={"add-card"}
     >
       Add a card
     </Button>

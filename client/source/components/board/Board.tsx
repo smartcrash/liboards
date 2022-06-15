@@ -27,8 +27,6 @@ interface BoardProps {
   onCardDragEnd: CardDragEndHandler;
 }
 
-// TODO: Move to helpers file
-
 export const Board = ({ children: initialBoard, onColumnNew, onCardNew, onCardDragEnd }: BoardProps) => {
   const columnWidth = "2xs";
 
@@ -83,17 +81,18 @@ export const Board = ({ children: initialBoard, onColumnNew, onCardNew, onCardDr
   return (
     <HStack justifyContent={"flex-start"} alignItems={"start"}>
       <DragDropContext onDragEnd={onDragEnd}>
-        {boardRef.current.columns.map((column) => {
+        {boardRef.current.columns.map((column, columnIndex) => {
           return (
             <Box minW={columnWidth} key={column.id}>
-              <Column title={column.title} droppableId={`${column.id}`}>
-                {column.cards.map((card, index) => (
+              <Column title={column.title} droppableId={`${column.id}`} data-testid={`column-${columnIndex}`}>
+                {column.cards.map((card, cardIndex) => (
                   <Card
                     title={card.title}
                     description={card.description}
                     draggableId={`${card.id}`}
-                    index={index}
+                    index={cardIndex}
                     key={card.id}
+                    data-testid={`card-${cardIndex}`}
                   />
                 ))}
               </Column>

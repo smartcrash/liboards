@@ -1,7 +1,7 @@
-import { Stack, Input, ButtonGroup, Button, InputElementProps, useEventListener } from "@chakra-ui/react";
+import { Stack, Input, ButtonGroup, Button, InputElementProps, useEventListener, BoxProps } from "@chakra-ui/react";
 import { useRef, FormEventHandler } from "react";
 
-interface AdderFormProps {
+interface AdderFormProps extends BoxProps {
   onConfirm: (inputValue: string) => void;
   onCancel: () => void;
   confirmText?: string;
@@ -15,6 +15,7 @@ export const AdderForm = ({
   confirmText = "Add",
   cancelText = "Cancel",
   inputProps,
+  ...props
 }: AdderFormProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -32,7 +33,7 @@ export const AdderForm = ({
   };
 
   return (
-    <Stack as={"form"} onSubmit={addColumn}>
+    <Stack as={"form"} onSubmit={addColumn} {...props}>
       <Input type={"text"} ref={inputRef} autoFocus={true} {...inputProps} />
       <ButtonGroup size={"sm"} spacing={1}>
         <Button type={"submit"}>{confirmText}</Button>
