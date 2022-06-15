@@ -10,9 +10,6 @@ import {
   dedupExchange, errorExchange, fetchExchange
 } from "urql";
 import {
-  AddCardMutationVariables,
-  AddColumnMutation,
-  AddColumnMutationVariables,
   AllBoardsDocument,
   AllBoardsQuery,
   AllDeletedBoardsDocument,
@@ -22,13 +19,8 @@ import {
   CurrentUserDocument,
   CurrentUserQuery,
   DeleteBoardMutation,
-  DeleteBoardMutationVariables,
-  FindBoardByIdDocument,
-  FindBoardByIdQuery,
-  LoginWithPasswordMutation,
-  LogoutMutation,
-  MoveCardMutationVariables,
-  RestoreBoardMutation,
+  DeleteBoardMutationVariables, LoginWithPasswordMutation,
+  LogoutMutation, RestoreBoardMutation,
   RestoreBoardMutationVariables
 } from "./generated/graphql";
 
@@ -52,15 +44,6 @@ export const createUrqlClient = () => createClient({
   exchanges: [
     dedupExchange,
     cacheExchange({
-      optimistic: {
-        moveCard: (variables: MoveCardMutationVariables, cache, info) => ({
-          __typename: 'Card',
-          id: variables.id,
-          index: variables.toIndex,
-          columnId: variables.toColumnId
-        }),
-      },
-
       updates: {
         Mutation: {
           loginWithPassword: (result, args, cache, info) => {
@@ -128,46 +111,6 @@ export const createUrqlClient = () => createClient({
               result, (result, data) => ({ boards: (data?.boards || []).filter((board) => board.id !== args.id) })
             )
           },
-
-          addColumn: (result, args: AddColumnMutationVariables, cache, info) => {
-            updateQuery<AddColumnMutation, FindBoardByIdQuery>(
-              cache,
-              { query: FindBoardByIdDocument, variables: { id: args.boardId } },
-              result, (result, data) => {
-                // If there is no cache or the mutaton didn't resolve correctly
-                // just leave the query cache as it is.
-                if (!data?.board || !result.column) return data
-
-                // TODO: Use merge function
-                return {
-                  ...data,
-                  board: {
-                    ...data.board,
-                    columns: [...data.board.columns, result.column]
-                  }
-                }
-              }
-            )
-          },
-
-          addCard: (result, args: AddCardMutationVariables, cache, info) => {
-            // TODO: Optimize be directly adding card to column
-            // NOTE: This works for updating the UI when a card is added
-            //       but it forces a re-fetch. A better way would be to add
-            //       the card to the Board's `columns[].cards` array.
-            //       But from here we don't have to Board's ID.
-            cache.invalidate({
-              __typename: 'Column',
-              id: args.columnId,
-            });
-          },
-
-          // moveCard: (result, args: MoveCardMutationVariables, cache, info) => {
-          //   cache.invalidate({
-          //     __typename: 'Column',
-          //     id: args.toColumnId
-          //   });
-          // },
         },
       },
     }),

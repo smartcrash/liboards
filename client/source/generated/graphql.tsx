@@ -264,7 +264,7 @@ export type MoveCardMutationVariables = Exact<{
 }>;
 
 
-export type MoveCardMutation = { __typename?: 'Mutation', card?: { __typename?: 'Card', id: number, title: string, description: string, index: number } | null };
+export type MoveCardMutation = { __typename?: 'Mutation', card?: { __typename?: 'Card', id: number } | null };
 
 export type ResetPasswordMutationVariables = Exact<{
   newPassword: Scalars['String'];
@@ -448,10 +448,10 @@ export function useLogoutMutation() {
 export const MoveCardDocument = gql`
     mutation MoveCard($toIndex: Int!, $toColumnId: Int!, $id: Int!) {
   card: moveCard(toIndex: $toIndex, toColumnId: $toColumnId, id: $id) {
-    ...CardFragment
+    id
   }
 }
-    ${CardFragmentFragmentDoc}`;
+    `;
 
 export function useMoveCardMutation() {
   return Urql.useMutation<MoveCardMutation, MoveCardMutationVariables>(MoveCardDocument);

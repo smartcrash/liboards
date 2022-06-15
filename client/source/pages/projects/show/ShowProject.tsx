@@ -16,12 +16,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
-import {
-  Board,
-  CardDragEndHandler,
-  CardNewHandler,
-  ColumnNewHandler,
-} from "../../../components";
+import { Board, CardDragEndHandler, CardNewHandler, ColumnNewHandler } from "../../../components";
 import {
   useAddCardMutation,
   useAddColumnMutation,
@@ -47,7 +42,7 @@ export const ShowProject = () => {
   if (fetching) return <>loading...</>; // TODO: Add skeleton
   if (!data?.board) return <>Something went wrong! :O</>;
 
-  const { title, description, columns } = data.board;
+  const { title, description } = data.board;
 
   const onDelete = async () => {
     await deleteBoard({ id });
@@ -55,21 +50,29 @@ export const ShowProject = () => {
   };
 
   const onColumnNew: ColumnNewHandler = async (newColumn) => {
-    await addColumn({
+    const { data, error } = await addColumn({
       ...newColumn,
       boardId: id,
     });
+
+    if (!data) {
+      throw new Error("Error at `addColumn` mutation", error);
+    }
+
+    return data.column;
   };
 
   const onCardNew: CardNewHandler = async (newCard) => {
-    await addCard({ ...newCard });
+    const { data, error } = await addCard({ ...newCard });
+
+    if (!data) {
+      throw new Error("Error at `addColumn` mutation", error);
+    }
+
+    return data.card;
   };
 
-  const onCardDragEnd: CardDragEndHandler = async ({
-    cardId,
-    toIndex,
-    toColumnId,
-  }) => {
+  const onCardDragEnd: CardDragEndHandler = async ({ cardId, toIndex, toColumnId }) => {
     await moveCard({ id: cardId, toIndex, toColumnId });
   };
 
@@ -83,11 +86,7 @@ export const ShowProject = () => {
 
         <Popover>
           <PopoverTrigger>
-            <Button
-              leftIcon={<DeleteIcon mb={1} mr={1} />}
-              colorScheme={"gray"}
-              variant={"ghost"}
-            >
+            <Button leftIcon={<DeleteIcon mb={1} mr={1} />} colorScheme={"gray"} variant={"ghost"}>
               Delete project
             </Button>
           </PopoverTrigger>
@@ -99,23 +98,12 @@ export const ShowProject = () => {
               <VStack spacing={3}>
                 <Text fontSize={"sm"} color={"gray.500"}>
                   You can find and reopen closed boards at the bottom of{" "}
-                  <Link
-                    as={RouterLink}
-                    to={route("projects.list")}
-                    color={"gray.700"}
-                    textDecoration={"underline"}
-                  >
+                  <Link as={RouterLink} to={route("projects.list")} color={"gray.700"} textDecoration={"underline"}>
                     your boards page
                   </Link>
                 </Text>
 
-                <Button
-                  colorScheme={"red"}
-                  w={"full"}
-                  size={"sm"}
-                  onClick={onDelete}
-                  data-testid={"delete"}
-                >
+                <Button colorScheme={"red"} w={"full"} size={"sm"} onClick={onDelete} data-testid={"delete"}>
                   Delete
                 </Button>
               </VStack>
@@ -125,12 +113,9 @@ export const ShowProject = () => {
       </HStack>
 
       <Box>
-        <Board
-          columns={columns}
-          onColumnNew={onColumnNew}
-          onCardNew={onCardNew}
-          onCardDragEnd={onCardDragEnd}
-        />
+        <Board onColumnNew={onColumnNew} onCardNew={onCardNew} onCardDragEnd={onCardDragEnd}>
+          {data.board}
+        </Board>
       </Box>
     </Stack>
   );
