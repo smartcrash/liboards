@@ -6,7 +6,7 @@ import useRefState from "../../hooks/useRefState";
 import { Card, Column } from "./components";
 import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
-import { addCard, addColumn, moveCard, removeColumn } from "./helpers";
+import { addCard, addColumn, moveCard, removeCard, removeColumn } from "./helpers";
 import { BoardType, CardType, ColumnType } from "./types";
 
 export type ColumnNewHandler = (newColumn: { title: string }) => Promise<ColumnType>;
@@ -14,6 +14,8 @@ export type ColumnNewHandler = (newColumn: { title: string }) => Promise<ColumnT
 export type ColumnRemoveHandler = (column: ColumnType) => void;
 
 export type CardNewHandler = (newCard: { title: string; columnId: number }) => Promise<CardType>;
+
+export type CardRemoveHandler = (card: CardType) => void;
 
 export type CardDragEndHandler = (result: {
   cardId: number;
@@ -28,6 +30,7 @@ interface BoardProps {
   onColumnNew: ColumnNewHandler;
   onColumnRemove: ColumnRemoveHandler;
   onCardNew: CardNewHandler;
+  onCardRemove: CardRemoveHandler;
   onCardDragEnd: CardDragEndHandler;
 }
 
@@ -36,6 +39,7 @@ export const Board = ({
   onColumnNew,
   onCardNew,
   onColumnRemove,
+  onCardRemove,
   onCardDragEnd,
 }: BoardProps) => {
   const columnWidth = "2xs";
@@ -65,6 +69,13 @@ export const Board = ({
     const filteredBoard = removeColumn(board, column);
     onColumnRemove(column);
     setBoardRef(filteredBoard);
+  };
+
+  const handleCardRemove = async (column: ColumnType, card: CardType) => {
+    const board = boardRef.current;
+    const boardWithoutCard = removeCard(board, column, card);
+    onCardRemove(card);
+    setBoardRef(boardWithoutCard);
   };
 
   const onDragEnd = ({ draggableId, source, destination }: DropResult) => {
@@ -126,6 +137,20 @@ export const Board = ({
                     description={card.description}
                     draggableId={`${card.id}`}
                     index={cardIndex}
+                    contextMenu={
+                      <Menu>
+                        <MenuButton
+                          as={IconButton}
+                          icon={<HamburgerIcon />}
+                          variant={"ghost"}
+                          size={"sm"}
+                          colorScheme={"gray"}
+                        />
+                        <MenuList>
+                          <MenuItem onClick={() => handleCardRemove(column, card)}>Delete</MenuItem>
+                        </MenuList>
+                      </Menu>
+                    }
                     key={card.id}
                     data-testid={`card-${cardIndex}`}
                   />

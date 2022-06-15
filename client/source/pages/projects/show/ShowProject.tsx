@@ -16,13 +16,21 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
-import { Board, CardDragEndHandler, CardNewHandler, ColumnNewHandler, ColumnRemoveHandler } from "../../../components";
+import {
+  Board,
+  CardDragEndHandler,
+  CardNewHandler,
+  CardRemoveHandler,
+  ColumnNewHandler,
+  ColumnRemoveHandler,
+} from "../../../components";
 import {
   useAddCardMutation,
   useAddColumnMutation,
   useDeleteBoardMutation,
   useFindBoardByIdQuery,
   useMoveCardMutation,
+  useRemoveCardMutation,
   useRemoveColumnMutation,
   useUpdateBoardMutation,
 } from "../../../generated/graphql";
@@ -39,6 +47,7 @@ export const ShowProject = () => {
   const [, addColumn] = useAddColumnMutation();
   const [, addCard] = useAddCardMutation();
   const [, removeColumn] = useRemoveColumnMutation();
+  const [, removeCard] = useRemoveCardMutation();
   const [, moveCard] = useMoveCardMutation();
 
   if (fetching) return <>loading...</>; // TODO: Add skeleton
@@ -52,16 +61,12 @@ export const ShowProject = () => {
   };
 
   const onColumnNew: ColumnNewHandler = async (newColumn) => {
-    const { data, error } = await addColumn({
+    const { data } = await addColumn({
       ...newColumn,
       boardId: id,
     });
 
-    if (!data) {
-      throw new Error("Error at `addColumn` mutation", error);
-    }
-
-    return data.column;
+    return data!.column;
   };
 
   const onColumnRemove: ColumnRemoveHandler = async ({ id }) => {
@@ -69,13 +74,13 @@ export const ShowProject = () => {
   };
 
   const onCardNew: CardNewHandler = async (newCard) => {
-    const { data, error } = await addCard({ ...newCard });
+    const { data } = await addCard({ ...newCard });
 
-    if (!data) {
-      throw new Error("Error at `addColumn` mutation", error);
-    }
+    return data!.card;
+  };
 
-    return data.card;
+  const onCardRemove: CardRemoveHandler = async ({ id }) => {
+    await removeCard({ id });
   };
 
   const onCardDragEnd: CardDragEndHandler = async ({ cardId, toIndex, toColumnId }) => {
@@ -123,6 +128,7 @@ export const ShowProject = () => {
           onColumnNew={onColumnNew}
           onColumnRemove={onColumnRemove}
           onCardNew={onCardNew}
+          onCardRemove={onCardRemove}
           onCardDragEnd={onCardDragEnd}
         >
           {data.board}

@@ -1,4 +1,4 @@
-import { Box, BoxProps, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, BoxProps, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { Draggable } from "react-beautiful-dnd";
 
 interface CardProps extends BoxProps {
@@ -6,9 +6,10 @@ interface CardProps extends BoxProps {
   description: string;
   index: number;
   draggableId: string;
+  contextMenu: any;
 }
 
-export const Card = ({ title, description, index, draggableId, ...boxProps }: CardProps) => {
+export const Card = ({ title, description, index, draggableId, contextMenu, ...boxProps }: CardProps) => {
   return (
     <Draggable draggableId={draggableId} index={index}>
       {({ innerRef, draggableProps, dragHandleProps }) => (
@@ -23,7 +24,10 @@ export const Card = ({ title, description, index, draggableId, ...boxProps }: Ca
           {...dragHandleProps}
         >
           <Stack>
-            <Heading fontSize={"md"}>{title}</Heading>
+            <HStack>
+              <Heading fontSize={"md"}>{title}</Heading>
+              {contextMenu}
+            </HStack>
             <Text fontSize={"sm"} color={"gray.500"}>
               {description}
             </Text>

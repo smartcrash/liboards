@@ -261,6 +261,13 @@ export type MoveCardMutationVariables = Exact<{
 
 export type MoveCardMutation = { __typename?: 'Mutation', card?: { __typename?: 'Card', id: number } | null };
 
+export type RemoveCardMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type RemoveCardMutation = { __typename?: 'Mutation', id?: number | null };
+
 export type RemoveColumnMutationVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -452,6 +459,15 @@ export const MoveCardDocument = gql`
 
 export function useMoveCardMutation() {
   return Urql.useMutation<MoveCardMutation, MoveCardMutationVariables>(MoveCardDocument);
+};
+export const RemoveCardDocument = gql`
+    mutation removeCard($id: Int!) {
+  id: removeCard(id: $id)
+}
+    `;
+
+export function useRemoveCardMutation() {
+  return Urql.useMutation<RemoveCardMutation, RemoveCardMutationVariables>(RemoveCardDocument);
 };
 export const RemoveColumnDocument = gql`
     mutation RemoveColumn($id: Int!) {

@@ -44,3 +44,11 @@ export const addCard = (board: BoardType, inColumn: ColumnType, card: CardType):
 
   return board;
 };
+
+export const removeCard = (board: BoardType, fromColumn: ColumnType, card: CardType): BoardType => {
+  const columnToRemove = board.columns.find(({ id }) => id === fromColumn.id)!
+  const filteredCards = columnToRemove.cards.filter(({ id }) => card.id !== id)
+  const columnWithoutCard = { ...columnToRemove, cards: filteredCards }
+  const filteredColumns = board.columns.map((column) => (fromColumn.id === column.id ? columnWithoutCard : column))
+  return { ...board, columns: filteredColumns }
+}
