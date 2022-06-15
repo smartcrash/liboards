@@ -6,21 +6,19 @@ import { CardRepository, ColumnRepository } from '../../repository';
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
 
 const AddColumnMutation = `
-  mutation AddColumn($boardId: Int!, $title: String!, $index: Int) {
-    column: addColumn(boardId: $boardId, title: $title, index: $index) {
+  mutation AddColumn($boardId: Int!, $title: String!) {
+    column: addColumn(boardId: $boardId, title: $title) {
       id
       title
-      index
     }
   }
 `
 
 const UpdateColumnMutation = `
-  mutation UpdateColumn($id: Int!, $title: String, $index: Int) {
-    column: updateColumn(id: $id, title: $title, index: $index) {
+  mutation UpdateColumn($id: Int!, $title: String) {
+    column: updateColumn(id: $id, title: $title) {
       id
       title
-      index
     }
   }
 `
@@ -44,14 +42,12 @@ test.group('addColumn', () => {
     const [user, cookie] = await createUser(client)
     const { id: boardId } = await createRandomBoard(user.id)
     const title = faker.lorem.words()
-    const index = faker.datatype.number()
 
     const queryData = {
       query: AddColumnMutation,
       variables: {
         boardId,
         title,
-        index
       }
     };
 
@@ -63,7 +59,6 @@ test.group('addColumn', () => {
     expect(data.column).toBeTruthy()
     expect(typeof data.column.id).toBe('number')
     expect(data.column.title).toBe(title)
-    expect(data.column.index).toBe(index)
 
     const { id } = data.column
     const column = await ColumnRepository.findOneBy({ id })
@@ -82,7 +77,6 @@ test.group('addColumn', () => {
       variables: {
         boardId,
         title: faker.lorem.word(),
-        index: 0,
       }
     };
 
@@ -91,7 +85,7 @@ test.group('addColumn', () => {
     assertIsForbiddenExeption({ response, expect })
   })
 
-  test('assigns correct `index` by default if was not provided', async ({ expect, client, createUser }) => {
+  test('assigns correct `index` by default', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
     const { id: boardId } = await createRandomBoard(user.id)
 
@@ -129,14 +123,12 @@ test.group('updateColumn', () => {
     const { id } = await createRandomColumn(boardId)
 
     const title = faker.lorem.words()
-    const index = faker.datatype.number()
 
     const queryData = {
       query: UpdateColumnMutation,
       variables: {
         id,
         title,
-        index
       }
     };
 
@@ -148,11 +140,10 @@ test.group('updateColumn', () => {
     expect(data.column).toBeTruthy()
     expect(data.column.id).toBe(id)
     expect(data.column.title).toBe(title)
-    expect(data.column.index).toBe(index)
 
     const column = await ColumnRepository.findOneBy({ id })
 
-    expect(column).toMatchObject({ title, index })
+    expect(column.title).toBe(title)
   })
 
   test('can\'t update someone else board\'s column', async ({ expect, client, createUser }) => {

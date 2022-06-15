@@ -13,13 +13,12 @@ export class ColumnResolver {
   @Mutation(() => Column)
   async addColumn(
     @Arg('title') title: string,
-    @Arg('index', () => Int, { nullable: true }) index: number | null,
     @Arg('boardId', () => Int) boardId: number,
     @Ctx() { }: ContextType): Promise<Column | null> {
     const column = new Column()
 
     column.title = title
-    column.index = index ?? (await ColumnRepository.countBy({ boardId }))
+    column.index = await ColumnRepository.countBy({ boardId })
     column.boardId = boardId
 
     await ColumnRepository.save(column)
@@ -33,12 +32,10 @@ export class ColumnResolver {
   async updateColumn(
     @Arg('id', () => Int) id: number,
     @Arg('title', { nullable: true }) title: string | null,
-    @Arg('index', () => Int, { nullable: true }) index: number | null,
     @Ctx() { }: ContextType): Promise<Column | null> {
     const column = await ColumnRepository.findOneBy({ id })
 
     column.title = title ?? column.title
-    column.index = index ?? column.index
 
     await ColumnRepository.save(column)
 

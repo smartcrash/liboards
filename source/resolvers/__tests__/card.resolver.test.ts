@@ -6,12 +6,11 @@ import { CardRepository } from "../../repository";
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
 const AddCardMutation = `
-  mutation AddCard($columnId: Int!, $title: String!, $description: String, $index: Int) {
-    card: addCard(columnId: $columnId, title: $title, description: $description, index: $index) {
+  mutation AddCard($columnId: Int!, $title: String!, $description: String) {
+    card: addCard(columnId: $columnId, title: $title, description: $description) {
       id
       title
       description
-      index
     }
   }
 `
@@ -58,7 +57,6 @@ test.group('addCard', () => {
 
     const title = faker.lorem.words()
     const description = faker.lorem.sentences()
-    const index = faker.datatype.number()
 
     const queryData = {
       query: AddCardMutation,
@@ -66,7 +64,6 @@ test.group('addCard', () => {
         columnId,
         title,
         description,
-        index
       }
     };
 
@@ -79,7 +76,6 @@ test.group('addCard', () => {
     expect(typeof data.card.id).toBe('number')
     expect(data.card.title).toBe(title)
     expect(data.card.description).toBe(description)
-    expect(data.card.index).toBe(index)
 
     const { id } = data.card
     const card = await CardRepository.findOneBy({ id })
@@ -88,7 +84,7 @@ test.group('addCard', () => {
     expect(card.columnId).toBe(columnId)
   })
 
-  test('assigns correct `index` by default if was not provided', async ({ expect, client, createUser }) => {
+  test('assigns correct `index` by default', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
     const { id: boardId } = await createRandomBoard(user.id)
     const { id: columnId } = await createRandomColumn(boardId)

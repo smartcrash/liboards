@@ -1,5 +1,5 @@
 import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
-import { Between, FindOperator, MoreThan, MoreThanOrEqual } from "typeorm";
+import { Between, FindOperator, MoreThanOrEqual } from "typeorm";
 import { dataSource } from "../dataSource";
 import { Card } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
@@ -15,14 +15,13 @@ export class CardResolver {
   async addCard(
     @Arg('title') title: string,
     @Arg('description', { nullable: true }) description: string | null,
-    @Arg('index', () => Int, { nullable: true }) index: number | null,
     @Arg('columnId', () => Int) columnId: number,
     @Ctx() { }: ContextType): Promise<Card | null> {
     const card = new Card()
 
     card.title = title
     card.description = description
-    card.index = index ?? ((await CardRepository.countBy({ columnId })))
+    card.index = await CardRepository.countBy({ columnId })
     card.columnId = columnId
 
     await CardRepository.save(card)
