@@ -1,10 +1,4 @@
-import {
-  Stack,
-  Input,
-  ButtonGroup,
-  Button,
-  InputElementProps,
-} from "@chakra-ui/react";
+import { Stack, Input, ButtonGroup, Button, InputElementProps, useEventListener } from "@chakra-ui/react";
 import { useRef, FormEventHandler } from "react";
 
 interface AdderFormProps {
@@ -24,7 +18,9 @@ export const AdderForm = ({
 }: AdderFormProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  // TODO: Invoce `onCancel` on Escape or blur
+  useEventListener("keydown", (event) => {
+    if (event.key === "Escape") onCancel();
+  });
 
   const addColumn: FormEventHandler = (event) => {
     event.preventDefault();
