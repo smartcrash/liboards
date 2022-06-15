@@ -1,4 +1,4 @@
-import { Box, HStack } from "@chakra-ui/react";
+import { Box, HStack, Stack, VStack } from "@chakra-ui/react";
 import { cloneDeep } from "lodash-es";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import useRefState from "../../hooks/useRefState";
@@ -83,7 +83,7 @@ export const Board = ({ children: initialBoard, onColumnNew, onCardNew, onCardDr
       <DragDropContext onDragEnd={onDragEnd}>
         {boardRef.current.columns.map((column, columnIndex) => {
           return (
-            <Box minW={columnWidth} key={column.id}>
+            <Stack minW={columnWidth} key={column.id}>
               <Column title={column.title} droppableId={`${column.id}`} data-testid={`column-${columnIndex}`}>
                 {column.cards.map((card, cardIndex) => (
                   <Card
@@ -98,7 +98,7 @@ export const Board = ({ children: initialBoard, onColumnNew, onCardNew, onCardDr
               </Column>
 
               <CardAdder onConfirm={(title) => handleCardAdd(column, { title })} />
-            </Box>
+            </Stack>
           );
         })}
 
