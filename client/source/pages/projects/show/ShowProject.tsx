@@ -27,6 +27,7 @@ import {
   useAddColumnMutation,
   useDeleteBoardMutation,
   useFindBoardByIdQuery,
+  useMoveCardMutation,
   useUpdateBoardMutation,
 } from "../../../generated/graphql";
 import { route } from "../../../routes";
@@ -41,6 +42,7 @@ export const ShowProject = () => {
   const [, deleteBoard] = useDeleteBoardMutation();
   const [, addColumn] = useAddColumnMutation();
   const [, addCard] = useAddCardMutation();
+  const [, moveCard] = useMoveCardMutation();
 
   if (fetching) return <>loading...</>; // TODO: Add skeleton
   if (!data?.board) return <>Something went wrong! :O</>;
@@ -63,8 +65,12 @@ export const ShowProject = () => {
     await addCard({ ...newCard });
   };
 
-  const onCardDragEnd: CardDragEndHandler = async () => {
-    // TODO: Implement
+  const onCardDragEnd: CardDragEndHandler = async ({
+    cardId,
+    toIndex,
+    toColumnId,
+  }) => {
+    await moveCard({ id: cardId, toIndex, toColumnId });
   };
 
   return (

@@ -59,13 +59,14 @@ export type FieldError = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addCard?: Maybe<Card>;
-  addColumn?: Maybe<Column>;
+  addCard: Card;
+  addColumn: Column;
   createBoard: Board;
   createUser: AuthenticationResponse;
   deleteBoard?: Maybe<Scalars['Int']>;
   loginWithPassword: AuthenticationResponse;
   logout: Scalars['Boolean'];
+  moveCard?: Maybe<Card>;
   removeCard?: Maybe<Scalars['Int']>;
   removeColumn?: Maybe<Scalars['Int']>;
   resetPassword: AuthenticationResponse;
@@ -116,6 +117,13 @@ export type MutationLoginWithPasswordArgs = {
 };
 
 
+export type MutationMoveCardArgs = {
+  id: Scalars['Int'];
+  toColumnId: Scalars['Int'];
+  toIndex: Scalars['Int'];
+};
+
+
 export type MutationRemoveCardArgs = {
   id: Scalars['Int'];
 };
@@ -152,7 +160,6 @@ export type MutationUpdateBoardArgs = {
 export type MutationUpdateCardArgs = {
   description?: InputMaybe<Scalars['String']>;
   id: Scalars['Int'];
-  index?: InputMaybe<Scalars['Int']>;
   title?: InputMaybe<Scalars['String']>;
 };
 
@@ -202,7 +209,7 @@ export type AddCardMutationVariables = Exact<{
 }>;
 
 
-export type AddCardMutation = { __typename?: 'Mutation', card?: { __typename?: 'Card', id: number, title: string, description: string, index: number } | null };
+export type AddCardMutation = { __typename?: 'Mutation', card: { __typename?: 'Card', id: number, title: string, description: string, index: number } };
 
 export type AddColumnMutationVariables = Exact<{
   boardId: Scalars['Int'];
@@ -211,7 +218,7 @@ export type AddColumnMutationVariables = Exact<{
 }>;
 
 
-export type AddColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } | null };
+export type AddColumnMutation = { __typename?: 'Mutation', column: { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } };
 
 export type CreateBoardMutationVariables = Exact<{
   title: Scalars['String'];
@@ -249,6 +256,15 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+
+export type MoveCardMutationVariables = Exact<{
+  toIndex: Scalars['Int'];
+  toColumnId: Scalars['Int'];
+  id: Scalars['Int'];
+}>;
+
+
+export type MoveCardMutation = { __typename?: 'Mutation', card?: { __typename?: 'Card', id: number, title: string, description: string, index: number } | null };
 
 export type ResetPasswordMutationVariables = Exact<{
   newPassword: Scalars['String'];
@@ -428,6 +444,17 @@ export const LogoutDocument = gql`
 
 export function useLogoutMutation() {
   return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
+};
+export const MoveCardDocument = gql`
+    mutation MoveCard($toIndex: Int!, $toColumnId: Int!, $id: Int!) {
+  card: moveCard(toIndex: $toIndex, toColumnId: $toColumnId, id: $id) {
+    ...CardFragment
+  }
+}
+    ${CardFragmentFragmentDoc}`;
+
+export function useMoveCardMutation() {
+  return Urql.useMutation<MoveCardMutation, MoveCardMutationVariables>(MoveCardDocument);
 };
 export const ResetPasswordDocument = gql`
     mutation ResetPassword($newPassword: String!, $token: String!) {

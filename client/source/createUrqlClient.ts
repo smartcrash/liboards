@@ -21,8 +21,13 @@ import {
   CreateUserMutation,
   CurrentUserDocument,
   CurrentUserQuery,
-  DeleteBoardMutation, DeleteBoardMutationVariables, FindBoardByIdDocument, FindBoardByIdQuery, LoginWithPasswordMutation,
+  DeleteBoardMutation,
+  DeleteBoardMutationVariables,
+  FindBoardByIdDocument,
+  FindBoardByIdQuery,
+  LoginWithPasswordMutation,
   LogoutMutation,
+  MoveCardMutationVariables,
   RestoreBoardMutation,
   RestoreBoardMutationVariables
 } from "./generated/graphql";
@@ -47,6 +52,15 @@ export const createUrqlClient = () => createClient({
   exchanges: [
     dedupExchange,
     cacheExchange({
+      optimistic: {
+        moveCard: (variables: MoveCardMutationVariables, cache, info) => ({
+          __typename: 'Card',
+          id: variables.id,
+          index: variables.toIndex,
+          columnId: variables.toColumnId
+        }),
+      },
+
       updates: {
         Mutation: {
           loginWithPassword: (result, args, cache, info) => {
@@ -95,6 +109,7 @@ export const createUrqlClient = () => createClient({
 
           deleteBoard: (result, args: DeleteBoardMutationVariables, cache, info) => {
             cache.invalidate('Query', 'findBoardById', { id: args.id })
+            // TODO: Update query instead of invalidate is board is on cache
             cache.invalidate('Query', 'allDeletedBoards')
 
             updateQuery<DeleteBoardMutation, AllBoardsQuery>(
@@ -146,6 +161,13 @@ export const createUrqlClient = () => createClient({
               id: args.columnId,
             });
           },
+
+          // moveCard: (result, args: MoveCardMutationVariables, cache, info) => {
+          //   cache.invalidate({
+          //     __typename: 'Column',
+          //     id: args.toColumnId
+          //   });
+          // },
         },
       },
     }),
