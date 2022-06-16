@@ -1,0 +1,11 @@
+query FindCardById($id: Int!) {
+  card: findCardById(id: $id) {
+    id
+    title
+    description
+    column {
+      id
+      title
+    }
+  }
+}

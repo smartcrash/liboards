@@ -61,6 +61,19 @@ const gates: Readonly<Record<string, GateFn>> = {
   /*                                    Card                                    */
   /* -------------------------------------------------------------------------- */
 
+  async 'view-card'({ context: { user }, args }) {
+    const { id } = args
+
+    const card = await CardRepository.findOneBy({ id })
+
+    const column = await ColumnRepository.findOne({
+      where: { id: card.columnId },
+      relations: { board: true }
+    })
+
+    return column.board.createdById === user.id
+  },
+
   async 'create-card'({ context: { user }, args }) {
     const { columnId } = args
 

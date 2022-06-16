@@ -5,6 +5,25 @@ import { SESSION_COOKIE } from "../../constants";
 import { CardRepository } from "../../repository";
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
+const FindCardByIdQuery = `
+  query FindQueryById($id: Int!) {
+    card: findCardById(id: $id) {
+      id
+      title
+      description
+      column {
+        id
+        title
+      }
+      # TODO: Add createdBy field
+      # createdBy {
+      #   id
+      #   username
+      # }
+    }
+  }
+`
+
 const AddCardMutation = `
   mutation AddCard($columnId: Int!, $title: String!, $description: String) {
     card: addCard(columnId: $columnId, title: $title, description: $description) {
@@ -41,6 +60,65 @@ const MoveCardMutation = `
   }
 `
 
+
+test.group('findCardById', () => {
+  testThrowsIfNotAuthenticated({
+    query: FindCardByIdQuery,
+    variables: { id: 0 }
+  })
+
+  test('should get card\'s details using it\'s `id`', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const board = await createRandomBoard(user.id)
+    const column = await createRandomColumn(board.id)
+    const card = await createRandomCard(column.id)
+
+
+    const queryData = {
+      query: FindCardByIdQuery,
+      variables: { id: card.id }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data, errors } = response.body()
+
+    expect(errors).toBeFalsy()
+    expect(data.card).toBeTruthy()
+    // expect(data.card.createdBy.id).toBe(user.id)
+    // expect(data.card.createdBy.username).toBe(user.username)
+
+    expect(data.card).toMatchObject({
+      id: card.id,
+      title: card.title,
+      description: card.description,
+      column: {
+        id: column.id,
+        title: column.title,
+      },
+      // createdBy: {
+      //   id: user.id,
+      //   username: user.username
+      // }
+    })
+  })
+
+  test('should not be able to see some else\'s card', async ({ expect, client, createUser }) => {
+    const [user] = await createUser(client)
+    const [, cookie] = await createUser(client)
+    const board = await createRandomBoard(user.id)
+    const column = await createRandomColumn(board.id)
+    const card = await createRandomCard(column.id)
+
+    const queryData = {
+      query: FindCardByIdQuery,
+      variables: { id: card.id }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+
+    assertIsForbiddenExeption({ response, expect })
+  })
+})
 
 test.group('addCard', () => {
   testThrowsIfNotAuthenticated({

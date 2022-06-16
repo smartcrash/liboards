@@ -17,6 +17,8 @@ export type CardNewHandler = (newCard: { title: string; columnId: number }) => P
 
 export type CardRemoveHandler = (card: CardType) => void;
 
+export type CardClickHandler = (card: CardType, column: ColumnType) => void;
+
 export type CardDragEndHandler = (result: {
   cardId: number;
   fromColumnId: number;
@@ -32,6 +34,7 @@ interface BoardProps {
   onCardNew: CardNewHandler;
   onCardRemove: CardRemoveHandler;
   onCardDragEnd: CardDragEndHandler;
+  onCardClick: CardClickHandler;
 }
 
 export const Board = ({
@@ -41,6 +44,8 @@ export const Board = ({
   onColumnRemove,
   onCardRemove,
   onCardDragEnd,
+
+  onCardClick,
 }: BoardProps) => {
   const columnWidth = "2xs";
 
@@ -139,6 +144,7 @@ export const Board = ({
                     description={card.description}
                     draggableId={`${card.id}`}
                     index={cardIndex}
+                    onClick={() => onCardClick(card, column)}
                     contextMenu={
                       <Menu>
                         <MenuButton

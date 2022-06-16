@@ -1,4 +1,15 @@
-import { Card as CardType, Column as ColumnType } from "../../generated/graphql";
-
 export type BoardType = { columns: ColumnType[] };
-export type { ColumnType, CardType }
+
+export type CardType = {
+  id: number,
+  title: string,
+  description: string,
+  index: number
+}
+
+export type ColumnType = {
+  id: number;
+  title: string;
+  index: number,
+  cards: CardType[]
+}

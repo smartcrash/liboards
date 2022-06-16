@@ -1,4 +1,4 @@
-import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import { Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import { Between, FindOperator, MoreThan, MoreThanOrEqual } from "typeorm";
 import { dataSource } from "../dataSource";
 import { Card } from "../entity";
@@ -9,6 +9,15 @@ import { ContextType } from "../types";
 
 @Resolver(Card)
 export class CardResolver {
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('view-card'))
+  @Query(() => Card, { nullable: true })
+  async findCardById(@Arg('id', () => Int) id: number) {
+    const card = await CardRepository.findOneBy({ id })
+
+    return card
+  }
+
   @UseMiddleware(Authenticate)
   @UseMiddleware(AllowIf('create-card'))
   @Mutation(() => Card)

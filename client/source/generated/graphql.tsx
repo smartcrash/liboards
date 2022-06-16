@@ -36,6 +36,7 @@ export type Board = {
 
 export type Card = {
   __typename?: 'Card';
+  column: Column;
   description: Scalars['String'];
   id: Scalars['Float'];
   index: Scalars['Float'];
@@ -170,10 +171,16 @@ export type Query = {
   allDeletedBoards: Array<Board>;
   currentUser?: Maybe<User>;
   findBoardById?: Maybe<Board>;
+  findCardById?: Maybe<Card>;
 };
 
 
 export type QueryFindBoardByIdArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type QueryFindCardByIdArgs = {
   id: Scalars['Int'];
 };
 
@@ -322,6 +329,13 @@ export type FindBoardByIdQueryVariables = Exact<{
 
 
 export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> }> } | null };
+
+export type FindCardByIdQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string } } | null };
 
 export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
@@ -571,4 +585,21 @@ export const FindBoardByIdDocument = gql`
 
 export function useFindBoardByIdQuery(options: Omit<Urql.UseQueryArgs<FindBoardByIdQueryVariables>, 'query'>) {
   return Urql.useQuery<FindBoardByIdQuery>({ query: FindBoardByIdDocument, ...options });
+};
+export const FindCardByIdDocument = gql`
+    query FindCardById($id: Int!) {
+  card: findCardById(id: $id) {
+    id
+    title
+    description
+    column {
+      id
+      title
+    }
+  }
+}
+    `;
+
+export function useFindCardByIdQuery(options: Omit<Urql.UseQueryArgs<FindCardByIdQueryVariables>, 'query'>) {
+  return Urql.useQuery<FindCardByIdQuery>({ query: FindCardByIdDocument, ...options });
 };

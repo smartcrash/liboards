@@ -24,11 +24,11 @@ export const Card = ({ title, description, index, draggableId, contextMenu, ...b
           {...dragHandleProps}
         >
           <Stack>
-            <HStack>
+            <HStack justifyContent={"space-between"}>
               <Heading fontSize={"md"}>{title}</Heading>
               {contextMenu}
             </HStack>
-            <Text fontSize={"sm"} color={"gray.500"}>
+            <Text fontSize={"sm"} color={"gray.500"} hidden={!description}>
               {description}
             </Text>
           </Stack>
