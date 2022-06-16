@@ -1,30 +1,30 @@
 import Chance from "chance"
 
 const chance = new Chance()
+let user: [string, string]
 
 describe('Project View', () => {
-  before(() => cy.createUser())
+  before(() => {
+    cy.createUser().then(([email, pwd]) => user = [email, pwd])
+  })
 
   // Create a fresh project for each test
   beforeEach(() => {
-    cy.visit("/projects/new")
+    cy.loginWithPassword(...user)
+
+    cy.visit('/projects/new')
     cy.getByTestId('title').clear().type(chance.sentence({ words: 2 }))
-    cy.getByTestId('description').clear().type(chance.sentence({ words: 5 }))
     cy.getByTestId('submit').click()
   })
 
-  it('should allow to edit the project\'s `title` and `description`', () => {
+  it('should allow to edit the project\'s `title`', () => {
     const title = chance.sentence({ words: 2 })
-    const desc = chance.sentence({ words: 5 })
 
-    cy.getByTestId('title').parent().click().clear().type(title)
-    cy.getByTestId('description').parent().click().clear().type(`${desc}{enter}`)
+    cy.getByTestId('title').parent().click().clear().type(`${title}{enter}`)
 
     // Force reload the page to ensure that changes are persisted
     cy.reload(true)
-
     cy.contains(title)
-    cy.contains(desc)
   })
 
   it('can add a new column', () => {
@@ -126,7 +126,7 @@ describe('Project View', () => {
     cy.contains(newCard).should('not.exist')
   })
 
-  it.only('keeps correct order when a card is removed', () => {
+  it('keeps correct order when a card is removed', () => {
     const newColumn = 'Column 1'
     const newCards = ['Card 1', 'Card 2', 'Card 3']
 

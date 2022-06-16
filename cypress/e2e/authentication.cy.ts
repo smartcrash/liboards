@@ -34,7 +34,7 @@ describe('User authentication flow', () => {
     cy.contains(username)
   })
 
-  it.only('can login with username instead of email', () => {
+  it('can login with username instead of email', () => {
     const username = chance.name()
     const email = chance.email()
     const password = chance.word({ length: 5 })
@@ -59,7 +59,7 @@ describe('User authentication flow', () => {
     cy.getByTestId("password").clear().type('wrongpasword')
     cy.getByTestId('submit').click()
 
-    cy.contains('This email does\'nt exists.')
+    cy.contains('This user does\'nt exists.')
 
     cy.getByTestId("email").clear().type(email)
     cy.getByTestId("password").clear().type('wrongpasword')

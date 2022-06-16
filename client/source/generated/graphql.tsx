@@ -29,7 +29,6 @@ export type Board = {
   createdAt: Scalars['DateTime'];
   createdBy: User;
   deletedAt: Scalars['DateTime'];
-  description: Scalars['String'];
   id: Scalars['Float'];
   title: Scalars['String'];
   updatedAt: Scalars['DateTime'];
@@ -92,7 +91,6 @@ export type MutationAddColumnArgs = {
 
 
 export type MutationCreateBoardArgs = {
-  description?: InputMaybe<Scalars['String']>;
   title: Scalars['String'];
 };
 
@@ -149,7 +147,6 @@ export type MutationSendResetPasswordEmailArgs = {
 
 
 export type MutationUpdateBoardArgs = {
-  description?: InputMaybe<Scalars['String']>;
   id: Scalars['Int'];
   title?: InputMaybe<Scalars['String']>;
 };
@@ -190,7 +187,7 @@ export type User = {
   username: Scalars['String'];
 };
 
-export type BoardFragmentFragment = { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any };
+export type BoardFragmentFragment = { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any };
 
 export type CardFragmentFragment = { __typename?: 'Card', id: number, title: string, description: string, index: number };
 
@@ -217,11 +214,10 @@ export type AddColumnMutation = { __typename?: 'Mutation', column: { __typename?
 
 export type CreateBoardMutationVariables = Exact<{
   title: Scalars['String'];
-  description?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type CreateBoardMutation = { __typename?: 'Mutation', board: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any } };
+export type CreateBoardMutation = { __typename?: 'Mutation', board: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any } };
 
 export type CreateUserMutationVariables = Exact<{
   password: Scalars['String'];
@@ -300,21 +296,20 @@ export type SendResetPasswordEmailMutation = { __typename?: 'Mutation', sendRese
 export type UpdateBoardMutationVariables = Exact<{
   id: Scalars['Int'];
   title?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type UpdateBoardMutation = { __typename?: 'Mutation', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any } | null };
+export type UpdateBoardMutation = { __typename?: 'Mutation', board?: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any } | null };
 
 export type AllBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AllBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any }> };
+export type AllBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any }> };
 
 export type AllDeletedBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AllDeletedBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any }> };
+export type AllDeletedBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any }> };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -326,13 +321,12 @@ export type FindBoardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, description: string, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> }> } | null };
+export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> }> } | null };
 
 export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
   id
   title
-  description
   createdAt
   updatedAt
 }
@@ -387,8 +381,8 @@ export function useAddColumnMutation() {
   return Urql.useMutation<AddColumnMutation, AddColumnMutationVariables>(AddColumnDocument);
 };
 export const CreateBoardDocument = gql`
-    mutation CreateBoard($title: String!, $description: String) {
-  board: createBoard(title: $title, description: $description) {
+    mutation CreateBoard($title: String!) {
+  board: createBoard(title: $title) {
     ...BoardFragment
   }
 }
@@ -514,8 +508,8 @@ export function useSendResetPasswordEmailMutation() {
   return Urql.useMutation<SendResetPasswordEmailMutation, SendResetPasswordEmailMutationVariables>(SendResetPasswordEmailDocument);
 };
 export const UpdateBoardDocument = gql`
-    mutation UpdateBoard($id: Int!, $title: String, $description: String) {
-  board: updateBoard(id: $id, title: $title, description: $description) {
+    mutation UpdateBoard($id: Int!, $title: String) {
+  board: updateBoard(id: $id, title: $title) {
     ...BoardFragment
   }
 }
@@ -562,7 +556,6 @@ export const FindBoardByIdDocument = gql`
   board: findBoardById(id: $id) {
     id
     title
-    description
     createdBy {
       id
       username

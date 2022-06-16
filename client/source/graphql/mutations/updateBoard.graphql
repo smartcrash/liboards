@@ -1,5 +1,5 @@
-mutation UpdateBoard($id: Int!, $title: String, $description: String) {
-  board: updateBoard(id: $id, title: $title, description: $description) {
+mutation UpdateBoard($id: Int!, $title: String) {
+  board: updateBoard(id: $id, title: $title) {
     ...BoardFragment
   }
 }

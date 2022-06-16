@@ -1,5 +1,5 @@
-mutation CreateBoard($title: String!, $description: String) {
-  board: createBoard(title: $title, description: $description) {
+mutation CreateBoard($title: String!) {
+  board: createBoard(title: $title) {
     ...BoardFragment
   }
 }

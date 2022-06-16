@@ -35,7 +35,7 @@ import {
   useUpdateBoardMutation,
 } from "../../../generated/graphql";
 import { route } from "../../../routes";
-import { EditableTitleAndDesc } from "./EditableTitleAndDesc";
+import { EditableTitle } from "./EditableTitleAndDesc";
 
 export const ShowProject = () => {
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ export const ShowProject = () => {
   if (fetching) return <>loading...</>; // TODO: Add skeleton
   if (!data?.board) return <>Something went wrong! :O</>;
 
-  const { title, description } = data.board;
+  const { title } = data.board;
 
   const onDelete = async () => {
     await deleteBoard({ id });
@@ -90,10 +90,7 @@ export const ShowProject = () => {
   return (
     <Stack spacing={6}>
       <HStack justifyContent={"space-between"}>
-        <EditableTitleAndDesc
-          defaultValues={{ title, description }}
-          onSubmit={(nextValues) => update({ id, ...nextValues })}
-        />
+        <EditableTitle defaultValue={title} onSubmit={(title) => update({ id, title })} />
 
         <Popover>
           <PopoverTrigger>

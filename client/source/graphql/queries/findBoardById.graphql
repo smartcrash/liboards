@@ -2,7 +2,6 @@ query FindBoardById($id: Int!) {
   board: findBoardById(id: $id) {
     id
     title
-    description
     createdBy {
       id
       username

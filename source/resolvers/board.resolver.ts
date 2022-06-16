@@ -50,13 +50,11 @@ export class BoardResolver {
   @Mutation(() => Board)
   async createBoard(
     @Arg('title') title: string,
-    @Arg('description', () => String, { nullable: true }) description: string,
     @Ctx() { user }: ContextType
   ): Promise<Board> {
     const board = new Board()
 
     board.title = title
-    board.description = description
     board.createdById = user.id
 
     await BoardRepository.save(board)
@@ -70,7 +68,6 @@ export class BoardResolver {
   async updateBoard(
     @Arg('id', () => Int) id: number,
     @Arg('title', () => String, { nullable: true }) title: string | null,
-    @Arg('description', () => String, { nullable: true }) description: string | null,
     @Ctx() { user }: ContextType
   ): Promise<Board | null> {
     const board = await BoardRepository.findOneBy({ id, createdById: user.id })
@@ -78,7 +75,6 @@ export class BoardResolver {
     if (!board) return null
 
     board.title = title ?? board.title
-    board.description = description ?? board.description
 
     await BoardRepository.save(board)
 

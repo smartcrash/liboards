@@ -1,7 +1,6 @@
 fragment BoardFragment on Board {
   id
   title
-  description
   createdAt
   updatedAt
 }

@@ -16,15 +16,15 @@ describe('Resetting passwords', () => {
     cy.logout()
     cy.location("pathname").should("equal", "/login");
 
+
+    cy.wait(500)
     cy.getByTestId('forgot-password').click()
     cy.location("pathname").should("equal", "/forgot-password");
 
     cy.getByTestId('email').clear().type(email)
     cy.getByTestId('submit').click()
 
-    // ANTI-PATTERN wait for N seconds
-    // then get the email and hope it has arrived
-    cy.wait(10000)
+    cy.getByTestId('success', { timeout: 10000 }).should('be.visible')
 
     /** Make a request to Mailtrap's REST API to fecth the last message sended
      * to this user and assert that indeed was sended

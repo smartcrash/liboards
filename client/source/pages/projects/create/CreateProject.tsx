@@ -7,7 +7,6 @@ import { route } from "../../../routes";
 
 interface FieldValues {
   title: string;
-  description?: string;
 }
 
 export const CreateProject = () => {
@@ -19,8 +18,8 @@ export const CreateProject = () => {
     formState: { isSubmitting },
   } = useForm<FieldValues>({});
 
-  const onSubmit = handleSubmit(async ({ title, description }) => {
-    const { data, error } = await createBoard({ title, description });
+  const onSubmit = handleSubmit(async ({ title }) => {
+    const { data, error } = await createBoard({ title });
 
     if (data?.board.id) {
       const id = data?.board.id;
@@ -36,9 +35,8 @@ export const CreateProject = () => {
       <Stack mb={12}>
         <Heading fontSize={"3xl"}>Create new project</Heading>
         <Text color={"gray.500"}>
-          A project contains a board, and a board is made up of cards ordered on
-          lists. Use it to manage your project, track information, or organize
-          antthing.
+          A project contains a board, and a board is made up of cards ordered on lists. Use it to manage your project,
+          track information, or organize antthing.
         </Text>
       </Stack>
 
@@ -50,19 +48,8 @@ export const CreateProject = () => {
           rules={{ required: true }}
           data-testid={"title"}
         />
-        <Input
-          label={"Description"}
-          name={"description"}
-          control={control}
-          placeholder={"(optional)"}
-          data-testid={"description"}
-        />
 
-        <Button
-          isDisabled={isSubmitting}
-          type={"submit"}
-          data-testid={"submit"}
-        >
+        <Button isDisabled={isSubmitting} type={"submit"} data-testid={"submit"}>
           Create project
         </Button>
       </Stack>

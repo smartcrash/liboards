@@ -15,10 +15,6 @@ export class Board {
   @Property()
   title: string;
 
-  @Field()
-  @Property({ default: '' })
-  description: string;
-
   @Property()
   createdById: number
 

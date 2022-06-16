@@ -9,25 +9,19 @@ Cypress.Commands.add("getByTestId", (selector, ...args) => {
 });
 
 Cypress.Commands.add("createUser", (username = chance.name(), email = chance.email(), password = chance.word({ length: 6 })) => {
-  cy.location("pathname").then((currentPath) => {
-    if (currentPath !== '/signup') {
-      cy.visit('/signup');
-    }
-  });
+  cy.visit('/signup');
 
   cy.getByTestId("username").clear().type(username);
   cy.getByTestId("email").clear().type(email);
   cy.getByTestId("password").clear().type(password);
   cy.getByTestId("passwordConfirm").clear().type(password);
   cy.getByTestId("submit").click();
+
+  return cy.wrap([email, password] as [string, string])
 });
 
 Cypress.Commands.add("loginWithPassword", (email, password) => {
-  cy.location("pathname").then((currentPath) => {
-    if (currentPath !== '/login') {
-      cy.visit('/login');
-    }
-  });
+  cy.visit('/login');
 
   cy.getByTestId("email").clear().type(email);
   cy.getByTestId("password").clear().type(password);
@@ -42,7 +36,7 @@ Cypress.Commands.add("logout", () => {
 declare global {
   namespace Cypress {
     interface Chainable {
-      createUser(username?: string, email?: string, password?: string): void
+      createUser(username?: string, email?: string, password?: string): Chainable<[string, string]>
       loginWithPassword(email: string, password: string): void
       logout(): void
 

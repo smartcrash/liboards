@@ -5,11 +5,10 @@ import { BoardRepository } from '../../repository';
 import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
 
 const CreateBoardMutation = `
-  mutation CreateBoard($description: String, $title: String!) {
-    board: createBoard(description: $description, title: $title) {
+  mutation CreateBoard($title: String!) {
+    board: createBoard(title: $title) {
       id
       title
-      description
     }
   }
 `
@@ -19,7 +18,6 @@ const FindBoardByIdQuery = `
     board: findBoardById(id: $id) {
       id
       title
-      description
       createdBy { id }
     }
   }
@@ -43,11 +41,10 @@ const AllDeletedBoardsQuery = `
 `
 
 const UpdateBoardMutation = `
-  mutation UpdateBoard($id: Int!, $title: String, $description: String) {
-    board: updateBoard(id: $id, title: $title, description: $description) {
+  mutation UpdateBoard($id: Int!, $title: String) {
+    board: updateBoard(id: $id, title: $title) {
       id
       title
-      description
     }
   }
 `
@@ -67,21 +64,17 @@ const RestoreBoardMutation = `
 test.group('createBoard', () => {
   testThrowsIfNotAuthenticated({
     query: CreateBoardMutation,
-    variables: { title: '', description: '', }
+    variables: { title: '' }
   })
 
   test('should create board', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
 
     const title = faker.lorem.words()
-    const description = faker.lorem.sentences()
 
     const queryData = {
       query: CreateBoardMutation,
-      variables: {
-        title,
-        description
-      }
+      variables: { title, }
     };
 
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
@@ -89,13 +82,12 @@ test.group('createBoard', () => {
 
     expect(data.board).toBeDefined()
     expect(data.board.title).toBe(title)
-    expect(data.board.description).toBe(description)
 
     const { id } = data.board
     const board = await BoardRepository.findOneBy({ id })
 
     expect(board).toBeDefined()
-    expect(board).toMatchObject({ title, description })
+    expect(board.title).toBe(title)
     expect(board.createdById).toBe(user.id)
   })
 })
@@ -170,7 +162,7 @@ test.group('findBoardById', () => {
 
   test('should return single board', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id, title, description } = await createRandomBoard(user.id)
+    const { id, title } = await createRandomBoard(user.id)
 
     const queryData = {
       query: FindBoardByIdQuery,
@@ -184,7 +176,6 @@ test.group('findBoardById', () => {
     expect(data.board).toMatchObject({
       id,
       title,
-      description,
       createdBy: { id: user.id }
     })
   })
@@ -216,14 +207,12 @@ test.group('updateBoard', () => {
     const [user, cookie] = await createUser(client)
     const { id } = await createRandomBoard(user.id)
     const title = faker.lorem.words()
-    const description = faker.lorem.paragraphs()
 
     const queryData = {
       query: UpdateBoardMutation,
       variables: {
         id,
         title,
-        description
       }
     }
 
@@ -232,41 +221,19 @@ test.group('updateBoard', () => {
 
     expect(data.board.id).toBe(id)
     expect(data.board.title).toBe(title)
-    expect(data.board.description).toBe(description)
-  })
-
-  test('should only set given properties', async ({ expect, client, createUser }) => {
-    const [user, cookie] = await createUser(client)
-    const { id, title } = await createRandomBoard(user.id)
-    const description = faker.lorem.paragraphs()
-
-    const queryData = {
-      query: UpdateBoardMutation,
-      variables: {
-        id,
-        description
-      }
-    }
-
-    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
-    const { data } = response.body()
-
-    expect(data.board.id).toBe(id)
-    expect(data.board.title).toBe(title)
-    expect(data.board.description).toBe(description)
   })
 
   test('should only be allowed to update if is owner', async ({ expect, client, createUser }) => {
     const [user1] = await createUser(client)
     const [, cookie] = await createUser(client)
 
-    const { id, description } = await createRandomBoard(user1.id)
+    const { id, title } = await createRandomBoard(user1.id)
 
     const queryData = {
       query: UpdateBoardMutation,
       variables: {
         id,
-        description: faker.lorem.paragraph()
+        title: faker.lorem.paragraph()
       }
     };
 
@@ -277,7 +244,7 @@ test.group('updateBoard', () => {
     const board = await BoardRepository.findOneBy({ id })
 
     expect(board).toBeDefined()
-    expect(board.description).toBe(description) // It should not have changed
+    expect(board.title).toBe(title) // It should not have changed
   })
 })
 
