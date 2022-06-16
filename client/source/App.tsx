@@ -1,9 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Navigate,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
 import { useCurrentUserQuery } from "./generated/graphql";
 import {
   CreateProject,
@@ -30,18 +25,9 @@ function App() {
         ) : user ? (
           <>
             <Route path={routes.index} element={<Dashboard />}>
-              <Route
-                path={routes.index}
-                element={<Navigate to={routes["projects.list"]} replace />}
-              />
-              <Route
-                path={routes["projects.list"]}
-                element={<ListProjects />}
-              />
-              <Route
-                path={routes["projects.create"]}
-                element={<CreateProject />}
-              />
+              <Route path={routes.index} element={<Navigate to={routes["projects.list"]} replace />} />
+              <Route path={routes["projects.list"]} element={<ListProjects />} />
+              <Route path={routes["projects.create"]} element={<CreateProject />} />
               <Route path={routes["projects.show"]} element={<ShowProject />} />
             </Route>
             <Route path="*" element={<Navigate to={routes.index} replace />} />

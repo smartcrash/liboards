@@ -65,8 +65,6 @@ export const ShowProject = () => {
   if (fetching) return <>loading...</>; // TODO: Add skeleton
   if (!data?.board) return <>Something went wrong! :O</>;
 
-  console.log("Re-rendering board");
-
   const { title } = data.board;
 
   const onDelete = async () => {
