@@ -2,6 +2,8 @@ import { DeleteIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
+  EditableInput,
+  EditablePreview,
   HStack,
   Link,
   Popover,
@@ -21,13 +23,14 @@ import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import {
   Board,
   CardClickHandler,
+  CardDetailsModal,
   CardDragEndHandler,
   CardNewHandler,
   CardRemoveHandler,
   ColumnNewHandler,
   ColumnRemoveHandler,
+  NonEmptyEditable,
 } from "../../../components";
-import { CardDetailsModal } from "../../../components/CardDetailsModal";
 import {
   useAddCardMutation,
   useAddColumnMutation,
@@ -39,7 +42,6 @@ import {
   useUpdateBoardMutation,
 } from "../../../generated/graphql";
 import { route } from "../../../routes";
-import { EditableTitle } from "./EditableTitleAndDesc";
 
 export const ShowProject = () => {
   const navigate = useNavigate();
@@ -103,7 +105,15 @@ export const ShowProject = () => {
     <>
       <Stack spacing={6}>
         <HStack justifyContent={"space-between"}>
-          <EditableTitle defaultValue={title} onSubmit={(title) => update({ id, title })} />
+          <NonEmptyEditable
+            defaultValue={title}
+            onSubmit={(title) => update({ id, title })}
+            fontSize={"3xl"}
+            fontWeight={"bold"}
+          >
+            <EditablePreview />
+            <EditableInput data-testid={"title"} />
+          </NonEmptyEditable>
 
           <Popover>
             <PopoverTrigger>

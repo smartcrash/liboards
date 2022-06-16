@@ -39,17 +39,8 @@ export const ListProjects = () => {
         gap={2}
       >
         {boards?.boards.map(({ id, title }) => (
-          <Link to={route("projects.show", { id })}>
-            <Box
-              h={28}
-              p={5}
-              bg={"primary.500"}
-              color={"white"}
-              borderRadius={"md"}
-              borderWidth={1}
-              shadow={"md"}
-              key={id}
-            >
+          <Link to={route("projects.show", { id })} key={id}>
+            <Box h={28} p={5} bg={"primary.500"} color={"white"} borderRadius={"md"} borderWidth={1} shadow={"md"}>
               <VStack spacing={4} alignItems={"flex-start"}>
                 <Heading fontSize={"xl"}>{title}</Heading>
               </VStack>

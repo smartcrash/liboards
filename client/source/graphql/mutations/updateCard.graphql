@@ -1,0 +1,5 @@
+mutation UpdateCard($id: Int!, $description: String, $title: String) {
+  updateCard(id: $id, description: $description, title: $title) {
+    ...CardFragment
+  }
+}

@@ -308,6 +308,15 @@ export type UpdateBoardMutationVariables = Exact<{
 
 export type UpdateBoardMutation = { __typename?: 'Mutation', board?: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any } | null };
 
+export type UpdateCardMutationVariables = Exact<{
+  id: Scalars['Int'];
+  description?: InputMaybe<Scalars['String']>;
+  title?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type UpdateCardMutation = { __typename?: 'Mutation', updateCard?: { __typename?: 'Card', id: number, title: string, description: string, index: number } | null };
+
 export type AllBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -531,6 +540,17 @@ export const UpdateBoardDocument = gql`
 
 export function useUpdateBoardMutation() {
   return Urql.useMutation<UpdateBoardMutation, UpdateBoardMutationVariables>(UpdateBoardDocument);
+};
+export const UpdateCardDocument = gql`
+    mutation UpdateCard($id: Int!, $description: String, $title: String) {
+  updateCard(id: $id, description: $description, title: $title) {
+    ...CardFragment
+  }
+}
+    ${CardFragmentFragmentDoc}`;
+
+export function useUpdateCardMutation() {
+  return Urql.useMutation<UpdateCardMutation, UpdateCardMutationVariables>(UpdateCardDocument);
 };
 export const AllBoardsDocument = gql`
     query AllBoards {
