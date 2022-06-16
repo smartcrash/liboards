@@ -42,7 +42,15 @@ export const ListProjects = () => {
           <Link to={route("projects.show", { id })} key={id}>
             <Box h={28} p={5} bg={"primary.500"} color={"white"} borderRadius={"md"} borderWidth={1} shadow={"md"}>
               <VStack spacing={4} alignItems={"flex-start"}>
-                <Heading fontSize={"xl"}>{title}</Heading>
+                <Heading
+                  fontSize={"xl"}
+                  maxW={"full"}
+                  textOverflow={"ellipsis"}
+                  whiteSpace={"nowrap"}
+                  overflow={"hidden"}
+                >
+                  {title}
+                </Heading>
               </VStack>
             </Box>
           </Link>
