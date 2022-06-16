@@ -1,4 +1,5 @@
-import { Box, BoxProps, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, BoxProps, Heading, Stack, Text } from "@chakra-ui/react";
+import { useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 
 interface CardProps extends BoxProps {
@@ -10,6 +11,8 @@ interface CardProps extends BoxProps {
 }
 
 export const Card = ({ title, description, index, draggableId, contextMenu, ...boxProps }: CardProps) => {
+  const [isHover, setIsHover] = useState(false);
+
   return (
     <Draggable draggableId={draggableId} index={index}>
       {({ innerRef, draggableProps, dragHandleProps }) => (
@@ -19,16 +22,29 @@ export const Card = ({ title, description, index, draggableId, contextMenu, ...b
           borderWidth={1}
           bg={"white"}
           ref={innerRef}
+          position={"relative"}
+          onPointerEnter={() => setIsHover(true)}
+          onPointerLeave={() => setIsHover(false)}
           {...boxProps}
           {...draggableProps}
           {...dragHandleProps}
         >
+          <Box
+            display={isHover ? "block" : "none"}
+            position={"absolute"}
+            top={1}
+            right={1}
+            onClick={(event) => event.stopPropagation()}
+            bg={"white"}
+          >
+            {contextMenu}
+          </Box>
+
           <Stack>
-            <HStack justifyContent={"space-between"}>
-              <Heading fontSize={"md"}>{title}</Heading>
-              {contextMenu}
-            </HStack>
-            <Text fontSize={"sm"} color={"gray.500"} hidden={!description}>
+            <Heading as={"h4"} fontSize={"md"} maxW={"full"} whiteSpace={"pre-wrap"} fontWeight={"medium"}>
+              {title}
+            </Heading>
+            <Text fontSize={"sm"} color={"gray.500"} hidden={!description} noOfLines={5}>
               {description}
             </Text>
           </Stack>
