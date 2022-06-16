@@ -1,21 +1,9 @@
 import { AddIcon } from "@chakra-ui/icons";
-import {
-  Avatar,
-  Box,
-  Button,
-  HStack,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Text,
-} from "@chakra-ui/react";
+import { Avatar, Box, Button, HStack, Menu, MenuButton, MenuDivider, MenuItem, MenuList, Text } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { route } from "../routes";
-import { Container } from "./";
-import { Link } from "./Link";
+import { Container, Logo } from "./";
 
 function NavBar() {
   const { user, logout } = useAuth();
@@ -25,7 +13,7 @@ function NavBar() {
   return (
     <Container as={"nav"}>
       <HStack justifyContent={"space-between"} h={20}>
-        <Link to={route("index")}>Liboards</Link>
+        <Logo />
 
         <HStack spacing={10}>
           <Button

@@ -4,6 +4,7 @@ import { Provider as UrqlProvider } from "urql";
 import App from "./App";
 import theme from "./theme";
 import { createUrqlClient } from "./createUrqlClient";
+import "@fontsource/lobster";
 
 const client = createUrqlClient();
 

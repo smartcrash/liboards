@@ -17,6 +17,7 @@
     "@chakra-ui/react": "^2.1.2",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
+    "@fontsource/lobster": "^4.5.9",
     "@types/lodash-es": "^4.17.6",
     "@urql/exchange-graphcache": "^4.4.2",
     "framer-motion": "^6.3.10",
