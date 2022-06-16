@@ -1,17 +1,31 @@
 import { HamburgerIcon } from "@chakra-ui/icons";
-import { Box, HStack, IconButton, Menu, MenuButton, MenuItem, MenuList, Stack } from "@chakra-ui/react";
+import {
+  Box,
+  EditableInput,
+  EditablePreview,
+  HStack,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Stack,
+} from "@chakra-ui/react";
 import { cloneDeep } from "lodash-es";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import useRefState from "../../hooks/useRefState";
+import { NonEmptyEditable } from "../NonEmptyEditable";
 import { Card, Column } from "./components";
 import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
-import { addCard, addColumn, moveCard, removeCard, removeColumn } from "./helpers";
+import { addCard, addColumn, changeColumn, moveCard, removeCard, removeColumn } from "./helpers";
 import { BoardType, CardType, ColumnType } from "./types";
 
 export type ColumnNewHandler = (newColumn: { title: string }) => Promise<ColumnType>;
 
 export type ColumnRemoveHandler = (column: ColumnType) => void;
+
+export type ColumnRenameHandler = (renamedColumn: ColumnType) => void;
 
 export type CardNewHandler = (newCard: { title: string; columnId: number }) => Promise<CardType>;
 
@@ -31,6 +45,7 @@ interface BoardProps {
   children: BoardType;
   onColumnNew: ColumnNewHandler;
   onColumnRemove: ColumnRemoveHandler;
+  onColumnRename: ColumnRenameHandler;
   onCardNew: CardNewHandler;
   onCardRemove: CardRemoveHandler;
   onCardDragEnd: CardDragEndHandler;
@@ -42,9 +57,9 @@ export const Board = ({
   onColumnNew,
   onCardNew,
   onColumnRemove,
+  onColumnRename,
   onCardRemove,
   onCardDragEnd,
-
   onCardClick,
 }: BoardProps) => {
   const columnWidth = "2xs";
@@ -83,6 +98,15 @@ export const Board = ({
     setBoardRef(boardWithoutCard);
   };
 
+  const handleColumnRename = async (column: ColumnType, title: string) => {
+    if (column.title === title) return;
+
+    const board = boardRef.current;
+    const boardWithRenamedColumn = changeColumn(board, column, { title });
+    onColumnRename({ ...column, title });
+    setBoardRef(boardWithRenamedColumn);
+  };
+
   const onDragEnd = ({ draggableId, source, destination }: DropResult) => {
     // Sometimes the destination may be `null` such as when the user
     // drops outside of a list.
@@ -118,9 +142,18 @@ export const Board = ({
           return (
             <Stack w={columnWidth} key={column.id}>
               <Column
-                title={column.title}
                 droppableId={`${column.id}`}
-                data-testid={`column-${columnIndex}`}
+                columnHeader={
+                  <NonEmptyEditable
+                    defaultValue={column.title}
+                    onSubmit={(nextValue) => handleColumnRename(column, nextValue)}
+                    fontSize={"md"}
+                    fontWeight={"semibold"}
+                  >
+                    <EditablePreview />
+                    <EditableInput />
+                  </NonEmptyEditable>
+                }
                 contextMenu={
                   <Menu>
                     <MenuButton
@@ -137,6 +170,7 @@ export const Board = ({
                     </MenuList>
                   </Menu>
                 }
+                data-testid={`column-${columnIndex}`}
               >
                 {column.cards.map((card, cardIndex) => (
                   <Card

@@ -1,18 +1,18 @@
-import { Box, BoxProps, Heading, HStack, VStack } from "@chakra-ui/react";
+import { Box, BoxProps, HStack, VStack } from "@chakra-ui/react";
 import { Droppable } from "react-beautiful-dnd";
 
 interface ColumnProps extends BoxProps {
-  title: string;
+  columnHeader: any;
   droppableId: string;
   contextMenu: any;
   children: any;
 }
 
-export const Column = ({ title, droppableId, contextMenu, children, ...boxProps }: ColumnProps) => {
+export const Column = ({ columnHeader, droppableId, contextMenu, children, ...boxProps }: ColumnProps) => {
   return (
     <Box {...boxProps}>
-      <HStack mb={3} bg={"gray.200"} px={3} py={2} borderRadius={"sm"} justifyContent={"space-between"}>
-        <Heading fontSize={"lg"}>{title}</Heading>
+      <HStack mb={3} px={3} py={2} justifyContent={"space-between"}>
+        {columnHeader}
         {contextMenu}
       </HStack>
 

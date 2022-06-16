@@ -1,0 +1,5 @@
+mutation UpdateColumn($id: Int!, $title: String) {
+  column: updateColumn(id: $id, title: $title) {
+    ...ColumnFragment
+  }
+}

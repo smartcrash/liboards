@@ -29,6 +29,7 @@ import {
   CardRemoveHandler,
   ColumnNewHandler,
   ColumnRemoveHandler,
+  ColumnRenameHandler,
   NonEmptyEditable,
 } from "../../../components";
 import {
@@ -40,6 +41,7 @@ import {
   useRemoveCardMutation,
   useRemoveColumnMutation,
   useUpdateBoardMutation,
+  useUpdateColumnMutation,
 } from "../../../generated/graphql";
 import { route } from "../../../routes";
 
@@ -51,6 +53,7 @@ export const ShowProject = () => {
   const [, update] = useUpdateBoardMutation();
   const [, deleteBoard] = useDeleteBoardMutation();
   const [, addColumn] = useAddColumnMutation();
+  const [, updateColumn] = useUpdateColumnMutation();
   const [, addCard] = useAddCardMutation();
   const [, removeColumn] = useRemoveColumnMutation();
   const [, removeCard] = useRemoveCardMutation();
@@ -61,6 +64,8 @@ export const ShowProject = () => {
 
   if (fetching) return <>loading...</>; // TODO: Add skeleton
   if (!data?.board) return <>Something went wrong! :O</>;
+
+  console.log("Re-rendering board");
 
   const { title } = data.board;
 
@@ -80,6 +85,10 @@ export const ShowProject = () => {
 
   const onColumnRemove: ColumnRemoveHandler = async ({ id }) => {
     await removeColumn({ id });
+  };
+
+  const onColumnRename: ColumnRenameHandler = async ({ id, title }) => {
+    await updateColumn({ id, title });
   };
 
   const onCardNew: CardNewHandler = async (newCard) => {
@@ -147,6 +156,7 @@ export const ShowProject = () => {
           <Board
             onColumnNew={onColumnNew}
             onColumnRemove={onColumnRemove}
+            onColumnRename={onColumnRename}
             onCardNew={onCardNew}
             onCardRemove={onCardRemove}
             onCardDragEnd={onCardDragEnd}

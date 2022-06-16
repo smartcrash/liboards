@@ -52,3 +52,9 @@ export const removeCard = (board: BoardType, fromColumn: ColumnType, card: CardT
   const filteredColumns = board.columns.map((column) => (fromColumn.id === column.id ? columnWithoutCard : column))
   return { ...board, columns: filteredColumns }
 }
+
+
+export const changeColumn = (board: BoardType, column: ColumnType, newColumn: { title: string }) => {
+  const changedColumns = board.columns.map((values) => values.id === column.id ? { ...values, ...newColumn } : values)
+  return { ...board, columns: changedColumns }
+}
