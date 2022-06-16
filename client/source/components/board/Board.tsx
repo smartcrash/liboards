@@ -162,6 +162,8 @@ export const Board = ({
                       variant={"ghost"}
                       size={"sm"}
                       colorScheme={"gray"}
+                      aria-label={"More column actions"}
+                      title={"More column actions"}
                     />
                     <MenuList>
                       <MenuItem data-testid={"remove-column"} onClick={() => handleColumnRemove(column)}>
@@ -187,6 +189,8 @@ export const Board = ({
                           variant={"ghost"}
                           size={"sm"}
                           colorScheme={"gray"}
+                          aria-label={"More card actions"}
+                          title={"More card actions"}
                         />
                         <MenuList>
                           <MenuItem data-testid={"remove-card"} onClick={() => handleCardRemove(column, card)}>
