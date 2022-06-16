@@ -46,6 +46,7 @@ export const CreateProject = () => {
           name={"title"}
           control={control}
           rules={{ required: true }}
+          autoFocus
           data-testid={"title"}
         />
 
