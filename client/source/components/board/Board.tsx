@@ -116,7 +116,7 @@ export const Board = ({
       <DragDropContext onDragEnd={onDragEnd}>
         {boardRef.current.columns.map((column, columnIndex) => {
           return (
-            <Stack minW={columnWidth} key={column.id}>
+            <Stack w={columnWidth} key={column.id}>
               <Column
                 title={column.title}
                 droppableId={`${column.id}`}
@@ -172,7 +172,7 @@ export const Board = ({
           );
         })}
 
-        <Box minW={columnWidth}>
+        <Box w={columnWidth}>
           <ColumnAdder onConfirm={handleColumnAdd} />
         </Box>
       </DragDropContext>
