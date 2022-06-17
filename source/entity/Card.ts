@@ -2,7 +2,7 @@ import { Field, ObjectType } from "type-graphql";
 import { TypeormLoader } from "type-graphql-dataloader";
 import { Column as Property, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, } from "typeorm";
 import { Column } from "./Column";
-import { Taks } from "./Task";
+import { Task } from "./Task";
 
 @ObjectType()
 @Entity()
@@ -31,8 +31,8 @@ export class Card {
   @TypeormLoader()
   column: Column
 
-  @Field(() => [Taks])
-  @OneToMany(() => Taks, taks => taks.card)
+  @Field(() => [Task])
+  @OneToMany(() => Task, taks => taks.card)
   @TypeormLoader()
   tasks: Card[]
 }

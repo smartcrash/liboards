@@ -1,12 +1,12 @@
 import { Field, ObjectType } from "type-graphql";
 import { TypeormLoader } from "type-graphql-dataloader";
-import { AfterLoad, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Card } from "./Card";
 import { User } from "./User";
 
 @ObjectType()
 @Entity()
-export class Taks {
+export class Task {
   @Field()
   @PrimaryGeneratedColumn()
   id: number;
@@ -15,7 +15,6 @@ export class Taks {
   @Column()
   description: string;
 
-  @Field()
   @Column()
   completedAt: Date
 

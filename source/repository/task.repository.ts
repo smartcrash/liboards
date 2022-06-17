@@ -1,4 +1,4 @@
 import { dataSource } from "../dataSource";
-import { Taks } from "../entity";
+import { Task } from "../entity";
 
-export const taskRepository = dataSource.getRepository(Taks)
+export const taskRepository = dataSource.getRepository(Task)
