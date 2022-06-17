@@ -14,7 +14,7 @@ import {
 import { cloneDeep } from "lodash-es";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import useRefState from "../../hooks/useRefState";
-import { NonEmptyEditable } from "../NonEmptyEditable";
+import { NonEmptyEditable } from "../";
 import { Card, Column } from "./components";
 import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";

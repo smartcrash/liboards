@@ -6,7 +6,7 @@ export * from './card-details-modal'
 export * from './Container'
 export * from './board'
 export * from './Logo'
-export * from './NonEmptyEditable'
+export * from './non-empty-editable'
 export * from './AutoResizeTextarea'
 export * from './HeartButton'
 

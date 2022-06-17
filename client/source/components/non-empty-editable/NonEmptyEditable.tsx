@@ -1,7 +1,9 @@
 import { Editable, EditableProps } from "@chakra-ui/react";
 import { useRef, useState } from "react";
 
-interface NonEmptyEditableProps extends EditableProps {}
+interface NonEmptyEditableProps extends EditableProps {
+  defaultValue: string;
+}
 
 export const NonEmptyEditable = ({ defaultValue, onSubmit = () => {}, children, ...props }: NonEmptyEditableProps) => {
   const [value, setValue] = useState(defaultValue);
