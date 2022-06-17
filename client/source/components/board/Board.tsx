@@ -10,6 +10,7 @@ import {
   MenuItem,
   MenuList,
   Stack,
+  useUpdateEffect,
 } from "@chakra-ui/react";
 import { cloneDeep } from "lodash-es";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
@@ -20,6 +21,7 @@ import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
 import { addCard, addColumn, changeColumn, moveCard, removeCard, removeColumn } from "./helpers";
 import { BoardType, CardType, ColumnType } from "./types";
+import { useEffect } from "react";
 
 export type ColumnNewHandler = (newColumn: { title: string }) => Promise<ColumnType>;
 
@@ -63,12 +65,13 @@ export const Board = ({
   onCardClick,
 }: BoardProps) => {
   const columnWidth = "2xs";
+  const [boardRef, setBoardRef] = useRefState<BoardType>({ columns: [] });
 
-  const [boardRef, setBoardRef] = useRefState(() => {
+  useEffect(() => {
     const board = cloneDeep(initialBoard);
     board.columns.forEach((column) => column.cards.sort((a, b) => a.index - b.index));
-    return board;
-  });
+    setBoardRef(board);
+  }, [initialBoard]);
 
   const handleColumnAdd = async (title: string) => {
     const board = boardRef.current;
