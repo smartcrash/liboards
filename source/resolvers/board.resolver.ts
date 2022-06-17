@@ -1,5 +1,8 @@
+import { groupBy } from "lodash";
+import type DataLoader from "dataloader";
 import { Arg, Ctx, FieldResolver, Int, Mutation, Query, Resolver, Root, UseMiddleware } from "type-graphql";
-import { IsNull, Not } from "typeorm";
+import { Loader } from "type-graphql-dataloader";
+import { In, IsNull, Not } from "typeorm";
 import { Board } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
@@ -9,14 +12,21 @@ import { ContextType } from '../types';
 @Resolver(Board)
 export class BoardResolver {
   @FieldResolver(() => Boolean)
-  async favorite(
-    @Root() root: Board,
-    @Ctx() { user }: ContextType
-  ): Promise<boolean> {
-    const userId = user.id
-    const boardId = root.id
+  @Loader<number, boolean>(async (ids, { context }) => {
+    const { id: userId } = (context as ContextType).user
 
-    return !!(await favoritesRepository.findOneBy({ userId, boardId }))
+    const favorites = await favoritesRepository.find({
+      where: {
+        userId,
+        boardId: In([...ids])
+      }
+    })
+    const favoritesById = groupBy(favorites, 'boardId')
+    return ids.map((id) => !!favoritesById[id]);
+
+  })
+  async favorite(@Root() root: Board) {
+    return (dataloader: DataLoader<number, boolean>) => dataloader.load(root.id);
   }
 
   @UseMiddleware(Authenticate)

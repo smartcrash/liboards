@@ -4,7 +4,7 @@ import { DataSource, DataSourceOptions } from "typeorm";
 const config: DataSourceOptions = {
   type: "sqlite", // TODO: Move to .env
   database: "database.sqlite",
-  logging: true,
+  logging: false,
   synchronize: true,
   dropSchema: false,
   migrationsRun: true,

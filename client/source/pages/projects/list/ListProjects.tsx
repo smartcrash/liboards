@@ -29,7 +29,7 @@ export const ListProjects = () => {
             </Heading>
             <BoardList>
               {favorites?.favorites.map((board) => (
-                <BoardItem board={board} />
+                <BoardItem board={board} key={board.id} />
               ))}
             </BoardList>
           </Box>
@@ -41,7 +41,7 @@ export const ListProjects = () => {
           </Heading>
           <BoardList>
             {boards?.boards.map((board) => (
-              <BoardItem board={board} />
+              <BoardItem board={board} key={board.id} />
             ))}
             <BoardAdderItem />
           </BoardList>
