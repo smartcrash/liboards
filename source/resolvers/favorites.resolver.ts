@@ -2,7 +2,7 @@ import { Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware } from "type-gr
 import { Board } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
-import { BoardRepository, UserRepository } from "../repository";
+import { favoriteRepository } from "../repository";
 import { ContextType } from "../types";
 
 @Resolver(Board)
@@ -12,12 +12,13 @@ export class FavoritesResolver {
   async allFavorites(
     @Ctx() { req }: ContextType): Promise<Board[]> {
     const { userId } = req.session
-    const user = await UserRepository.findOneOrFail({
-      where: { id: userId },
-      relations: { favorites: true }
+
+    const favorites = await favoriteRepository.find({
+      where: { userId },
+      relations: { board: true }
     })
 
-    return user.favorites
+    return favorites.map(({ board }) => board)
   }
 
   @UseMiddleware(Authenticate)
@@ -27,15 +28,8 @@ export class FavoritesResolver {
     @Arg('id', () => Int) id: number,
     @Ctx() { req }: ContextType): Promise<Boolean | null> {
     const { userId } = req.session
-    const board = await BoardRepository.findOneByOrFail({ id })
-    const user = await UserRepository.findOneOrFail({
-      where: { id: userId },
-      relations: { favorites: true }
-    })
 
-    user.favorites = [...user.favorites, board]
-
-    await UserRepository.save(user)
+    await favoriteRepository.upsert({ userId, boardId: id }, ['userId', 'boardId'])
 
     return true
   }
@@ -47,12 +41,8 @@ export class FavoritesResolver {
     @Arg('id', () => Int) id: number,
     @Ctx() { req }: ContextType): Promise<Boolean | null> {
     const { userId } = req.session
-    const user = await UserRepository.findOneOrFail({
-      where: { id: userId },
-      relations: { favorites: true }
-    })
-    user.favorites = user.favorites.filter((favorite) => favorite.id !== id)
-    await UserRepository.save(user)
+
+    await favoriteRepository.delete({ userId, boardId: id })
 
     return true
   }

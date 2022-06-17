@@ -1,8 +1,9 @@
 import { hash } from "argon2";
 import { Field, ObjectType } from "type-graphql";
 import { TypeormLoader } from "type-graphql-dataloader";
-import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Board } from "./Board";
+import { Favorite } from "./Favorite";
 
 @ObjectType()
 @Entity()
@@ -35,9 +36,8 @@ export class User {
   @TypeormLoader()
   boards: Board[]
 
-  @ManyToMany(() => Board)
-  @JoinTable()
-  favorites: Board[]
+  @OneToMany(() => Favorite, favorite => favorite.user)
+  favorites: Favorite[];
 
   @Field(() => String)
   @CreateDateColumn()

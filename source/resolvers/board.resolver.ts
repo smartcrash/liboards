@@ -1,13 +1,19 @@
-import { Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
+import { Arg, Ctx, FieldResolver, Int, Mutation, Query, Resolver, Root, UseMiddleware } from "type-graphql";
 import { IsNull, Not } from "typeorm";
 import { Board } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
-import { BoardRepository } from "../repository";
+import { BoardRepository, UserRepository } from "../repository";
 import { ContextType } from '../types';
 
 @Resolver(Board)
 export class BoardResolver {
+  @FieldResolver(() => Boolean)
+  async favorite(@Root() root: Board): Promise<boolean> {
+
+    return false
+  }
+
   @UseMiddleware(Authenticate)
   @Query(() => [Board])
   async allBoards(

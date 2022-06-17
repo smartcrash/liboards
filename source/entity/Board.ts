@@ -2,6 +2,7 @@ import { Field, ObjectType } from "type-graphql";
 import { TypeormLoader } from "type-graphql-dataloader";
 import { Column as Property, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Column } from "./Column";
+import { Favorite } from "./Favorite";
 import { User } from "./User";
 
 @ObjectType()
@@ -27,6 +28,9 @@ export class Board {
   @OneToMany(() => Column, column => column.board)
   @TypeormLoader()
   columns: Column[]
+
+  @OneToMany(() => Favorite, favorite => favorite.board)
+  favorites!: Favorite[];
 
   @Field()
   @CreateDateColumn()

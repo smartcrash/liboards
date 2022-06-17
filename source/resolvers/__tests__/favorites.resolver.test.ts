@@ -1,6 +1,6 @@
 import { test } from "@japa/runner"
 import { SESSION_COOKIE } from "../../constants"
-import { UserRepository } from "../../repository"
+import { favoriteRepository, UserRepository } from "../../repository"
 import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from "../../utils/testUtils"
 
 const AllFavoritesQuery = `
@@ -31,21 +31,16 @@ test.group('allFavorites', () => {
   })
 
   test('get user\'s favorites list', async ({ expect, client, createUser }) => {
-    const [{ id: userId }, cookie] = await createUser(client)
+    const [user, cookie] = await createUser(client)
 
-    const board1 = await createRandomBoard(userId)
-    const board2 = await createRandomBoard(userId)
-    const board3 = await createRandomBoard(userId)
+    const board1 = await createRandomBoard(user.id)
+    const board2 = await createRandomBoard(user.id)
+    const board3 = await createRandomBoard(user.id)
 
-    const user = await UserRepository.findOne({
-      where: { id: userId },
-      relations: { favorites: true }
-    })
-
-    user.favorites = [board2, board3]
-
-    await UserRepository.save(user)
-
+    await favoriteRepository.insert([
+      { userId: user.id, boardId: board2.id },
+      { userId: user.id, boardId: board3.id },
+    ])
 
     const queryData = {
       query: AllFavoritesQuery,
@@ -94,14 +89,16 @@ test.group('addToFavorites', () => {
     })
 
     expect(favorites).toHaveLength(1)
-    expect(favorites[0].id).toBe(id)
+    expect(favorites[0].boardId).toBe(id)
   })
 
   test('can only favorite boards that has access to', async ({ expect, client, createUser }) => {
-    const [user,] = await createUser(client)
-    const [, cookie] = await createUser(client)
+    const [otherUser,] = await createUser(client)
+    const [loggedUser, cookie] = await createUser(client)
 
-    const { id } = await createRandomBoard(user.id)
+    const { id } = await createRandomBoard(otherUser.id)
+
+    await favoriteRepository.insert({ userId: otherUser.id, boardId: id })
 
     const queryData = {
       query: AddToFavoritesMutation,
@@ -113,7 +110,7 @@ test.group('addToFavorites', () => {
     assertIsForbiddenExeption({ response, expect })
 
     const { favorites } = await UserRepository.findOne({
-      where: { id: user.id },
+      where: { id: loggedUser.id },
       relations: { favorites: true }
     })
 
@@ -128,12 +125,9 @@ test.group('removeFromFavorites', () => {
   })
 
   test('it removes board from user\'s favorites', async ({ expect, client, createUser }) => {
-    const [{ id: userId }, cookie] = await createUser(client)
-    const board = await createRandomBoard(userId)
+    const [user, cookie] = await createUser(client)
+    const board = await createRandomBoard(user.id)
 
-    const user = await UserRepository.findOneByOrFail({ id: userId })
-    user.favorites = [board]
-    await UserRepository.save(user)
 
     const queryData = {
       query: RemoveFromFavoritesMutation,
