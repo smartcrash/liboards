@@ -4,7 +4,7 @@ import { dataSource } from "../dataSource";
 import { Card } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
-import { CardRepository } from "../repository";
+import { cardRepository } from "../repository";
 import { ContextType } from "../types";
 
 @Resolver(Card)
@@ -13,7 +13,7 @@ export class CardResolver {
   @UseMiddleware(AllowIf('view-card'))
   @Query(() => Card, { nullable: true })
   async findCardById(@Arg('id', () => Int) id: number) {
-    const card = await CardRepository.findOneBy({ id })
+    const card = await cardRepository.findOneBy({ id })
 
     return card
   }
@@ -30,10 +30,10 @@ export class CardResolver {
 
     card.title = title
     card.description = description
-    card.index = await CardRepository.countBy({ columnId })
+    card.index = await cardRepository.countBy({ columnId })
     card.columnId = columnId
 
-    await CardRepository.save(card)
+    await cardRepository.save(card)
 
     return card
   }
@@ -46,12 +46,12 @@ export class CardResolver {
     @Arg('title', { nullable: true }) title: string | null,
     @Arg('description', { nullable: true }) description: string | null,
     @Ctx() { }: ContextType): Promise<Card | null> {
-    const card = await CardRepository.findOneBy({ id })
+    const card = await cardRepository.findOneBy({ id })
 
     card.title = title ?? card.title
     card.description = description ?? card.description
 
-    await CardRepository.save(card)
+    await cardRepository.save(card)
 
     return card
   }
@@ -64,7 +64,7 @@ export class CardResolver {
     @Arg('toIndex', () => Int) toIndex: number,
     @Arg('toColumnId', () => Int) toColumnId: number,
     @Ctx() { }: ContextType): Promise<Card | null> {
-    const card = await CardRepository.findOneBy({ id })
+    const card = await cardRepository.findOneBy({ id })
     const fromIndex = card.index
     const isMovingUp = toIndex > fromIndex
 
@@ -95,7 +95,7 @@ export class CardResolver {
   async removeCard(
     @Arg('id', () => Int) id: number,
     @Ctx() { }: ContextType): Promise<number | null> {
-    const { index, columnId } = await CardRepository.findOneBy({ id })
+    const { index, columnId } = await cardRepository.findOneBy({ id })
 
     await dataSource.transaction(async (manager) => {
       const repository = manager.getRepository(Card)

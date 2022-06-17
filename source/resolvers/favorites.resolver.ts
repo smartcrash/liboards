@@ -2,7 +2,7 @@ import { Arg, Ctx, Int, Mutation, Query, Resolver, UseMiddleware } from "type-gr
 import { Board } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
-import { favoriteRepository } from "../repository";
+import { favoritesRepository } from "../repository";
 import { ContextType } from "../types";
 
 @Resolver(Board)
@@ -13,7 +13,7 @@ export class FavoritesResolver {
     @Ctx() { req }: ContextType): Promise<Board[]> {
     const { userId } = req.session
 
-    const favorites = await favoriteRepository.find({
+    const favorites = await favoritesRepository.find({
       where: { userId },
       relations: { board: true }
     })
@@ -29,7 +29,7 @@ export class FavoritesResolver {
     @Ctx() { req }: ContextType): Promise<Boolean | null> {
     const { userId } = req.session
 
-    await favoriteRepository.upsert({ userId, boardId: id }, ['userId', 'boardId'])
+    await favoritesRepository.upsert({ userId, boardId: id }, ['userId', 'boardId'])
 
     return true
   }
@@ -42,7 +42,7 @@ export class FavoritesResolver {
     @Ctx() { req }: ContextType): Promise<Boolean | null> {
     const { userId } = req.session
 
-    await favoriteRepository.delete({ userId, boardId: id })
+    await favoritesRepository.delete({ userId, boardId: id })
 
     return true
   }

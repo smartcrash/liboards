@@ -5,7 +5,7 @@ import { dataSource } from "../dataSource";
 import { Column } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
-import { ColumnRepository } from "../repository";
+import { columnRepository } from "../repository";
 import { ContextType } from "../types";
 
 @Resolver(Column)
@@ -20,10 +20,10 @@ export class ColumnResolver {
     const column = new Column()
 
     column.title = title
-    column.index = await ColumnRepository.countBy({ boardId })
+    column.index = await columnRepository.countBy({ boardId })
     column.boardId = boardId
 
-    await ColumnRepository.save(column)
+    await columnRepository.save(column)
 
     return column
   }
@@ -35,11 +35,11 @@ export class ColumnResolver {
     @Arg('id', () => Int) id: number,
     @Arg('title', { nullable: true }) title: string | null,
     @Ctx() { }: ContextType): Promise<Column | null> {
-    const column = await ColumnRepository.findOneBy({ id })
+    const column = await columnRepository.findOneBy({ id })
 
     column.title = title ?? column.title
 
-    await ColumnRepository.save(column)
+    await columnRepository.save(column)
 
     return column
   }
@@ -50,7 +50,7 @@ export class ColumnResolver {
   async removeColumn(
     @Arg('id', () => Int) id: number,
     @Ctx() { }: ContextType): Promise<number | null> {
-    const { index, boardId } = await ColumnRepository.findOneBy({ id })
+    const { index, boardId } = await columnRepository.findOneBy({ id })
 
     await dataSource.transaction(async (manager) => {
       const repository = manager.getRepository(Column)

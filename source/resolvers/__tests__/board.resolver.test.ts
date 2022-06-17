@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import { SESSION_COOKIE } from '../../constants';
-import { BoardRepository } from '../../repository';
+import { boardRepository } from '../../repository';
 import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
 
 const CreateBoardMutation = `
@@ -84,7 +84,7 @@ test.group('createBoard', () => {
     expect(data.board.title).toBe(title)
 
     const { id } = data.board
-    const board = await BoardRepository.findOneBy({ id })
+    const board = await boardRepository.findOneBy({ id })
 
     expect(board).toBeDefined()
     expect(board.title).toBe(title)
@@ -120,7 +120,7 @@ test.group('allBoards', () => {
     await createRandomBoard(user.id)
     await createRandomBoard(user.id)
     const { id } = await createRandomBoard(user.id)
-    await BoardRepository.softDelete({ id })
+    await boardRepository.softDelete({ id })
 
     const queryData = { query: AllBoardsQuery };
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
@@ -143,7 +143,7 @@ test.group('allDeletedBoards', () => {
     await createRandomBoard(user.id)
     await createRandomBoard(user.id)
     const { id } = await createRandomBoard(user.id)
-    await BoardRepository.softDelete({ id })
+    await boardRepository.softDelete({ id })
 
     const queryData = { query: AllDeletedBoardsQuery };
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
@@ -241,7 +241,7 @@ test.group('updateBoard', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const board = await BoardRepository.findOneBy({ id })
+    const board = await boardRepository.findOneBy({ id })
 
     expect(board).toBeDefined()
     expect(board.title).toBe(title) // It should not have changed
@@ -271,7 +271,7 @@ test.group('deletBoard', () => {
     expect(data.id).toBeDefined()
     expect(data.id).toBe(id)
 
-    const board = await BoardRepository.findOne({ where: { id }, withDeleted: true })
+    const board = await boardRepository.findOne({ where: { id }, withDeleted: true })
 
     expect(board).not.toBeNull()
     expect(board.deletedAt).toBeDefined()
@@ -293,7 +293,7 @@ test.group('deletBoard', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const board = await BoardRepository.findOne({ where: { id }, withDeleted: true })
+    const board = await boardRepository.findOne({ where: { id }, withDeleted: true })
 
     expect(board).toBeDefined()
     expect(board.deletedAt).toBeNull()
@@ -310,10 +310,10 @@ test.group('restoreBoard', () => {
     const [user, cookie] = await createUser(client)
 
     const { id } = await createRandomBoard(user.id)
-    await BoardRepository.softDelete({ id })
+    await boardRepository.softDelete({ id })
 
     // Ensure that is initialy deleted
-    expect((await BoardRepository.findOne({
+    expect((await boardRepository.findOne({
       where: { id },
       withDeleted: true
     })).deletedAt).not.toBeNull()
@@ -329,7 +329,7 @@ test.group('restoreBoard', () => {
     expect(data.id).toBeDefined()
     expect(data.id).toBe(id)
 
-    const board = await BoardRepository.findOneBy({ id })
+    const board = await boardRepository.findOneBy({ id })
 
     expect(board).not.toBeNull()
     expect(board.deletedAt).toBeNull()
@@ -340,10 +340,10 @@ test.group('restoreBoard', () => {
     const [, cookie] = await createUser(client)
 
     const { id } = await createRandomBoard(user.id)
-    await BoardRepository.softDelete({ id })
+    await boardRepository.softDelete({ id })
 
     // Ensure that is initialy deleted
-    expect((await BoardRepository.findOne({
+    expect((await boardRepository.findOne({
       where: { id },
       withDeleted: true
     })).deletedAt).not.toBeNull()
@@ -357,7 +357,7 @@ test.group('restoreBoard', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const board = await BoardRepository.findOne({
+    const board = await boardRepository.findOne({
       where: { id },
       withDeleted: true
     })

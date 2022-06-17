@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@japa/runner";
 import { In } from "typeorm";
 import { SESSION_COOKIE } from "../../constants";
-import { CardRepository } from "../../repository";
+import { cardRepository } from "../../repository";
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
 const FindCardByIdQuery = `
@@ -157,7 +157,7 @@ test.group('addCard', () => {
     expect(data.card.description).toBe(description)
 
     const { id } = data.card
-    const card = await CardRepository.findOneBy({ id })
+    const card = await cardRepository.findOneBy({ id })
 
     expect(card).toBeTruthy()
     expect(card.columnId).toBe(columnId)
@@ -243,7 +243,7 @@ test.group('updateCard', () => {
     expect(data.card.title).toBe(title)
     expect(data.card.description).toBe(description)
 
-    const card = await CardRepository.findOneBy({ id })
+    const card = await cardRepository.findOneBy({ id })
 
     expect(card).toMatchObject({ title, description })
   })
@@ -267,7 +267,7 @@ test.group('updateCard', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const card = await CardRepository.findOneBy({ id })
+    const card = await cardRepository.findOneBy({ id })
 
     expect(card.title).toBe(title)
   })
@@ -312,7 +312,7 @@ test.group('moveCard', () => {
     expect(data.card.id).toBe(card1.id)
     expect(data.card.index).toBe(toIndex)
 
-    const cards = await CardRepository.find({
+    const cards = await cardRepository.find({
       select: { id: true, index: true, title: true },
       where: { id: In([card1.id, card2.id, card3.id]) },
       order: { index: 'ASC' },
@@ -349,7 +349,7 @@ test.group('moveCard', () => {
     expect(data.card.id).toBe(card3.id)
     expect(data.card.index).toBe(toIndex)
 
-    const cards = await CardRepository.find({
+    const cards = await cardRepository.find({
       select: { id: true, index: true, title: true },
       where: { id: In([card1.id, card2.id, card3.id]) },
       order: { index: 'ASC' },
@@ -382,7 +382,7 @@ test.group('removeCard', () => {
     expect(errors).toBeFalsy()
     expect(data.id).toBe(id)
 
-    const card = await CardRepository.findOneBy({ id })
+    const card = await cardRepository.findOneBy({ id })
 
     expect(card).toBeFalsy()
   })
@@ -403,7 +403,7 @@ test.group('removeCard', () => {
 
     await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
 
-    const cards = await CardRepository.find({
+    const cards = await cardRepository.find({
       select: { id: true, index: true },
       where: { columnId },
       order: { index: "ASC" }
@@ -429,7 +429,7 @@ test.group('removeCard', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const card = await CardRepository.findOneBy({ id })
+    const card = await cardRepository.findOneBy({ id })
 
     expect(card).toBeTruthy()
   })

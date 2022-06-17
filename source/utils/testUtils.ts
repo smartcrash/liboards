@@ -3,7 +3,7 @@ import { ApiResponse } from "@japa/api-client"
 import { Expect } from "@japa/expect"
 import { test } from "@japa/runner"
 import { Board, Card, Column } from "../entity"
-import { BoardRepository, CardRepository, ColumnRepository } from "../repository"
+import { boardRepository, cardRepository, columnRepository } from "../repository"
 
 export const createRandomBoard = async (userId: number): Promise<Board> => {
   const board = new Board()
@@ -11,7 +11,7 @@ export const createRandomBoard = async (userId: number): Promise<Board> => {
   board.title = faker.lorem.words()
   board.createdById = userId
 
-  await BoardRepository.save(board)
+  await boardRepository.save(board)
 
   return board
 }
@@ -23,7 +23,7 @@ export const createRandomColumn = async (boardId: number, index = faker.datatype
   column.index = index
   column.boardId = boardId
 
-  await ColumnRepository.save(column)
+  await columnRepository.save(column)
 
   return column
 }
@@ -36,7 +36,7 @@ export const createRandomCard = async (columnId: number, index = faker.datatype.
   card.index = index
   card.columnId = columnId
 
-  await CardRepository.save(card)
+  await cardRepository.save(card)
 
   return card
 }

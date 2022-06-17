@@ -5,7 +5,7 @@ import sinon from 'sinon';
 import { SESSION_COOKIE } from '../../constants';
 import { User } from '../../entity';
 import { redisClient } from '../../redisClient';
-import { UserRepository } from '../../repository';
+import { userRepository } from '../../repository';
 
 test.group('createUser', () => {
   test('should create user', async ({ expect, client }) => {
@@ -42,7 +42,7 @@ test.group('createUser', () => {
     expect(typeof data.createUser.user.id).toBe('number')
 
     const { id } = data.createUser.user
-    const user = await UserRepository.findOneBy({ id })
+    const user = await userRepository.findOneBy({ id })
 
     expect(user).toBeDefined()
     expect(user).toMatchObject({ username, email })
@@ -101,7 +101,7 @@ test.group('createUser', () => {
     user.email = email
     user.password = password
 
-    await UserRepository.save(user)
+    await userRepository.save(user)
 
     const queryData = {
       query: `
@@ -371,7 +371,7 @@ test.group('resetPassword', () => {
     user.email = faker.internet.exampleEmail()
     user.password = oldPassword
 
-    const { id } = await UserRepository.save(user)
+    const { id } = await userRepository.save(user)
 
     sinon.replace(redisClient, 'get', sinon.fake.resolves(`${id}`) as any)
 
@@ -400,7 +400,7 @@ test.group('resetPassword', () => {
     expect(data.resetPassword.user).toBeDefined()
     expect(data.resetPassword.user.id).toBe(id)
 
-    const { password } = await UserRepository.findOneBy({ id })
+    const { password } = await userRepository.findOneBy({ id })
     expect(await verify(password, oldPassword)).toBe(false)
     expect(await verify(password, newPassword)).toBe(true)
 
@@ -420,7 +420,7 @@ test.group('logout', () => {
     user.email = email
     user.password = password
 
-    await UserRepository.save(user)
+    await userRepository.save(user)
 
     {
       const queryData = {

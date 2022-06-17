@@ -1,6 +1,6 @@
 import { test } from "@japa/runner"
 import { SESSION_COOKIE } from "../../constants"
-import { favoriteRepository, UserRepository } from "../../repository"
+import { favoritesRepository, userRepository } from "../../repository"
 import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from "../../utils/testUtils"
 
 const AllFavoritesQuery = `
@@ -37,7 +37,7 @@ test.group('allFavorites', () => {
     const board2 = await createRandomBoard(user.id)
     const board3 = await createRandomBoard(user.id)
 
-    await favoriteRepository.insert([
+    await favoritesRepository.insert([
       { userId: user.id, boardId: board2.id },
       { userId: user.id, boardId: board3.id },
     ])
@@ -83,7 +83,7 @@ test.group('addToFavorites', () => {
     expect(data).toBeTruthy()
     expect(data.addToFavorites).toBe(true)
 
-    const { favorites } = await UserRepository.findOne({
+    const { favorites } = await userRepository.findOne({
       where: { id: user.id },
       relations: { favorites: true }
     })
@@ -98,7 +98,7 @@ test.group('addToFavorites', () => {
 
     const { id } = await createRandomBoard(otherUser.id)
 
-    await favoriteRepository.insert({ userId: otherUser.id, boardId: id })
+    await favoritesRepository.insert({ userId: otherUser.id, boardId: id })
 
     const queryData = {
       query: AddToFavoritesMutation,
@@ -109,7 +109,7 @@ test.group('addToFavorites', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const { favorites } = await UserRepository.findOne({
+    const { favorites } = await userRepository.findOne({
       where: { id: loggedUser.id },
       relations: { favorites: true }
     })
@@ -141,7 +141,7 @@ test.group('removeFromFavorites', () => {
     expect(data).toBeTruthy()
     expect(data.removeFromFavorites).toBe(true)
 
-    const { favorites } = await UserRepository.findOne({
+    const { favorites } = await userRepository.findOne({
       where: { id: user.id },
       relations: { favorites: true }
     })
