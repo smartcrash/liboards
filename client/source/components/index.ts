@@ -8,4 +8,5 @@ export * from './board'
 export * from './Logo'
 export * from './NonEmptyEditable'
 export * from './AutoResizeTextarea'
+export * from './HeartButton'
 

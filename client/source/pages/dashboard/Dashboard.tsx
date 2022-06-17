@@ -7,7 +7,7 @@ export const Dashboard = () => {
   return (
     <Stack h={"100vh"}>
       <NavBar />
-      <Container flexGrow={1} pt={6}>
+      <Container flexGrow={1} pt={6} as={"main"}>
         <Outlet />
       </Container>
     </Stack>

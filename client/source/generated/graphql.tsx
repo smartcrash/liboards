@@ -29,6 +29,7 @@ export type Board = {
   createdAt: Scalars['DateTime'];
   createdBy: User;
   deletedAt: Scalars['DateTime'];
+  favorite: Scalars['Boolean'];
   id: Scalars['Float'];
   title: Scalars['String'];
   updatedAt: Scalars['DateTime'];
@@ -61,6 +62,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addCard: Card;
   addColumn: Column;
+  addToFavorites: Scalars['Boolean'];
   createBoard: Board;
   createUser: AuthenticationResponse;
   deleteBoard?: Maybe<Scalars['Int']>;
@@ -69,6 +71,7 @@ export type Mutation = {
   moveCard?: Maybe<Card>;
   removeCard?: Maybe<Scalars['Int']>;
   removeColumn?: Maybe<Scalars['Int']>;
+  removeFromFavorites: Scalars['Boolean'];
   resetPassword: AuthenticationResponse;
   restoreBoard?: Maybe<Scalars['Int']>;
   sendResetPasswordEmail: Scalars['Boolean'];
@@ -88,6 +91,11 @@ export type MutationAddCardArgs = {
 export type MutationAddColumnArgs = {
   boardId: Scalars['Int'];
   title: Scalars['String'];
+};
+
+
+export type MutationAddToFavoritesArgs = {
+  id: Scalars['Int'];
 };
 
 
@@ -131,6 +139,11 @@ export type MutationRemoveColumnArgs = {
 };
 
 
+export type MutationRemoveFromFavoritesArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationResetPasswordArgs = {
   newPassword: Scalars['String'];
   token: Scalars['String'];
@@ -169,6 +182,7 @@ export type Query = {
   __typename?: 'Query';
   allBoards: Array<Board>;
   allDeletedBoards: Array<Board>;
+  allFavorites: Array<Board>;
   currentUser?: Maybe<User>;
   findBoardById?: Maybe<Board>;
   findCardById?: Maybe<Card>;
@@ -194,7 +208,7 @@ export type User = {
   username: Scalars['String'];
 };
 
-export type BoardFragmentFragment = { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any };
+export type BoardFragmentFragment = { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean };
 
 export type CardFragmentFragment = { __typename?: 'Card', id: number, title: string, description: string, index: number };
 
@@ -219,12 +233,24 @@ export type AddColumnMutationVariables = Exact<{
 
 export type AddColumnMutation = { __typename?: 'Mutation', column: { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } };
 
+export type AddToFavoritesMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type AddToFavoritesMutation = { __typename?: 'Mutation', addToFavorites: boolean };
+
+export type AllFavoritesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AllFavoritesQuery = { __typename?: 'Query', favorites: Array<{ __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean }> };
+
 export type CreateBoardMutationVariables = Exact<{
   title: Scalars['String'];
 }>;
 
 
-export type CreateBoardMutation = { __typename?: 'Mutation', board: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any } };
+export type CreateBoardMutation = { __typename?: 'Mutation', board: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean } };
 
 export type CreateUserMutationVariables = Exact<{
   password: Scalars['String'];
@@ -278,6 +304,13 @@ export type RemoveColumnMutationVariables = Exact<{
 
 export type RemoveColumnMutation = { __typename?: 'Mutation', id?: number | null };
 
+export type RemoveFromFavoritesMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type RemoveFromFavoritesMutation = { __typename?: 'Mutation', removeFromFavorites: boolean };
+
 export type ResetPasswordMutationVariables = Exact<{
   newPassword: Scalars['String'];
   token: Scalars['String'];
@@ -306,7 +339,7 @@ export type UpdateBoardMutationVariables = Exact<{
 }>;
 
 
-export type UpdateBoardMutation = { __typename?: 'Mutation', board?: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any } | null };
+export type UpdateBoardMutation = { __typename?: 'Mutation', board?: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean } | null };
 
 export type UpdateCardMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -323,17 +356,17 @@ export type UpdateColumnMutationVariables = Exact<{
 }>;
 
 
-export type UpdateColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'Column', id: number } | null };
+export type UpdateColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } | null };
 
 export type AllBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AllBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any }> };
+export type AllBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean }> };
 
 export type AllDeletedBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AllDeletedBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any }> };
+export type AllDeletedBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean }> };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -360,6 +393,7 @@ export const BoardFragmentFragmentDoc = gql`
   title
   createdAt
   updatedAt
+  favorite
 }
     `;
 export const CardFragmentFragmentDoc = gql`
@@ -410,6 +444,26 @@ export const AddColumnDocument = gql`
 
 export function useAddColumnMutation() {
   return Urql.useMutation<AddColumnMutation, AddColumnMutationVariables>(AddColumnDocument);
+};
+export const AddToFavoritesDocument = gql`
+    mutation AddToFavorites($id: Int!) {
+  addToFavorites(id: $id)
+}
+    `;
+
+export function useAddToFavoritesMutation() {
+  return Urql.useMutation<AddToFavoritesMutation, AddToFavoritesMutationVariables>(AddToFavoritesDocument);
+};
+export const AllFavoritesDocument = gql`
+    query AllFavorites {
+  favorites: allFavorites {
+    ...BoardFragment
+  }
+}
+    ${BoardFragmentFragmentDoc}`;
+
+export function useAllFavoritesQuery(options?: Omit<Urql.UseQueryArgs<AllFavoritesQueryVariables>, 'query'>) {
+  return Urql.useQuery<AllFavoritesQuery>({ query: AllFavoritesDocument, ...options });
 };
 export const CreateBoardDocument = gql`
     mutation CreateBoard($title: String!) {
@@ -503,6 +557,15 @@ export const RemoveColumnDocument = gql`
 export function useRemoveColumnMutation() {
   return Urql.useMutation<RemoveColumnMutation, RemoveColumnMutationVariables>(RemoveColumnDocument);
 };
+export const RemoveFromFavoritesDocument = gql`
+    mutation RemoveFromFavorites($id: Int!) {
+  removeFromFavorites(id: $id)
+}
+    `;
+
+export function useRemoveFromFavoritesMutation() {
+  return Urql.useMutation<RemoveFromFavoritesMutation, RemoveFromFavoritesMutationVariables>(RemoveFromFavoritesDocument);
+};
 export const ResetPasswordDocument = gql`
     mutation ResetPassword($newPassword: String!, $token: String!) {
   resetPassword(newPassword: $newPassword, token: $token) {
@@ -563,10 +626,10 @@ export function useUpdateCardMutation() {
 export const UpdateColumnDocument = gql`
     mutation UpdateColumn($id: Int!, $title: String) {
   column: updateColumn(id: $id, title: $title) {
-    id
+    ...ColumnFragment
   }
 }
-    `;
+    ${ColumnFragmentFragmentDoc}`;
 
 export function useUpdateColumnMutation() {
   return Urql.useMutation<UpdateColumnMutation, UpdateColumnMutationVariables>(UpdateColumnDocument);

@@ -1,82 +1,55 @@
+import { Box, Button, Grid, Heading, HStack, Spacer, Stack, Text, useDisclosure, VStack } from "@chakra-ui/react";
 import {
-  Box,
-  Button,
-  Center,
-  Grid,
-  Heading,
-  HStack,
-  Spacer,
-  Stack,
-  Text,
-  useDisclosure,
-  VStack,
-} from "@chakra-ui/react";
-import { Link } from "react-router-dom";
-import { useAllBoardsQuery, useAllDeletedBoardsQuery, useRestoreBoardMutation } from "../../../generated/graphql";
-import { route } from "../../../routes";
+  useAllBoardsQuery,
+  useAllDeletedBoardsQuery,
+  useAllFavoritesQuery,
+  useRestoreBoardMutation,
+} from "../../../generated/graphql";
+import { BoardAdderItem } from "./BoardAdderItem";
+import { BoardItem } from "./BoardItem";
+import { BoardList } from "./BoardList";
 
 export const ListProjects = () => {
   const { isOpen, onToggle } = useDisclosure();
 
   const [{ data: boards }] = useAllBoardsQuery();
-  const [{ data: deletedBoards }] = useAllDeletedBoardsQuery();
+  const [{ data: favorites }] = useAllFavoritesQuery();
+  const [{ data: deleted }] = useAllDeletedBoardsQuery();
   const [{ fetching: restoring }, restoreBoard] = useRestoreBoardMutation();
 
   // TODO: Add skeleton
-  // TODO: Make draggable?
 
   return (
     <Stack minH={"full"} mx={"auto"} maxW={"5xl"} pb={6}>
-      <Heading fontSize={"2xl"} mb={6}>
-        All projects
-      </Heading>
-
-      <Grid
-        templateColumns={{
-          base: "repeat(2, 1fr)",
-          md: "repeat(auto-fit, minmax(100px, 240px))",
-        }}
-        gap={2}
-      >
-        {boards?.boards.map(({ id, title }) => (
-          <Link to={route("projects.show", { id })} key={id}>
-            <Box h={28} p={5} bg={"primary.500"} color={"white"} borderRadius={"md"} borderWidth={1} shadow={"md"}>
-              <VStack spacing={4} alignItems={"flex-start"}>
-                <Heading
-                  fontSize={"xl"}
-                  maxW={"full"}
-                  textOverflow={"ellipsis"}
-                  whiteSpace={"nowrap"}
-                  overflow={"hidden"}
-                >
-                  {title}
-                </Heading>
-              </VStack>
-            </Box>
-          </Link>
-        ))}
-
-        <Link to={route("projects.create")}>
-          <Box
-            h={28}
-            p={5}
-            bg={"gray.100"}
-            _hover={{ bg: "gray.200" }}
-            borderRadius={"md"}
-            borderWidth={1}
-            shadow={"md"}
-            flexShrink={0}
-          >
-            <Center h={"full"}>
-              <Text>Create new project</Text>
-            </Center>
+      <Stack spacing={8}>
+        {favorites?.favorites.length && (
+          <Box as={"section"}>
+            <Heading fontSize={"2xl"} mb={4}>
+              Favorites
+            </Heading>
+            <BoardList>
+              {favorites?.favorites.map((board) => (
+                <BoardItem board={board} />
+              ))}
+            </BoardList>
           </Box>
-        </Link>
-      </Grid>
+        )}
 
+        <Box as={"section"}>
+          <Heading fontSize={"2xl"} mb={4}>
+            All projects
+          </Heading>
+          <BoardList>
+            {boards?.boards.map((board) => (
+              <BoardItem board={board} />
+            ))}
+            <BoardAdderItem />
+          </BoardList>
+        </Box>
+      </Stack>
       <Spacer />
 
-      <Box mt={8}>
+      <Box as={"section"} mt={8}>
         <Button onClick={onToggle} variant={"link"}>
           View all deleted boards
         </Button>
@@ -92,7 +65,7 @@ export const ListProjects = () => {
             gap={2}
             mt={4}
           >
-            {deletedBoards?.boards.map(({ id, title }) => (
+            {deleted?.boards.map(({ id, title }) => (
               <HStack
                 key={id}
                 justifyContent={"space-between"}
@@ -121,7 +94,7 @@ export const ListProjects = () => {
               </HStack>
             ))}
 
-            {!deletedBoards?.boards.length && (
+            {!deleted?.boards.length && (
               <Text my={5} color={"gray.500"}>
                 No projects have been closed
               </Text>

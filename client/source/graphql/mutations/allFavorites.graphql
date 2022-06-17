@@ -1,0 +1,5 @@
+query AllFavorites {
+  favorites: allFavorites {
+    ...BoardFragment
+  }
+}

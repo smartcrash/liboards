@@ -30,16 +30,19 @@ import {
   ColumnNewHandler,
   ColumnRemoveHandler,
   ColumnRenameHandler,
+  HeartButton,
   NonEmptyEditable,
 } from "../../../components";
 import {
   useAddCardMutation,
   useAddColumnMutation,
+  useAddToFavoritesMutation,
   useDeleteBoardMutation,
   useFindBoardByIdQuery,
   useMoveCardMutation,
   useRemoveCardMutation,
   useRemoveColumnMutation,
+  useRemoveFromFavoritesMutation,
   useUpdateBoardMutation,
   useUpdateColumnMutation,
 } from "../../../generated/graphql";
@@ -50,7 +53,9 @@ export const ShowProject = () => {
   const params = useParams<{ id: string }>();
   const id = parseInt(params.id!);
   const [{ data, fetching }] = useFindBoardByIdQuery({ variables: { id } });
-  const [, update] = useUpdateBoardMutation();
+  const [, updateBoard] = useUpdateBoardMutation();
+  const [, addToFavorites] = useAddToFavoritesMutation();
+  const [, removeFromFavorites] = useRemoveFromFavoritesMutation();
   const [, deleteBoard] = useDeleteBoardMutation();
   const [, addColumn] = useAddColumnMutation();
   const [, updateColumn] = useUpdateColumnMutation();
@@ -112,15 +117,19 @@ export const ShowProject = () => {
     <>
       <Stack spacing={6}>
         <HStack justifyContent={"space-between"}>
-          <NonEmptyEditable
-            defaultValue={title}
-            onSubmit={(title) => update({ id, title })}
-            fontSize={"3xl"}
-            fontWeight={"bold"}
-          >
-            <EditablePreview />
-            <EditableInput data-testid={"title"} />
-          </NonEmptyEditable>
+          <HStack alignItems={"center"} spacing={3}>
+            <NonEmptyEditable
+              defaultValue={title}
+              onSubmit={(title) => updateBoard({ id, title })}
+              fontSize={"3xl"}
+              fontWeight={"bold"}
+            >
+              <EditablePreview />
+              <EditableInput data-testid={"title"} />
+            </NonEmptyEditable>
+
+            <HeartButton onClick={(value) => (value ? addToFavorites({ id }) : removeFromFavorites({ id }))} />
+          </HStack>
 
           <Popover>
             <PopoverTrigger>

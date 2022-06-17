@@ -11,7 +11,7 @@ interface CardProps extends BoxProps {
 }
 
 export const Card = ({ title, description, index, draggableId, contextMenu, ...boxProps }: CardProps) => {
-  const [isHover, setIsHover] = useState(false);
+  const [isHover, setHover] = useState(false);
 
   return (
     <Draggable draggableId={draggableId} index={index}>
@@ -23,8 +23,8 @@ export const Card = ({ title, description, index, draggableId, contextMenu, ...b
           bg={"white"}
           ref={innerRef}
           position={"relative"}
-          onPointerEnter={() => setIsHover(true)}
-          onPointerLeave={() => setIsHover(false)}
+          onPointerEnter={() => setHover(true)}
+          onPointerLeave={() => setHover(false)}
           {...boxProps}
           {...draggableProps}
           {...dragHandleProps}

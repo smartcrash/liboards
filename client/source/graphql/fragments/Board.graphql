@@ -3,4 +3,5 @@ fragment BoardFragment on Board {
   title
   createdAt
   updatedAt
+  favorite
 }

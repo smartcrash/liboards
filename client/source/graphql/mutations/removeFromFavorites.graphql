@@ -1,0 +1,3 @@
+mutation RemoveFromFavorites($id: Int!) {
+  removeFromFavorites(id: $id)
+}
