@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 import { route } from "../../../routes";
 
 interface BoardItemProps {
-  board: { id: number; title: string };
+  board: {
+    id: number;
+    title: string;
+  };
 }
 
 export const BoardItem = ({ board: { id, title } }: BoardItemProps) => {

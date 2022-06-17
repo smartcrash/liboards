@@ -1,4 +1,5 @@
 
+import { gql } from '@urql/core';
 import {
   Cache,
   cacheExchange,
@@ -7,20 +8,26 @@ import {
 } from "@urql/exchange-graphcache";
 import {
   createClient,
-  dedupExchange, errorExchange, fetchExchange
+  dedupExchange,
+  errorExchange,
+  fetchExchange
 } from "urql";
 import {
+  AddToFavoritesMutationVariables,
   AllBoardsDocument,
   AllBoardsQuery,
   AllDeletedBoardsDocument,
   AllDeletedBoardsQuery,
+  AllFavoritesDocument,
+  AllFavoritesQuery,
+  BoardFragmentFragmentDoc,
   CreateBoardMutation,
   CreateUserMutation,
   CurrentUserDocument,
   CurrentUserQuery,
   DeleteBoardMutation,
   DeleteBoardMutationVariables, LoginWithPasswordMutation,
-  LogoutMutation, RestoreBoardMutation,
+  LogoutMutation, RemoveFromFavoritesMutationVariables, RestoreBoardMutation,
   RestoreBoardMutationVariables
 } from "./generated/graphql";
 
@@ -111,6 +118,50 @@ export const createUrqlClient = () => createClient({
               result, (result, data) => ({ boards: (data?.boards || []).filter((board) => board.id !== args.id) })
             )
           },
+
+          addToFavorites: (_, { id }: AddToFavoritesMutationVariables, cache) => {
+            // Update `favorite` field on every Board on cache
+            const fragment = gql`
+              fragment _ on Board {
+                id
+                favorite
+              }
+            `
+            cache.writeFragment(fragment, { id, favorite: true });
+
+            // Add Board to `allFavoritesQuery` cache
+            cache.updateQuery({ query: AllFavoritesDocument }, (data: AllFavoritesQuery | null) => {
+              if (!data || !data.favorites) return data
+
+              const entity = cache.readFragment(BoardFragmentFragmentDoc, { id })
+
+              if (!entity) return data
+
+              data.favorites.push({
+                __typename: 'Board' as const,
+                ...(entity as any)
+              })
+
+              return data
+            })
+          },
+
+          removeFromFavorites: (result, args: RemoveFromFavoritesMutationVariables, cache, info) => {
+            const fragment = gql`
+              fragment _ on Board {
+                id
+                favorite
+              }
+            `;
+
+            cache.writeFragment(fragment, { id: args.id, favorite: false });
+
+            cache.updateQuery({ query: AllFavoritesDocument }, (data: AllFavoritesQuery | null) => {
+              if (!data || !data.favorites) return data
+              data.favorites = data.favorites.filter(({ id }) => id !== args.id)
+              return data
+            })
+          }
         },
       },
     }),
