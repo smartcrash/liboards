@@ -1,7 +1,7 @@
 import { hash } from "argon2";
 import { Field, ObjectType } from "type-graphql";
 import { TypeormLoader } from "type-graphql-dataloader";
-import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Board } from "./Board";
 
 @ObjectType()
@@ -34,6 +34,10 @@ export class User {
   @OneToMany(() => Board, board => board.createdBy)
   @TypeormLoader()
   boards: Board[]
+
+  @ManyToMany(() => Board)
+  @JoinTable()
+  favorites: Board[]
 
   @Field(() => String)
   @CreateDateColumn()

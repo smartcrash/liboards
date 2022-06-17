@@ -10,6 +10,13 @@ const gates: Readonly<Record<string, GateFn>> = {
   /*                                    Board                                   */
   /* -------------------------------------------------------------------------- */
 
+  async 'view-board'({ context: { user }, args }) {
+    const { id } = args
+    const board = await BoardRepository.findOneBy({ id })
+
+    return user.id === board.createdById
+  },
+
   async 'update-board'({ context: { user }, args }) {
     const { id } = args
     const board = await BoardRepository.findOneBy({ id })
