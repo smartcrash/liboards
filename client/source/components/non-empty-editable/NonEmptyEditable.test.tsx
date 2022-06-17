@@ -25,7 +25,7 @@ describe("NonEmptyEditable", () => {
     expect(input.value).toBe(defaultValue);
   });
 
-  it.only("should display previous value on edit cancelation", () => {
+  it.concurrent("should display previous value on edit cancelation", () => {
     const onSubmit = vi.fn();
     const defaultValue = "I'm awesome";
 

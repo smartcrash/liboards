@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { AutoResizeTextarea, NonEmptyEditable } from "../";
 import { useFindCardByIdQuery, useUpdateCardMutation } from "../../generated/graphql";
-import { EditableDesc } from "./EditableDesc";
+import { EditableDesc } from "./components";
 
 interface CardDetailsModalProps {
   id?: number;

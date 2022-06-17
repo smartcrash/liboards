@@ -9,7 +9,7 @@ import {
   useEditableControls,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { AutoResizeTextarea } from "../";
+import { AutoResizeTextarea } from "../../../";
 
 interface EditableDescProps {
   defaultValue: string;
@@ -21,8 +21,10 @@ const EditableControls = ({ value }: { value: string }) => {
   if (isEditing) {
     return (
       <ButtonGroup size={"sm"} mt={2}>
-        <Button {...getSubmitButtonProps()}>Save</Button>
-        <Button colorScheme={"gray"} {...getCancelButtonProps()}>
+        <Button {...getSubmitButtonProps()} data-testid={"save"}>
+          Save
+        </Button>
+        <Button colorScheme={"gray"} {...getCancelButtonProps()} data-testid={"cancel"}>
           Cancel
         </Button>
       </ButtonGroup>
@@ -31,7 +33,7 @@ const EditableControls = ({ value }: { value: string }) => {
 
   if (!value) {
     return (
-      <Box role={"button"} px={2} py={2} {...getEditButtonProps()}>
+      <Box role={"button"} px={2} py={2} {...getEditButtonProps()} data-testid={"placeholder"}>
         <Text color={"gray.500"}>Add a more detailed description...</Text>
       </Box>
     );
@@ -45,8 +47,8 @@ export const EditableDesc = ({ defaultValue, onSubmit }: EditableDescProps) => {
 
   return (
     <Editable onChange={setValue} defaultValue={defaultValue} onSubmit={onSubmit} color={"gray.600"}>
-      {value && <EditablePreview whiteSpace={"pre-wrap"} w={"full"} lineHeight={"short"} />}
-      <EditableTextarea as={AutoResizeTextarea} minRows={5} px={0} />
+      {value && <EditablePreview data-testid={"preview"} whiteSpace={"pre-wrap"} w={"full"} lineHeight={"short"} />}
+      <EditableTextarea as={AutoResizeTextarea} minRows={5} px={0} data-testid={"textarea"} />
       <EditableControls value={value} />
     </Editable>
   );
