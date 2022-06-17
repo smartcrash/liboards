@@ -3,15 +3,20 @@ import { IsNull, Not } from "typeorm";
 import { Board } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
-import { boardRepository, userRepository } from "../repository";
+import { boardRepository, favoritesRepository } from "../repository";
 import { ContextType } from '../types';
 
 @Resolver(Board)
 export class BoardResolver {
   @FieldResolver(() => Boolean)
-  async favorite(@Root() root: Board): Promise<boolean> {
+  async favorite(
+    @Root() root: Board,
+    @Ctx() { user }: ContextType
+  ): Promise<boolean> {
+    const userId = user.id
+    const boardId = root.id
 
-    return false
+    return !!(await favoritesRepository.findOneBy({ userId, boardId }))
   }
 
   @UseMiddleware(Authenticate)

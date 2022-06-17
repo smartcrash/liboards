@@ -378,7 +378,7 @@ export type FindBoardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> }> } | null };
+export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, favorite: boolean, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> }> } | null };
 
 export type FindCardByIdQueryVariables = Exact<{
   id: Scalars['Int'];
@@ -672,6 +672,7 @@ export const FindBoardByIdDocument = gql`
   board: findBoardById(id: $id) {
     id
     title
+    favorite
     createdBy {
       id
       username

@@ -70,7 +70,7 @@ export const ShowProject = () => {
   if (fetching) return <>loading...</>; // TODO: Add skeleton
   if (!data?.board) return <>Something went wrong! :O</>;
 
-  const { title } = data.board;
+  const { title, favorite } = data.board;
 
   const onDelete = async () => {
     await deleteBoard({ id });
@@ -128,7 +128,10 @@ export const ShowProject = () => {
               <EditableInput data-testid={"title"} />
             </NonEmptyEditable>
 
-            <HeartButton onClick={(value) => (value ? addToFavorites({ id }) : removeFromFavorites({ id }))} />
+            <HeartButton
+              defaultIsClick={favorite}
+              onClick={(value) => (value ? addToFavorites({ id }) : removeFromFavorites({ id }))}
+            />
           </HStack>
 
           <Popover>
