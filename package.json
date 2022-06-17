@@ -9,6 +9,8 @@
     "migration:revert": "npx typeorm-ts-node-esm migration:revert -d ./source/dataSource.ts",
     "schema:drop": "npx typeorm-ts-node-esm schema:drop -d ./source/dataSource.ts",
     "schema:sync": "npx typeorm-ts-node-esm schema:sync -d ./source/dataSource.ts",
+    "seed:config": "ts-node ./node_modules/typeorm-seeding/dist/cli.js config",
+    "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
     "cypress": "cypress run",
     "cypress:open": "cypress open"
   },
@@ -55,6 +57,7 @@
     "type-graphql": "^1.1.1",
     "type-graphql-dataloader": "^0.5.0",
     "typeorm": "^0.3.6",
+    "typeorm-seeding": "^1.6.1",
     "uuid": "^8.3.2",
     "zod": "^3.17.3"
   }

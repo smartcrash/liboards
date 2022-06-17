@@ -15,7 +15,7 @@ export class Task {
   @Column()
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   completedAt: Date
 
   @Column()

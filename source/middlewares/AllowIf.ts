@@ -115,6 +115,22 @@ const gates: Readonly<Record<string, GateFn>> = {
 
     return column.board.createdById === user.id
   },
+
+  /* -------------------------------------------------------------------------- */
+  /*                                    Task                                    */
+  /* -------------------------------------------------------------------------- */
+
+  async 'create-task'({ context: { user }, args }) {
+    const { cardId } = args
+    const card = await cardRepository.findOneBy({ id: cardId })
+
+    const column = await columnRepository.findOne({
+      where: { id: card.columnId },
+      relations: { board: true }
+    })
+
+    return column.board.createdById === user.id
+  },
 }
 
 export const AllowIf = (gateKey: keyof typeof gates): MiddlewareFn<ContextType> => {

@@ -1,5 +1,9 @@
-import { Arg, FieldResolver, Int, Mutation, Resolver, Root } from "type-graphql";
+import { Arg, Ctx, FieldResolver, Int, Mutation, Resolver, Root, UseMiddleware } from "type-graphql";
 import { Task } from "../entity";
+import { AllowIf } from "../middlewares/AllowIf";
+import { Authenticate } from "../middlewares/Authenticate";
+import { taskRepository } from "../repository";
+import { ContextType } from "../types";
 
 @Resolver(Task)
 export class TaskResolver {
@@ -8,13 +12,23 @@ export class TaskResolver {
     return !!root.completedAt
   }
 
-  @Mutation(() => Task)
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('create-task'))
+  @Mutation(() => Task, { nullable: true })
   async addTask(
     @Arg('description') description: string,
-    @Arg('toCardId', () => Int) toCardId: number
-  ): Promise<Task> {
-    // TODO: Validate non-empty description
-    return
+    @Arg('cardId', () => Int) cardId: number,
+    @Ctx() { user }: ContextType
+  ): Promise<Task | null> {
+    if (!description.length) return null
+
+    const task = new Task()
+    task.description = description
+    task.cardId = cardId
+    task.createdById = user.id
+    await taskRepository.save(task)
+
+    return task
   }
 
   @Mutation(() => Task)

@@ -1,16 +1,5 @@
 
-import { DataSource, DataSourceOptions } from "typeorm";
-
-const config: DataSourceOptions = {
-  type: "sqlite", // TODO: Move to .env
-  database: "database.sqlite",
-  logging: false,
-  synchronize: true,
-  dropSchema: false,
-  migrationsRun: true,
-  entities: ["source/entity/*.ts"],
-  migrations: ["source/migrations/*.ts"],
-  subscribers: ["source/subscribers/*.ts"],
-}
+import { DataSource } from "typeorm";
+import config from "../ormconfig";
 
 export const dataSource = new DataSource(config)

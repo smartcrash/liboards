@@ -43,6 +43,34 @@ const authPlugin = (): PluginFn => (config, runner, { Test, TestContext, Group }
 
     return [{ ...user, password }, cookie]
   })
+
+  TestContext.macro('login', async (client: ApiClient, email: string, password: string): Promise<string> => {
+    const queryData = {
+      query: `
+        mutation LoginWithPassword($email: String!, $password: String!) {
+          loginWithPassword(email: $email, password: $password) {
+            errors {
+              field
+              message
+            }
+            user {
+              id
+            }
+          }
+        }
+      `,
+      variables: {
+        email,
+        password,
+      }
+    };
+
+    const response = await client.post('/').json(queryData)
+    const cookie = response.cookie(SESSION_COOKIE)
+
+    return cookie?.value
+  })
+
 }
 
 
