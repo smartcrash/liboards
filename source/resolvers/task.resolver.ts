@@ -31,13 +31,23 @@ export class TaskResolver {
     return task
   }
 
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('update-task'))
   @Mutation(() => Task)
   async updateTask(
     @Arg('id', () => Int) id: number,
     @Arg('description', () => String, { nullable: true }) description: string | null,
-    @Arg('complete', () => Boolean, { nullable: true }) complete: boolean | null,
+    @Arg('completed', () => Boolean, { nullable: true }) completed: boolean | null,
   ): Promise<Task> {
-    return
+    const task = await taskRepository.findOneBy({ id })
+
+    task.description = description && description.length ? description : task.description
+    if (completed) task.completedAt = task.completedAt ?? new Date()
+    if (!completed) task.completedAt = null
+
+    await taskRepository.save(task)
+
+    return task
   }
 
   @Mutation(() => Boolean)

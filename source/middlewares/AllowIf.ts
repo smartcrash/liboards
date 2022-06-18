@@ -1,6 +1,6 @@
 
 import { MiddlewareFn, ResolverData } from "type-graphql";
-import { boardRepository, cardRepository, columnRepository } from "../repository";
+import { boardRepository, cardRepository, columnRepository, taskRepository } from "../repository";
 import { ContextType } from '../types';
 
 type GateFn = (action: ResolverData<ContextType>) => Promise<boolean>
@@ -125,6 +125,19 @@ const gates: Readonly<Record<string, GateFn>> = {
     const card = await cardRepository.findOneBy({ id: cardId })
 
     const column = await columnRepository.findOne({
+      where: { id: card.columnId },
+      relations: { board: true }
+    })
+
+    return column.board.createdById === user.id
+  },
+
+  async 'update-task'({ context: { user }, args }) {
+    const { id } = args
+    const task = await taskRepository.findOneByOrFail({ id })
+    const card = await cardRepository.findOneByOrFail({ id: task.cardId })
+
+    const column = await columnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })
