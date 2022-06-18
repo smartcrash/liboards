@@ -13,8 +13,13 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { AutoResizeTextarea, NonEmptyEditable } from "../";
-import { useAddTaskMutation, useFindCardByIdQuery, useUpdateCardMutation } from "../../generated/graphql";
-import { EditableDesc, TaskAdder } from "./components";
+import {
+  useAddTaskMutation,
+  useFindCardByIdQuery,
+  useRemoveTaskMutation,
+  useUpdateCardMutation,
+} from "../../generated/graphql";
+import { EditableDesc, TaskAdder, TaskItem, TaskList } from "./components";
 
 interface CardDetailsModalProps {
   id?: number;
@@ -29,6 +34,7 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
   });
   const [, updateCard] = useUpdateCardMutation();
   const [, addTask] = useAddTaskMutation();
+  const [, removeTask] = useRemoveTaskMutation();
 
   if (!id) return null;
   if (fetching) return null; // TODO: Show spinner
@@ -41,7 +47,7 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
       <ModalOverlay />
       <ModalContent>
         <ModalCloseButton />
-        <ModalBody pr={20} pt={3} minH={96}>
+        <ModalBody pl={10} pr={20} pt={5} pb={10} minH={96}>
           <Box>
             <NonEmptyEditable
               defaultValue={title}
@@ -80,17 +86,26 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
             <EditableDesc defaultValue={description} onSubmit={(description) => updateCard({ id, description })} />
           </Stack>
 
-          <Spacer h={10} />
+          {!!tasks.length && (
+            <>
+              <Spacer h={7} />
+              <Heading as="h6" size="xs" mb={6}>
+                Sub-tasks
+              </Heading>
+            </>
+          )}
 
-          <Box>
-            <Stack>
+          <Stack spacing={5}>
+            <TaskList>
               {tasks.map((task) => (
-                <Box key={task.id}>{task.content}</Box>
+                <TaskItem task={task} onRemove={() => removeTask({ id: task.id })} key={task.id} />
               ))}
-            </Stack>
+            </TaskList>
 
-            <TaskAdder onConfirm={(content) => addTask({ cardId: id, content })} />
-          </Box>
+            <Box>
+              <TaskAdder onConfirm={(content) => addTask({ cardId: id, content })} />
+            </Box>
+          </Stack>
         </ModalBody>
       </ModalContent>
     </Modal>

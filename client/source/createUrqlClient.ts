@@ -13,6 +13,8 @@ import {
   fetchExchange
 } from "urql";
 import {
+  AddTaskMutation,
+  AddTaskMutationVariables,
   AddToFavoritesMutationVariables,
   AllBoardsDocument,
   AllBoardsQuery,
@@ -26,8 +28,8 @@ import {
   CurrentUserDocument,
   CurrentUserQuery,
   DeleteBoardMutation,
-  DeleteBoardMutationVariables, LoginWithPasswordMutation,
-  LogoutMutation, RemoveFromFavoritesMutationVariables, RestoreBoardMutation,
+  DeleteBoardMutationVariables, FindCardByIdDocument, FindCardByIdQuery, LoginWithPasswordMutation,
+  LogoutMutation, RemoveFromFavoritesMutationVariables, RemoveTaskMutation, RemoveTaskMutationVariables, RestoreBoardMutation,
   RestoreBoardMutationVariables
 } from "./generated/graphql";
 
@@ -161,6 +163,30 @@ export const createUrqlClient = () => createClient({
               data.favorites = data.favorites.filter(({ id }) => id !== args.id)
               return data
             })
+          },
+
+          addTask(result: AddTaskMutation, args: AddTaskMutationVariables, cache, info) {
+            cache.updateQuery(
+              {
+                query: FindCardByIdDocument,
+                variables: { id: args.cardId }
+              },
+              (data: FindCardByIdQuery | null) => {
+                if (!result.task) return data
+                if (!data || !data.card) return data
+
+                data.card.tasks.push(result.task)
+
+                return data
+              }
+            )
+          },
+
+          removeTask(result: RemoveTaskMutation, args: RemoveTaskMutationVariables, cache, info) {
+            cache.invalidate({
+              __typename: 'Task',
+              id: args.id,
+            });
           }
         },
       },

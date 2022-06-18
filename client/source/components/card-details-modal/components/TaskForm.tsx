@@ -12,7 +12,7 @@ export const TaskForm = ({ onConfirm, onCancel }: TaskFormProps) => {
       onCancel={onCancel}
       confirmText={"Add task"}
       data-testid={"task-form"}
-      inputProps={{ placeholder: "Add a task" }}
+      inputProps={{ placeholder: "Add a task", size: "sm" }}
     />
   );
 };
