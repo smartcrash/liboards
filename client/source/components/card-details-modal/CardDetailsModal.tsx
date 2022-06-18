@@ -10,6 +10,7 @@ import {
   ModalCloseButton,
   ModalContent,
   ModalOverlay,
+  Progress,
   Spacer,
   Stack,
   Text,
@@ -48,6 +49,7 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
   if (!data || !data.card) return null; // TODO: not found error
 
   const { title, description, column, tasks } = data.card;
+  const progress = (tasks.filter((task) => task.completed).length / tasks.length) * 100;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
@@ -97,38 +99,50 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
             <>
               <Spacer h={7} />
 
-              <HStack justifyContent={"space-between"}>
-                <Heading as="h6" size="xs">
-                  Sub-tasks
-                </Heading>
+              <Stack spacing={4}>
+                <HStack justifyContent={"space-between"}>
+                  <Heading as="h6" size="xs">
+                    Sub-tasks
+                  </Heading>
 
-                <Button colorScheme={"gray"} variant={"solid"} size={"xs"} onClick={toggleShowCompleted}>
-                  {showCompleted ? "Hide" : "Show"} completed
-                </Button>
-              </HStack>
+                  <Button colorScheme={"gray"} variant={"solid"} size={"xs"} onClick={toggleShowCompleted}>
+                    {showCompleted ? "Hide" : "Show"} completed
+                  </Button>
+                </HStack>
 
-              <Spacer h={6} />
+                <HStack spacing={3}>
+                  <Text color={"gray.500"} fontSize={"sm"}>
+                    {progress.toFixed(0)}%
+                  </Text>
+                  <Progress
+                    value={progress}
+                    hasStripe
+                    size={"sm"}
+                    colorScheme={"primary"}
+                    borderRadius={"full"}
+                    flexGrow={1}
+                  />
+                </HStack>
+
+                <TaskList>
+                  {tasks
+                    .filter((task) => (!showCompleted ? !task.completed : true))
+                    .map((task) => (
+                      <TaskItem
+                        task={task}
+                        onUpdate={({ id, content, completed }) => updateTask({ id, content, completed })}
+                        onRemove={() => removeTask({ id: task.id })}
+                        key={task.id}
+                      />
+                    ))}
+                </TaskList>
+              </Stack>
             </>
           )}
 
-          <Stack spacing={5}>
-            <TaskList>
-              {tasks
-                .filter((task) => (!showCompleted ? !task.completed : true))
-                .map((task) => (
-                  <TaskItem
-                    task={task}
-                    onUpdate={({ id, content, completed }) => updateTask({ id, content, completed })}
-                    onRemove={() => removeTask({ id: task.id })}
-                    key={task.id}
-                  />
-                ))}
-            </TaskList>
+          <Spacer h={5} />
 
-            <Box>
-              <TaskAdder onConfirm={(content) => addTask({ cardId: id, content })} />
-            </Box>
-          </Stack>
+          <TaskAdder onConfirm={(content) => addTask({ cardId: id, content })} />
         </ModalBody>
       </ModalContent>
     </Modal>
