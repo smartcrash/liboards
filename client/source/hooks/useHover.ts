@@ -9,9 +9,6 @@ function useHover<T extends HTMLElement = HTMLElement>(elementRef: RefObject<T>)
   const handleMouseEnter = () => setValue(true)
   const handleMouseLeave = () => setValue(false)
 
-  console.log({ elementRef: elementRef.current });
-
-
   useEventListener('mouseenter', handleMouseEnter, () => elementRef.current)
   useEventListener('mouseleave', handleMouseLeave, () => elementRef.current)
 

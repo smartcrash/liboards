@@ -18,6 +18,7 @@ import {
   useFindCardByIdQuery,
   useRemoveTaskMutation,
   useUpdateCardMutation,
+  useUpdateTaskMutation,
 } from "../../generated/graphql";
 import { EditableDesc, TaskAdder, TaskItem, TaskList } from "./components";
 
@@ -34,6 +35,7 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
   });
   const [, updateCard] = useUpdateCardMutation();
   const [, addTask] = useAddTaskMutation();
+  const [, updateTask] = useUpdateTaskMutation();
   const [, removeTask] = useRemoveTaskMutation();
 
   if (!id) return null;
@@ -98,7 +100,12 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
           <Stack spacing={5}>
             <TaskList>
               {tasks.map((task) => (
-                <TaskItem task={task} onRemove={() => removeTask({ id: task.id })} key={task.id} />
+                <TaskItem
+                  task={task}
+                  onUpdate={({ id, content, completed }) => updateTask({ id, content, completed })}
+                  onRemove={() => removeTask({ id: task.id })}
+                  key={task.id}
+                />
               ))}
             </TaskList>
 
