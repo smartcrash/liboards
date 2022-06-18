@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Divider,
   EditablePreview,
   EditableTextarea,
   Heading,
@@ -26,7 +27,7 @@ import {
   useUpdateTaskMutation,
 } from "../../generated/graphql";
 import { useToggle } from "../../hooks";
-import { CommentFrom, EditableDesc, TaskAdder, TaskItem, TaskList } from "./components";
+import { CommentFrom, CommentItem, EditableDesc, TaskAdder, TaskItem, TaskList } from "./components";
 
 interface CardDetailsModalProps {
   id?: number;
@@ -101,10 +102,10 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
             <EditableDesc defaultValue={description} onSubmit={(description) => updateCard({ id, description })} />
           </Stack>
 
+          <Divider my={3} />
+
           {!!tasks.length && (
             <>
-              <Spacer h={7} />
-
               <Stack spacing={4}>
                 <HStack justifyContent={"space-between"}>
                   <Heading as="h6" size="xs">
@@ -143,20 +144,37 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
                     ))}
                 </TaskList>
               </Stack>
+
+              <Spacer h={5} />
             </>
           )}
 
-          <Spacer h={5} />
-
           <TaskAdder onConfirm={(content) => addTask({ cardId: id, content })} />
 
-          <Spacer h={5} />
+          <Divider my={3} />
 
-          <Stack>
-            {comments.map((comment) => (
-              <Box key={comment.id}>{comment.content}</Box>
-            ))}
-          </Stack>
+          {!!comments.length && (
+            <>
+              <HStack alignItems={"center"}>
+                <Heading as="h6" size="xs">
+                  Comments
+                </Heading>
+                <Text fontSize={"xs"} color={"gray.500"}>
+                  {comments.length}
+                </Text>
+              </HStack>
+
+              <Spacer h={5} />
+
+              <Stack spacing={3}>
+                {comments.map((comment) => (
+                  <CommentItem comment={comment} key={comment.id} />
+                ))}
+              </Stack>
+
+              <Spacer h={3} />
+            </>
+          )}
 
           <CommentFrom onConfirm={(content) => addComment({ content, cardId: id })} />
         </ModalBody>
