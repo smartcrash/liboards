@@ -1,7 +1,7 @@
 fragment ColumnFragment on Column {
   id
   title
-  index
+  # index
   cards {
     ...CardFragment
   }

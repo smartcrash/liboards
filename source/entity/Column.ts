@@ -15,9 +15,9 @@ export class Column {
   @Property()
   title: string;
 
-  @Field()
-  @Property()
-  index: number
+  // @Field()
+  // @Property()
+  // index: number
 
   @Property()
   boardId: number

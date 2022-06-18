@@ -10,7 +10,7 @@ const AddColumnMutation = `
     column: addColumn(boardId: $boardId, title: $title) {
       id
       title
-      index
+      # index
     }
   }
 `
@@ -86,29 +86,29 @@ test.group('addColumn', () => {
     assertIsForbiddenExeption({ response, expect })
   })
 
-  test('assigns correct `index` by default', async ({ expect, client, createUser }) => {
-    const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
+  // test('assigns correct `index` by default', async ({ expect, client, createUser }) => {
+  //   const [user, cookie] = await createUser(client)
+  //   const { id: boardId } = await createRandomBoard(user.id)
 
-    await createRandomColumn(boardId, 0)
-    await createRandomColumn(boardId, 1)
-    await createRandomColumn(boardId, 2)
+  //   await createRandomColumn(boardId, 0)
+  //   await createRandomColumn(boardId, 1)
+  //   await createRandomColumn(boardId, 2)
 
 
-    const queryData = {
-      query: AddColumnMutation,
-      variables: {
-        boardId,
-        title: faker.lorem.word(),
-      }
-    };
+  //   const queryData = {
+  //     query: AddColumnMutation,
+  //     variables: {
+  //       boardId,
+  //       title: faker.lorem.word(),
+  //     }
+  //   };
 
-    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
-    const { data } = response.body()
+  //   const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+  //   const { data } = response.body()
 
-    expect(data.column).toBeTruthy()
-    expect(data.column.index).toBe(3)
-  })
+  //   expect(data.column).toBeTruthy()
+  //   expect(data.column.index).toBe(3)
+  // })
 })
 
 test.group('updateColumn', () => {
@@ -199,29 +199,29 @@ test.group('removeColumn', () => {
     expect(column).toBeFalsy()
   })
 
-  test('shift remaining columm\'s indexes to keep sequense', async ({ expect, client, createUser }) => {
-    const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
-    const column1 = await createRandomColumn(boardId, 0)
-    const column2 = await createRandomColumn(boardId, 1)
-    const column3 = await createRandomColumn(boardId, 2)
+  // test('shift remaining columm\'s indexes to keep sequense', async ({ expect, client, createUser }) => {
+  //   const [user, cookie] = await createUser(client)
+  //   const { id: boardId } = await createRandomBoard(user.id)
+  //   const column1 = await createRandomColumn(boardId, 0)
+  //   const column2 = await createRandomColumn(boardId, 1)
+  //   const column3 = await createRandomColumn(boardId, 2)
 
-    const queryData = {
-      query: RemoveColumnMutation,
-      variables: { id: column2.id }
-    };
+  //   const queryData = {
+  //     query: RemoveColumnMutation,
+  //     variables: { id: column2.id }
+  //   };
 
-    await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+  //   await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
 
-    const columns = await columnRepository.find({
-      select: { id: true, index: true },
-      where: { boardId },
-      order: { index: "ASC" }
-    })
+  //   const columns = await columnRepository.find({
+  //     select: { id: true, index: true },
+  //     where: { boardId },
+  //     order: { index: "ASC" }
+  //   })
 
-    expect(columns).toHaveLength(2)
-    expect(columns).toMatchObject([{ id: column1.id, index: 0 }, { id: column3.id, index: 1 }])
-  })
+  //   expect(columns).toHaveLength(2)
+  //   expect(columns).toMatchObject([{ id: column1.id, index: 0 }, { id: column3.id, index: 1 }])
+  // })
 
   test('can\'t delete someone else board\'s column', async ({ expect, client, createUser }) => {
     const [user] = await createUser(client)
