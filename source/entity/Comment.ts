@@ -1,6 +1,6 @@
 import { Field, ObjectType } from "type-graphql";
 import { TypeormLoader } from "type-graphql-dataloader";
-import { Column as Property, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Card } from "./Card";
 import { User } from "./User";
 
@@ -12,16 +12,19 @@ export class Comment {
   id: number;
 
   @Field()
-  @Property()
+  @Column()
   content: string;
 
-  @Property()
+  @Column()
   userId: number
 
   @Field(() => User)
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @TypeormLoader()
   user: User
+
+  @Column()
+  cardId: number
 
   @Field(() => Card)
   @ManyToOne(() => Card, card => card.comments, { onDelete: 'CASCADE' })

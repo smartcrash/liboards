@@ -157,6 +157,22 @@ const gates: Readonly<Record<string, GateFn>> = {
 
     return column.board.createdById === user.id
   },
+
+  /* -------------------------------------------------------------------------- */
+  /*                                  Comments                                  */
+  /* -------------------------------------------------------------------------- */
+
+  async 'create-comment'({ context: { user }, args }) {
+    const { cardId } = args
+    const card = await cardRepository.findOneByOrFail({ id: cardId })
+
+    const column = await columnRepository.findOneOrFail({
+      where: { id: card.columnId },
+      relations: { board: true }
+    })
+
+    return column.board.createdById === user.id
+  },
 }
 
 export const AllowIf = (gateKey: keyof typeof gates): MiddlewareFn<ContextType> => {

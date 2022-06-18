@@ -2,8 +2,8 @@ import { faker } from "@faker-js/faker";
 import { test } from "@japa/runner";
 import { In } from "typeorm";
 import { SESSION_COOKIE } from "../../constants";
-import { boardFactory, cardFactory, columnFactory, userFactory } from "../../factories";
-import { cardRepository, columnRepository } from "../../repository";
+import { boardFactory, cardFactory, columnFactory } from "../../factories";
+import { cardRepository } from "../../repository";
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
 const FindCardByIdQuery = `
