@@ -2,6 +2,7 @@ import { Field, ObjectType } from "type-graphql";
 import { TypeormLoader } from "type-graphql-dataloader";
 import { Column as Property, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Column } from "./Column";
+import { Comment } from "./Comment";
 import { Task } from "./Task";
 
 @ObjectType()
@@ -30,6 +31,11 @@ export class Card {
   @ManyToOne(() => Column, column => column.cards, { onDelete: 'CASCADE' })
   @TypeormLoader()
   column: Column
+
+  @Field(() => [Comment])
+  @OneToMany(() => Comment, comment => comment.card)
+  @TypeormLoader()
+  comments: Comment[]
 
   @Field(() => [Task])
   @OneToMany(() => Task, taks => taks.card)

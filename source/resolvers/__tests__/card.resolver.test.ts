@@ -276,10 +276,7 @@ test.group('updateCard', () => {
 })
 
 
-test.group('moveCard', (group) => {
-  // 👇 all this tests are pinned
-  group.tap((test) => test.pin())
-
+test.group('moveCard', () => {
   testThrowsIfNotAuthenticated({
     query: MoveCardMutation,
     variables: {
