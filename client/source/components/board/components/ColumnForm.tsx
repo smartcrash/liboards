@@ -1,4 +1,4 @@
-import { AdderForm } from "./AdderForm";
+import { AdderForm } from "../../";
 
 interface ColumnFormProps {
   onConfirm: (title: string) => void;

@@ -13,8 +13,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { AutoResizeTextarea, NonEmptyEditable } from "../";
-import { useFindCardByIdQuery, useUpdateCardMutation } from "../../generated/graphql";
-import { EditableDesc } from "./components";
+import { useAddTaskMutation, useFindCardByIdQuery, useUpdateCardMutation } from "../../generated/graphql";
+import { EditableDesc, TaskAdder } from "./components";
 
 interface CardDetailsModalProps {
   id?: number;
@@ -28,12 +28,13 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
     pause: !id,
   });
   const [, updateCard] = useUpdateCardMutation();
+  const [, addTask] = useAddTaskMutation();
 
   if (!id) return null;
   if (fetching) return null; // TODO: Show spinner
   if (!data || !data.card) return null; // TODO: not found error
 
-  const { title, description, column } = data.card;
+  const { title, description, column, tasks } = data.card;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
@@ -78,6 +79,18 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
 
             <EditableDesc defaultValue={description} onSubmit={(description) => updateCard({ id, description })} />
           </Stack>
+
+          <Spacer h={10} />
+
+          <Box>
+            <Stack>
+              {tasks.map((task) => (
+                <Box key={task.id}>{task.description}</Box>
+              ))}
+            </Stack>
+
+            <TaskAdder onConfirm={(content) => addTask({ cardId: id, description: content })} />
+          </Box>
         </ModalBody>
       </ModalContent>
     </Modal>

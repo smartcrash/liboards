@@ -444,7 +444,7 @@ export type FindCardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string } } | null };
+export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string }, tasks: Array<{ __typename?: 'Task', id: number, description: string, completed: boolean }> } | null };
 
 export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
@@ -796,9 +796,12 @@ export const FindCardByIdDocument = gql`
       id
       title
     }
+    tasks {
+      ...TaskFragment
+    }
   }
 }
-    `;
+    ${TaskFragmentFragmentDoc}`;
 
 export function useFindCardByIdQuery(options: Omit<Urql.UseQueryArgs<FindCardByIdQueryVariables>, 'query'>) {
   return Urql.useQuery<FindCardByIdQuery>({ query: FindCardByIdDocument, ...options });

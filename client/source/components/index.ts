@@ -9,4 +9,5 @@ export * from './Logo'
 export * from './non-empty-editable'
 export * from './AutoResizeTextarea'
 export * from './HeartButton'
+export * from './AdderForm'
 
