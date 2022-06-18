@@ -144,6 +144,19 @@ const gates: Readonly<Record<string, GateFn>> = {
 
     return column.board.createdById === user.id
   },
+
+  async 'delete-task'({ context: { user }, args }) {
+    const { id } = args
+    const task = await taskRepository.findOneByOrFail({ id })
+    const card = await cardRepository.findOneByOrFail({ id: task.cardId })
+
+    const column = await columnRepository.findOneOrFail({
+      where: { id: card.columnId },
+      relations: { board: true }
+    })
+
+    return column.board.createdById === user.id
+  },
 }
 
 export const AllowIf = (gateKey: keyof typeof gates): MiddlewareFn<ContextType> => {

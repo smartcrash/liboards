@@ -50,6 +50,12 @@ export class TaskResolver {
     return task
   }
 
-  @Mutation(() => Boolean)
-  async removeTask(@Arg('id', () => Int) id: number) { }
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('delete-task'))
+  @Mutation(() => Int)
+  async removeTask(@Arg('id', () => Int) id: number): Promise<number> {
+    await taskRepository.delete({ id })
+
+    return id
+  }
 }

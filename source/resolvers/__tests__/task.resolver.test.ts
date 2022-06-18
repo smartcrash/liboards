@@ -18,7 +18,7 @@ const AddTaskMutation = `
   }
 `
 
-const UpdateCardMutation = `
+const UpdateTaskMutation = `
   mutation UpdateTask($id: Int!, $description: String, $completed: Boolean) {
     task: updateTask(id: $id, description: $description, completed: $completed) {
       id
@@ -28,7 +28,10 @@ const UpdateCardMutation = `
   }
 `
 
-const RemoveCardMutation = `
+const RemoveTaskMutation = `
+  mutation RemoveTask($id: Int!) {
+    id: removeTask(id: $id)
+  }
 `
 
 test.group('addCard', () => {
@@ -97,7 +100,7 @@ test.group('addCard', () => {
 
 test.group('updateCard', () => {
   testThrowsIfNotAuthenticated({
-    query: UpdateCardMutation,
+    query: UpdateTaskMutation,
     variables: { description: '', id: 0 }
   })
 
@@ -111,7 +114,7 @@ test.group('updateCard', () => {
     const description = faker.lorem.words()
 
     const queryData = {
-      query: UpdateCardMutation,
+      query: UpdateTaskMutation,
       variables: { description, id }
     }
 
@@ -139,7 +142,7 @@ test.group('updateCard', () => {
     const { id, description } = await taskFactory().create({ card, createdBy: user })
 
     const queryData = {
-      query: UpdateCardMutation,
+      query: UpdateTaskMutation,
       variables: {
         id,
         description: faker.lorem.words(),
@@ -165,7 +168,7 @@ test.group('updateCard', () => {
     expect(completedAt).toBeFalsy()
 
     const queryData = {
-      query: UpdateCardMutation,
+      query: UpdateTaskMutation,
       variables: { id, completed: true }
     }
 
@@ -193,7 +196,7 @@ test.group('updateCard', () => {
     expect(completedAt).toBeTruthy()
 
     const queryData = {
-      query: UpdateCardMutation,
+      query: UpdateTaskMutation,
       variables: { id, completed: false }
     }
 
@@ -209,5 +212,59 @@ test.group('updateCard', () => {
     const task = await taskRepository.findOneBy({ id })
 
     expect(task.completedAt).toBeNull()
+  })
+})
+
+test.group('removeTask', () => {
+  testThrowsIfNotAuthenticated({
+    query: RemoveTaskMutation,
+    variables: { id: 0 }
+  })
+
+  test('remove task', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const board = await boardFactory().create({ createdBy: user })
+    const column = await columnFactory().create({ board })
+    const card = await cardFactory().create({ column })
+    const { id } = await taskFactory().create({ card, createdBy: user })
+
+    const queryData = {
+      query: RemoveTaskMutation,
+      variables: { id }
+    }
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data, errors } = response.body()
+
+    expect(errors).toBeFalsy()
+    expect(data).toBeTruthy()
+
+    expect(data.id).toBe(id)
+
+    const task = await taskRepository.findOneBy({ id })
+
+    expect(task).toBeFalsy()
+  })
+
+  test('try to remove someone else\'s task', async ({ expect, client, createUser }) => {
+    const otherUser = await userFactory().create()
+    const [user, cookie] = await createUser(client)
+    const board = await boardFactory().create({ createdBy: otherUser })
+    const column = await columnFactory().create({ board })
+    const card = await cardFactory().create({ column })
+    const { id } = await taskFactory().create({ card, createdBy: user })
+
+    const queryData = {
+      query: RemoveTaskMutation,
+      variables: { id }
+    }
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+
+    assertIsForbiddenExeption({ response, expect })
+
+    const task = await taskRepository.findOneBy({ id })
+
+    expect(task).toBeTruthy()
   })
 })
