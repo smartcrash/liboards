@@ -85,11 +85,11 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
           <Box>
             <Stack>
               {tasks.map((task) => (
-                <Box key={task.id}>{task.description}</Box>
+                <Box key={task.id}>{task.content}</Box>
               ))}
             </Stack>
 
-            <TaskAdder onConfirm={(content) => addTask({ cardId: id, description: content })} />
+            <TaskAdder onConfirm={(content) => addTask({ cardId: id, content })} />
           </Box>
         </ModalBody>
       </ModalContent>

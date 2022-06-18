@@ -13,7 +13,7 @@ export class Task {
 
   @Field()
   @Column()
-  description: string;
+  content: string;
 
   @Column({ nullable: true })
   completedAt: Date

@@ -6,10 +6,10 @@ import { cardRepository, taskRepository } from "../../repository"
 import { assertIsForbiddenExeption, testThrowsIfNotAuthenticated } from "../../utils/testUtils"
 
 const AddTaskMutation = `
-  mutation AddTask($cardId: Int!, $description: String!) {
-    task: addTask(cardId: $cardId, description: $description) {
+  mutation AddTask($cardId: Int!, $content: String!) {
+    task: addTask(cardId: $cardId, content: $content) {
       id
-      description
+      content
       completed
       card {
         id
@@ -19,10 +19,10 @@ const AddTaskMutation = `
 `
 
 const UpdateTaskMutation = `
-  mutation UpdateTask($id: Int!, $description: String, $completed: Boolean) {
-    task: updateTask(id: $id, description: $description, completed: $completed) {
+  mutation UpdateTask($id: Int!, $content: String, $completed: Boolean) {
+    task: updateTask(id: $id, content: $content, completed: $completed) {
       id
-      description
+      content
       completed
     }
   }
@@ -37,7 +37,7 @@ const RemoveTaskMutation = `
 test.group('addCard', () => {
   testThrowsIfNotAuthenticated({
     query: AddTaskMutation,
-    variables: { description: '', cardId: 0 }
+    variables: { content: '', cardId: 0 }
   })
 
   test('add task to card', async ({ expect, client, createUser }) => {
@@ -46,11 +46,11 @@ test.group('addCard', () => {
     const column = await columnFactory().create({ board })
     const card = await cardFactory().create({ column })
 
-    const description = faker.lorem.words()
+    const content = faker.lorem.words()
 
     const queryData = {
       query: AddTaskMutation,
-      variables: { description, cardId: card.id }
+      variables: { content, cardId: card.id }
     }
 
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
@@ -60,7 +60,7 @@ test.group('addCard', () => {
     expect(data).toBeTruthy()
 
     expect(typeof data.task.id).toBe('number')
-    expect(data.task.description).toBe(description)
+    expect(data.task.content).toBe(content)
     expect(data.task.completed).toBe(false)
     expect(data.task.card.id).toBe(card.id)
 
@@ -80,7 +80,7 @@ test.group('addCard', () => {
     const queryData = {
       query: AddTaskMutation,
       variables: {
-        description: faker.lorem.words(),
+        content: faker.lorem.words(),
         cardId: card.id,
       }
     }
@@ -101,7 +101,7 @@ test.group('addCard', () => {
 test.group('updateCard', () => {
   testThrowsIfNotAuthenticated({
     query: UpdateTaskMutation,
-    variables: { description: '', id: 0 }
+    variables: { content: '', id: 0 }
   })
 
   test('update card', async ({ expect, client, createUser }) => {
@@ -111,11 +111,11 @@ test.group('updateCard', () => {
     const card = await cardFactory().create({ column })
     const { id } = await taskFactory().create({ card, createdBy: user })
 
-    const description = faker.lorem.words()
+    const content = faker.lorem.words()
 
     const queryData = {
       query: UpdateTaskMutation,
-      variables: { description, id }
+      variables: { content, id }
     }
 
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
@@ -125,12 +125,12 @@ test.group('updateCard', () => {
     expect(data).toBeTruthy()
 
     expect(data.task.id).toBe(id)
-    expect(data.task.description).toBe(description)
+    expect(data.task.content).toBe(content)
     expect(data.task.completed).toBe(false)
 
     const task = await taskRepository.findOneBy({ id })
 
-    expect(task.description).toBe(description)
+    expect(task.content).toBe(content)
   })
 
   test('try to add a task to someone else\'s card', async ({ expect, client, createUser }) => {
@@ -139,13 +139,13 @@ test.group('updateCard', () => {
     const board = await boardFactory().create({ createdBy: otherUser })
     const column = await columnFactory().create({ board })
     const card = await cardFactory().create({ column })
-    const { id, description } = await taskFactory().create({ card, createdBy: user })
+    const { id, content } = await taskFactory().create({ card, createdBy: user })
 
     const queryData = {
       query: UpdateTaskMutation,
       variables: {
         id,
-        description: faker.lorem.words(),
+        content: faker.lorem.words(),
       }
     }
 
@@ -155,7 +155,7 @@ test.group('updateCard', () => {
 
     const task = await taskRepository.findOneBy({ id })
 
-    expect(task.description).toBe(description)
+    expect(task.content).toBe(content)
   })
 
   test('setting `completed` property to `true` set `completedAt` to current time', async ({ expect, client, createUser }) => {

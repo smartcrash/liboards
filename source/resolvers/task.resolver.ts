@@ -16,14 +16,14 @@ export class TaskResolver {
   @UseMiddleware(AllowIf('create-task'))
   @Mutation(() => Task, { nullable: true })
   async addTask(
-    @Arg('description') description: string,
+    @Arg('content') content: string,
     @Arg('cardId', () => Int) cardId: number,
     @Ctx() { user }: ContextType
   ): Promise<Task | null> {
-    if (!description.length) return null
+    if (!content.length) return null
 
     const task = new Task()
-    task.description = description
+    task.content = content
     task.cardId = cardId
     task.createdById = user.id
     await taskRepository.save(task)
@@ -36,12 +36,12 @@ export class TaskResolver {
   @Mutation(() => Task)
   async updateTask(
     @Arg('id', () => Int) id: number,
-    @Arg('description', () => String, { nullable: true }) description: string | null,
+    @Arg('content', () => String, { nullable: true }) content: string | null,
     @Arg('completed', () => Boolean, { nullable: true }) completed: boolean | null,
   ): Promise<Task> {
     const task = await taskRepository.findOneBy({ id })
 
-    task.description = description && description.length ? description : task.description
+    task.content = content && content.length ? content : task.content
     if (completed) task.completedAt = task.completedAt ?? new Date()
     if (!completed) task.completedAt = null
 

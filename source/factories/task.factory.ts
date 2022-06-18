@@ -4,7 +4,7 @@ import { Task } from '../entity'
 
 define(Task, () => {
   const task = new Task()
-  task.description = faker.lorem.words(5)
+  task.content = faker.lorem.words(5)
   return task
 })
 

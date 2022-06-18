@@ -1,5 +1,5 @@
-mutation AddTask($cardId: Int!, $description: String!) {
-  task: addTask(cardId: $cardId, description: $description) {
+mutation AddTask($cardId: Int!, $content: String!) {
+  task: addTask(cardId: $cardId, content: $content) {
     ...TaskFragment
   }
 }

@@ -100,7 +100,7 @@ export type MutationAddColumnArgs = {
 
 export type MutationAddTaskArgs = {
   cardId: Scalars['Int'];
-  description: Scalars['String'];
+  content: Scalars['String'];
 };
 
 
@@ -196,7 +196,7 @@ export type MutationUpdateColumnArgs = {
 
 export type MutationUpdateTaskArgs = {
   completed?: InputMaybe<Scalars['Boolean']>;
-  description?: InputMaybe<Scalars['String']>;
+  content?: InputMaybe<Scalars['String']>;
   id: Scalars['Int'];
 };
 
@@ -224,9 +224,9 @@ export type Task = {
   __typename?: 'Task';
   card: Card;
   completed: Scalars['Boolean'];
+  content: Scalars['String'];
   createdAt: Scalars['DateTime'];
   createdBy: User;
-  description: Scalars['String'];
   id: Scalars['Float'];
   updatedAt: Scalars['DateTime'];
 };
@@ -247,7 +247,7 @@ export type CardFragmentFragment = { __typename?: 'Card', id: number, title: str
 
 export type ColumnFragmentFragment = { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> };
 
-export type TaskFragmentFragment = { __typename?: 'Task', id: number, description: string, completed: boolean };
+export type TaskFragmentFragment = { __typename?: 'Task', id: number, content: string, completed: boolean };
 
 export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string };
 
@@ -270,11 +270,11 @@ export type AddColumnMutation = { __typename?: 'Mutation', column: { __typename?
 
 export type AddTaskMutationVariables = Exact<{
   cardId: Scalars['Int'];
-  description: Scalars['String'];
+  content: Scalars['String'];
 }>;
 
 
-export type AddTaskMutation = { __typename?: 'Mutation', task?: { __typename?: 'Task', id: number, description: string, completed: boolean } | null };
+export type AddTaskMutation = { __typename?: 'Mutation', task?: { __typename?: 'Task', id: number, content: string, completed: boolean } | null };
 
 export type AddToFavoritesMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -410,12 +410,12 @@ export type UpdateColumnMutation = { __typename?: 'Mutation', column?: { __typen
 
 export type UpdateTaskMutationVariables = Exact<{
   id: Scalars['Int'];
-  description?: InputMaybe<Scalars['String']>;
+  content?: InputMaybe<Scalars['String']>;
   completed?: InputMaybe<Scalars['Boolean']>;
 }>;
 
 
-export type UpdateTaskMutation = { __typename?: 'Mutation', task: { __typename?: 'Task', id: number, description: string, completed: boolean } };
+export type UpdateTaskMutation = { __typename?: 'Mutation', task: { __typename?: 'Task', id: number, content: string, completed: boolean } };
 
 export type AllBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -444,7 +444,7 @@ export type FindCardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string }, tasks: Array<{ __typename?: 'Task', id: number, description: string, completed: boolean }> } | null };
+export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string }, tasks: Array<{ __typename?: 'Task', id: number, content: string, completed: boolean }> } | null };
 
 export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
@@ -476,7 +476,7 @@ export const ColumnFragmentFragmentDoc = gql`
 export const TaskFragmentFragmentDoc = gql`
     fragment TaskFragment on Task {
   id
-  description
+  content
   completed
 }
     `;
@@ -512,8 +512,8 @@ export function useAddColumnMutation() {
   return Urql.useMutation<AddColumnMutation, AddColumnMutationVariables>(AddColumnDocument);
 };
 export const AddTaskDocument = gql`
-    mutation AddTask($cardId: Int!, $description: String!) {
-  task: addTask(cardId: $cardId, description: $description) {
+    mutation AddTask($cardId: Int!, $content: String!) {
+  task: addTask(cardId: $cardId, content: $content) {
     ...TaskFragment
   }
 }
@@ -721,8 +721,8 @@ export function useUpdateColumnMutation() {
   return Urql.useMutation<UpdateColumnMutation, UpdateColumnMutationVariables>(UpdateColumnDocument);
 };
 export const UpdateTaskDocument = gql`
-    mutation UpdateTask($id: Int!, $description: String, $completed: Boolean) {
-  task: updateTask(id: $id, description: $description, completed: $completed) {
+    mutation UpdateTask($id: Int!, $content: String, $completed: Boolean) {
+  task: updateTask(id: $id, content: $content, completed: $completed) {
     ...TaskFragment
   }
 }
