@@ -42,9 +42,9 @@ test.group('addCard', () => {
 
   test('add task to card', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await boardFactory().create({ createdBy: user })
-    const column = await columnFactory().create({ board })
-    const card = await cardFactory().create({ column })
+    const board = await boardFactory.create({ createdBy: user })
+    const column = await columnFactory.create({ board })
+    const card = await cardFactory.create({ column })
 
     const content = faker.lorem.words()
 
@@ -71,11 +71,11 @@ test.group('addCard', () => {
   })
 
   test('try to add a task to someone else\'s card', async ({ expect, client, createUser }) => {
-    const otherUser = await userFactory().create()
+    const otherUser = await userFactory.create()
     const [user, cookie] = await createUser(client)
-    const board = await boardFactory().create({ createdBy: otherUser })
-    const column = await columnFactory().create({ board })
-    const card = await cardFactory().create({ column })
+    const board = await boardFactory.create({ createdBy: otherUser })
+    const column = await columnFactory.create({ board })
+    const card = await cardFactory.create({ column })
 
     const queryData = {
       query: AddTaskMutation,
@@ -106,10 +106,10 @@ test.group('updateCard', () => {
 
   test('update card', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await boardFactory().create({ createdBy: user })
-    const column = await columnFactory().create({ board })
-    const card = await cardFactory().create({ column })
-    const { id } = await taskFactory().create({ card, createdBy: user })
+    const board = await boardFactory.create({ createdBy: user })
+    const column = await columnFactory.create({ board })
+    const card = await cardFactory.create({ column })
+    const { id } = await taskFactory.create({ card, createdBy: user })
 
     const content = faker.lorem.words()
 
@@ -134,12 +134,12 @@ test.group('updateCard', () => {
   })
 
   test('try to add a task to someone else\'s card', async ({ expect, client, createUser }) => {
-    const otherUser = await userFactory().create()
+    const otherUser = await userFactory.create()
     const [user, cookie] = await createUser(client)
-    const board = await boardFactory().create({ createdBy: otherUser })
-    const column = await columnFactory().create({ board })
-    const card = await cardFactory().create({ column })
-    const { id, content } = await taskFactory().create({ card, createdBy: user })
+    const board = await boardFactory.create({ createdBy: otherUser })
+    const column = await columnFactory.create({ board })
+    const card = await cardFactory.create({ column })
+    const { id, content } = await taskFactory.create({ card, createdBy: user })
 
     const queryData = {
       query: UpdateTaskMutation,
@@ -160,10 +160,10 @@ test.group('updateCard', () => {
 
   test('setting `completed` property to `true` set `completedAt` to current time', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await boardFactory().create({ createdBy: user })
-    const column = await columnFactory().create({ board })
-    const card = await cardFactory().create({ column })
-    const { id, completedAt } = await taskFactory().create({ card, createdBy: user })
+    const board = await boardFactory.create({ createdBy: user })
+    const column = await columnFactory.create({ board })
+    const card = await cardFactory.create({ column })
+    const { id, completedAt } = await taskFactory.create({ card, createdBy: user })
 
     expect(completedAt).toBeFalsy()
 
@@ -188,10 +188,10 @@ test.group('updateCard', () => {
 
   test('setting `completed` property to `false` set `completedAt` to `null`', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await boardFactory().create({ createdBy: user })
-    const column = await columnFactory().create({ board })
-    const card = await cardFactory().create({ column })
-    const { id, completedAt } = await taskFactory().create({ card, createdBy: user, completedAt: new Date() })
+    const board = await boardFactory.create({ createdBy: user })
+    const column = await columnFactory.create({ board })
+    const card = await cardFactory.create({ column })
+    const { id, completedAt } = await taskFactory.create({ card, createdBy: user, completedAt: new Date() })
 
     expect(completedAt).toBeTruthy()
 
@@ -223,10 +223,10 @@ test.group('removeTask', () => {
 
   test('remove task', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await boardFactory().create({ createdBy: user })
-    const column = await columnFactory().create({ board })
-    const card = await cardFactory().create({ column })
-    const { id } = await taskFactory().create({ card, createdBy: user })
+    const board = await boardFactory.create({ createdBy: user })
+    const column = await columnFactory.create({ board })
+    const card = await cardFactory.create({ column })
+    const { id } = await taskFactory.create({ card, createdBy: user })
 
     const queryData = {
       query: RemoveTaskMutation,
@@ -247,12 +247,12 @@ test.group('removeTask', () => {
   })
 
   test('try to remove someone else\'s task', async ({ expect, client, createUser }) => {
-    const otherUser = await userFactory().create()
+    const otherUser = await userFactory.create()
     const [user, cookie] = await createUser(client)
-    const board = await boardFactory().create({ createdBy: otherUser })
-    const column = await columnFactory().create({ board })
-    const card = await cardFactory().create({ column })
-    const { id } = await taskFactory().create({ card, createdBy: user })
+    const board = await boardFactory.create({ createdBy: otherUser })
+    const column = await columnFactory.create({ board })
+    const card = await cardFactory.create({ column })
+    const { id } = await taskFactory.create({ card, createdBy: user })
 
     const queryData = {
       query: RemoveTaskMutation,

@@ -10,4 +10,4 @@ define(User, () => {
   return user
 })
 
-export const userFactory = () => factory(User)()
+export const userFactory = factory(User)()

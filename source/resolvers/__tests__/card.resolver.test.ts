@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@japa/runner";
 import { In } from "typeorm";
 import { SESSION_COOKIE } from "../../constants";
+import { boardFactory, userFactory } from "../../factories";
 import { cardRepository } from "../../repository";
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
@@ -356,6 +357,10 @@ test.group('moveCard', () => {
     })
 
     expect(cards).toMatchObject([{ id: card3.id }, { id: card1.id }, { id: card2.id }])
+  })
+
+  test('moves the card to another column (empty)', async ({ expect, client, createUser }) => {
+    //
   })
 })
 

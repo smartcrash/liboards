@@ -8,4 +8,4 @@ define(Board, () => {
   return board
 })
 
-export const boardFactory = () => factory(Board)()
+export const boardFactory = factory(Board)()

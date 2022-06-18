@@ -8,4 +8,4 @@ define(Task, () => {
   return task
 })
 
-export const taskFactory = () => factory(Task)()
+export const taskFactory = factory(Task)()

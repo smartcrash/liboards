@@ -10,4 +10,4 @@ define(Card, () => {
   return card
 })
 
-export const cardFactory = () => factory(Card)()
+export const cardFactory = factory(Card)()
