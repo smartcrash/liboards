@@ -30,7 +30,6 @@ export class CardResolver {
 
     card.title = title
     card.description = description
-    card.index = await cardRepository.countBy({ columnId })
     card.columnId = columnId
 
     await cardRepository.save(card)

@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@japa/runner";
 import { In } from "typeorm";
 import { SESSION_COOKIE } from "../../constants";
-import { boardFactory, userFactory } from "../../factories";
+import { boardFactory, cardFactory, columnFactory, userFactory } from "../../factories";
 import { cardRepository } from "../../repository";
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
@@ -166,17 +166,15 @@ test.group('addCard', () => {
 
   test('assigns correct `index` by default', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
-    const { id: columnId } = await createRandomColumn(boardId)
+    const board = await boardFactory.create({ createdBy: user })
+    const column = await columnFactory.create({ board })
 
-    await createRandomCard(columnId, 0)
-    await createRandomCard(columnId, 1)
-    await createRandomCard(columnId, 2)
+    await cardFactory.createMany(3, { column })
 
     const queryData = {
       query: AddCardMutation,
       variables: {
-        columnId,
+        columnId: column.id,
         title: faker.lorem.words(),
         description: faker.lorem.sentences(),
       }
@@ -360,7 +358,12 @@ test.group('moveCard', () => {
   })
 
   test('moves the card to another column (empty)', async ({ expect, client, createUser }) => {
-    //
+    const [user, cookie] = await createUser(client)
+    const board = await boardFactory.create({ createdBy: user })
+    const fromColumn = await columnFactory.create({ board })
+    const toColumn = await columnFactory.create({ board })
+
+    const card = await cardFactory.create({ column: fromColumn })
   })
 })
 

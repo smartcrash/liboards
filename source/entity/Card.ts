@@ -1,6 +1,6 @@
 import { Field, ObjectType } from "type-graphql";
 import { TypeormLoader } from "type-graphql-dataloader";
-import { Column as Property, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, } from "typeorm";
+import { Column as Property, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Column } from "./Column";
 import { Task } from "./Task";
 
