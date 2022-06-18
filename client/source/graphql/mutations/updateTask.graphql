@@ -1,0 +1,5 @@
+mutation UpdateTask($id: Int!, $description: String, $completed: Boolean) {
+  task: updateTask(id: $id, description: $description, completed: $completed) {
+    ...TaskFragment
+  }
+}

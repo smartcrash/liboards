@@ -41,6 +41,7 @@ export type Card = {
   description: Scalars['String'];
   id: Scalars['Float'];
   index: Scalars['Float'];
+  tasks: Array<Task>;
   title: Scalars['String'];
 };
 
@@ -62,6 +63,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addCard: Card;
   addColumn: Column;
+  addTask?: Maybe<Task>;
   addToFavorites: Scalars['Boolean'];
   createBoard: Board;
   createUser: AuthenticationResponse;
@@ -72,12 +74,14 @@ export type Mutation = {
   removeCard?: Maybe<Scalars['Int']>;
   removeColumn?: Maybe<Scalars['Int']>;
   removeFromFavorites: Scalars['Boolean'];
+  removeTask: Scalars['Int'];
   resetPassword: AuthenticationResponse;
   restoreBoard?: Maybe<Scalars['Int']>;
   sendResetPasswordEmail: Scalars['Boolean'];
   updateBoard?: Maybe<Board>;
   updateCard?: Maybe<Card>;
   updateColumn?: Maybe<Column>;
+  updateTask: Task;
 };
 
 
@@ -91,6 +95,12 @@ export type MutationAddCardArgs = {
 export type MutationAddColumnArgs = {
   boardId: Scalars['Int'];
   title: Scalars['String'];
+};
+
+
+export type MutationAddTaskArgs = {
+  cardId: Scalars['Int'];
+  description: Scalars['String'];
 };
 
 
@@ -144,6 +154,11 @@ export type MutationRemoveFromFavoritesArgs = {
 };
 
 
+export type MutationRemoveTaskArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationResetPasswordArgs = {
   newPassword: Scalars['String'];
   token: Scalars['String'];
@@ -178,6 +193,13 @@ export type MutationUpdateColumnArgs = {
   title?: InputMaybe<Scalars['String']>;
 };
 
+
+export type MutationUpdateTaskArgs = {
+  completed?: InputMaybe<Scalars['Boolean']>;
+  description?: InputMaybe<Scalars['String']>;
+  id: Scalars['Int'];
+};
+
 export type Query = {
   __typename?: 'Query';
   allBoards: Array<Board>;
@@ -198,6 +220,17 @@ export type QueryFindCardByIdArgs = {
   id: Scalars['Int'];
 };
 
+export type Task = {
+  __typename?: 'Task';
+  card: Card;
+  completed: Scalars['Boolean'];
+  createdAt: Scalars['DateTime'];
+  createdBy: User;
+  description: Scalars['String'];
+  id: Scalars['Float'];
+  updatedAt: Scalars['DateTime'];
+};
+
 export type User = {
   __typename?: 'User';
   boards: Array<Board>;
@@ -213,6 +246,8 @@ export type BoardFragmentFragment = { __typename?: 'Board', id: number, title: s
 export type CardFragmentFragment = { __typename?: 'Card', id: number, title: string, description: string, index: number };
 
 export type ColumnFragmentFragment = { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> };
+
+export type TaskFragmentFragment = { __typename?: 'Task', id: number, description: string, completed: boolean };
 
 export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string };
 
@@ -232,6 +267,14 @@ export type AddColumnMutationVariables = Exact<{
 
 
 export type AddColumnMutation = { __typename?: 'Mutation', column: { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } };
+
+export type AddTaskMutationVariables = Exact<{
+  cardId: Scalars['Int'];
+  description: Scalars['String'];
+}>;
+
+
+export type AddTaskMutation = { __typename?: 'Mutation', task?: { __typename?: 'Task', id: number, description: string, completed: boolean } | null };
 
 export type AddToFavoritesMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -311,6 +354,13 @@ export type RemoveFromFavoritesMutationVariables = Exact<{
 
 export type RemoveFromFavoritesMutation = { __typename?: 'Mutation', removeFromFavorites: boolean };
 
+export type RemoveTaskMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type RemoveTaskMutation = { __typename?: 'Mutation', id: number };
+
 export type ResetPasswordMutationVariables = Exact<{
   newPassword: Scalars['String'];
   token: Scalars['String'];
@@ -357,6 +407,15 @@ export type UpdateColumnMutationVariables = Exact<{
 
 
 export type UpdateColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } | null };
+
+export type UpdateTaskMutationVariables = Exact<{
+  id: Scalars['Int'];
+  description?: InputMaybe<Scalars['String']>;
+  completed?: InputMaybe<Scalars['Boolean']>;
+}>;
+
+
+export type UpdateTaskMutation = { __typename?: 'Mutation', task: { __typename?: 'Task', id: number, description: string, completed: boolean } };
 
 export type AllBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -414,6 +473,13 @@ export const ColumnFragmentFragmentDoc = gql`
   }
 }
     ${CardFragmentFragmentDoc}`;
+export const TaskFragmentFragmentDoc = gql`
+    fragment TaskFragment on Task {
+  id
+  description
+  completed
+}
+    `;
 export const UserFragmentFragmentDoc = gql`
     fragment UserFragment on User {
   id
@@ -444,6 +510,17 @@ export const AddColumnDocument = gql`
 
 export function useAddColumnMutation() {
   return Urql.useMutation<AddColumnMutation, AddColumnMutationVariables>(AddColumnDocument);
+};
+export const AddTaskDocument = gql`
+    mutation AddTask($cardId: Int!, $description: String!) {
+  task: addTask(cardId: $cardId, description: $description) {
+    ...TaskFragment
+  }
+}
+    ${TaskFragmentFragmentDoc}`;
+
+export function useAddTaskMutation() {
+  return Urql.useMutation<AddTaskMutation, AddTaskMutationVariables>(AddTaskDocument);
 };
 export const AddToFavoritesDocument = gql`
     mutation AddToFavorites($id: Int!) {
@@ -566,6 +643,15 @@ export const RemoveFromFavoritesDocument = gql`
 export function useRemoveFromFavoritesMutation() {
   return Urql.useMutation<RemoveFromFavoritesMutation, RemoveFromFavoritesMutationVariables>(RemoveFromFavoritesDocument);
 };
+export const RemoveTaskDocument = gql`
+    mutation RemoveTask($id: Int!) {
+  id: removeTask(id: $id)
+}
+    `;
+
+export function useRemoveTaskMutation() {
+  return Urql.useMutation<RemoveTaskMutation, RemoveTaskMutationVariables>(RemoveTaskDocument);
+};
 export const ResetPasswordDocument = gql`
     mutation ResetPassword($newPassword: String!, $token: String!) {
   resetPassword(newPassword: $newPassword, token: $token) {
@@ -633,6 +719,17 @@ export const UpdateColumnDocument = gql`
 
 export function useUpdateColumnMutation() {
   return Urql.useMutation<UpdateColumnMutation, UpdateColumnMutationVariables>(UpdateColumnDocument);
+};
+export const UpdateTaskDocument = gql`
+    mutation UpdateTask($id: Int!, $description: String, $completed: Boolean) {
+  task: updateTask(id: $id, description: $description, completed: $completed) {
+    ...TaskFragment
+  }
+}
+    ${TaskFragmentFragmentDoc}`;
+
+export function useUpdateTaskMutation() {
+  return Urql.useMutation<UpdateTaskMutation, UpdateTaskMutationVariables>(UpdateTaskDocument);
 };
 export const AllBoardsDocument = gql`
     query AllBoards {
