@@ -166,9 +166,9 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
 
               <Spacer h={5} />
 
-              <Stack spacing={3}>
+              <Stack spacing={5}>
                 {comments.map((comment) => (
-                  <CommentItem comment={comment} key={comment.id} />
+                  <CommentItem comment={comment} onRemove={() => removeComment(comment)} key={comment.id} />
                 ))}
               </Stack>
 

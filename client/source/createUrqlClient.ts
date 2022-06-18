@@ -13,6 +13,8 @@ import {
   fetchExchange
 } from "urql";
 import {
+  AddCommentMutation,
+  AddCommentMutationVariables,
   AddTaskMutation,
   AddTaskMutationVariables,
   AddToFavoritesMutationVariables,
@@ -29,7 +31,7 @@ import {
   CurrentUserQuery,
   DeleteBoardMutation,
   DeleteBoardMutationVariables, FindCardByIdDocument, FindCardByIdQuery, LoginWithPasswordMutation,
-  LogoutMutation, RemoveFromFavoritesMutationVariables, RemoveTaskMutation, RemoveTaskMutationVariables, RestoreBoardMutation,
+  LogoutMutation, RemoveCardMutationVariables, RemoveColumnMutation, RemoveFromFavoritesMutationVariables, RemoveTaskMutation, RemoveTaskMutationVariables, RestoreBoardMutation,
   RestoreBoardMutationVariables
 } from "./generated/graphql";
 
@@ -185,6 +187,30 @@ export const createUrqlClient = () => createClient({
           removeTask(result: RemoveTaskMutation, args: RemoveTaskMutationVariables, cache, info) {
             cache.invalidate({
               __typename: 'Task',
+              id: args.id,
+            });
+          },
+
+          addComment(result: AddCommentMutation, args: AddCommentMutationVariables, cache, info) {
+            cache.updateQuery(
+              {
+                query: FindCardByIdDocument,
+                variables: { id: args.cardId }
+              },
+              (data: FindCardByIdQuery | null) => {
+                if (!result.comment) return data
+                if (!data || !data.card) return data
+
+                data.card.comments.push(result.comment)
+
+                return data
+              }
+            )
+          },
+
+          removeComment(result: RemoveColumnMutation, args: RemoveCardMutationVariables, cache, info) {
+            cache.invalidate({
+              __typename: 'Comment',
               id: args.id,
             });
           }
