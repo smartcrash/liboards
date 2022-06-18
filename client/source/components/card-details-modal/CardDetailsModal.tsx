@@ -1,8 +1,10 @@
 import {
   Box,
+  Button,
   EditablePreview,
   EditableTextarea,
   Heading,
+  HStack,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -20,6 +22,7 @@ import {
   useUpdateCardMutation,
   useUpdateTaskMutation,
 } from "../../generated/graphql";
+import { useToggle } from "../../hooks";
 import { EditableDesc, TaskAdder, TaskItem, TaskList } from "./components";
 
 interface CardDetailsModalProps {
@@ -37,6 +40,8 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
   const [, addTask] = useAddTaskMutation();
   const [, updateTask] = useUpdateTaskMutation();
   const [, removeTask] = useRemoveTaskMutation();
+
+  const [showCompleted, toggleShowCompleted] = useToggle(true);
 
   if (!id) return null;
   if (fetching) return null; // TODO: Show spinner
@@ -91,22 +96,33 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
           {!!tasks.length && (
             <>
               <Spacer h={7} />
-              <Heading as="h6" size="xs" mb={6}>
-                Sub-tasks
-              </Heading>
+
+              <HStack justifyContent={"space-between"}>
+                <Heading as="h6" size="xs">
+                  Sub-tasks
+                </Heading>
+
+                <Button colorScheme={"gray"} variant={"solid"} size={"xs"} onClick={toggleShowCompleted}>
+                  {showCompleted ? "Hide" : "Show"} completed
+                </Button>
+              </HStack>
+
+              <Spacer h={6} />
             </>
           )}
 
           <Stack spacing={5}>
             <TaskList>
-              {tasks.map((task) => (
-                <TaskItem
-                  task={task}
-                  onUpdate={({ id, content, completed }) => updateTask({ id, content, completed })}
-                  onRemove={() => removeTask({ id: task.id })}
-                  key={task.id}
-                />
-              ))}
+              {tasks
+                .filter((task) => (!showCompleted ? !task.completed : true))
+                .map((task) => (
+                  <TaskItem
+                    task={task}
+                    onUpdate={({ id, content, completed }) => updateTask({ id, content, completed })}
+                    onRemove={() => removeTask({ id: task.id })}
+                    key={task.id}
+                  />
+                ))}
             </TaskList>
 
             <Box>
