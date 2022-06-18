@@ -25,16 +25,26 @@ export class CommentResolver {
     return comment
   }
 
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('update-comment'))
   @Mutation(() => Comment)
   async updateComment(
     @Arg('id', () => Int) id: number,
-    @Arg('content') content: string,
-  ) {
-    throw new Error("Not Implemented");
+    @Arg('content', { nullable: true }) content: string | null,
+  ): Promise<Comment> {
+    const comment = await commentRepository.findOneBy({ id })
+    comment.content = content ?? comment.content
+    await commentRepository.save(comment)
+
+    return comment
   }
 
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('delete-comment'))
   @Mutation(() => Int)
   async removeComment(@Arg('id', () => Int) id: number): Promise<number> {
+    await commentRepository.delete({ id })
+
     return id
   }
 }

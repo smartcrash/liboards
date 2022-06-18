@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { test } from "@japa/runner";
 import { SESSION_COOKIE } from "../../constants";
-import { boardFactory, columnFactory, cardFactory } from "../../factories";
+import { boardFactory, columnFactory, cardFactory, CommentFactory, userFactory } from "../../factories";
 import { commentRepository } from "../../repository";
 import { assertIsForbiddenExeption, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
@@ -30,8 +30,6 @@ const RemoveCommentMutation = `
 `
 
 test.group('addComment', (group) => {
-  group.tap((test) => test.pin())
-
   testThrowsIfNotAuthenticated({
     query: AddCommentMutation,
     variables: {
@@ -96,5 +94,133 @@ test.group('addComment', (group) => {
     const comments = await commentRepository.findBy({ cardId: card.id })
 
     expect(comments).toHaveLength(0)
+  })
+})
+
+test.group('updateComment', (group) => {
+  testThrowsIfNotAuthenticated({
+    query: UpdateCommentMutation,
+    variables: { id: 0, content: '' }
+  })
+
+  test('update comment\'s content', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const board = await boardFactory.create({ createdBy: user })
+    const column = await columnFactory.create({ board })
+    const card = await cardFactory.create({ column })
+    const { id } = await CommentFactory.create({ card, user })
+
+    const content = faker.lorem.sentence()
+
+    const queryData = {
+      query: UpdateCommentMutation,
+      variables: {
+        id,
+        content,
+      }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data, errors } = response.body()
+
+    expect(errors).toBeFalsy()
+    expect(data).toBeTruthy()
+
+    expect(data.comment.id).toBe(id)
+    expect(data.comment.content).toBe(content)
+
+    const comment = await commentRepository.findOneBy({ id })
+
+    expect(comment.content).toBe(content)
+  })
+
+
+  test('can only update own comments', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+
+    const otherUser = await userFactory.create()
+    const board = await boardFactory.create({ createdBy: user })
+    const column = await columnFactory.create({ board })
+    const card = await cardFactory.create({ column })
+    const { id, content } = await CommentFactory.create({ card, user: otherUser })
+
+    const queryData = {
+      query: UpdateCommentMutation,
+      variables: {
+        id,
+        content: faker.lorem.sentence(),
+      }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+
+    assertIsForbiddenExeption({ response, expect })
+
+    const comment = await commentRepository.findOneBy({ id })
+
+    expect(comment.content).toBe(content)
+  })
+})
+
+test.group('removeComment', (group) => {
+  testThrowsIfNotAuthenticated({
+    query: RemoveCommentMutation,
+    variables: { id: 0 }
+  })
+
+  test('removes a comment from card', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const board = await boardFactory.create({ createdBy: user })
+    const column = await columnFactory.create({ board })
+    const card = await cardFactory.create({ column })
+    const { id } = await CommentFactory.create({ card, user })
+
+    const content = faker.lorem.sentence()
+
+    const queryData = {
+      query: RemoveCommentMutation,
+      variables: {
+        id,
+        content,
+      }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data, errors } = response.body()
+
+    expect(errors).toBeFalsy()
+    expect(data).toBeTruthy()
+
+    expect(data.id).toBe(id)
+
+    const comment = await commentRepository.findOneBy({ id })
+
+    expect(comment).toBeFalsy()
+  })
+
+
+  test('can only remove own comments', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+
+    const otherUser = await userFactory.create()
+    const board = await boardFactory.create({ createdBy: user })
+    const column = await columnFactory.create({ board })
+    const card = await cardFactory.create({ column })
+    const { id } = await CommentFactory.create({ card, user: otherUser })
+
+    const queryData = {
+      query: RemoveCommentMutation,
+      variables: {
+        id,
+      }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+
+    assertIsForbiddenExeption({ response, expect })
+
+    const comment = await commentRepository.findOneBy({ id })
+
+    expect(comment).toBeTruthy()
   })
 })

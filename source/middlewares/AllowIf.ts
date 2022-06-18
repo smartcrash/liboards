@@ -1,6 +1,6 @@
 
 import { MiddlewareFn, ResolverData } from "type-graphql";
-import { boardRepository, cardRepository, columnRepository, taskRepository } from "../repository";
+import { boardRepository, cardRepository, columnRepository, commentRepository, taskRepository } from "../repository";
 import { ContextType } from '../types';
 
 type GateFn = (action: ResolverData<ContextType>) => Promise<boolean>
@@ -172,6 +172,20 @@ const gates: Readonly<Record<string, GateFn>> = {
     })
 
     return column.board.createdById === user.id
+  },
+
+  async 'update-comment'({ context: { user }, args }) {
+    const { id } = args
+    const comment = await commentRepository.findOneByOrFail({ id })
+
+    return comment.userId === user.id
+  },
+
+  async 'delete-comment'({ context: { user }, args }) {
+    const { id } = args
+    const comment = await commentRepository.findOneByOrFail({ id })
+
+    return comment.userId === user.id
   },
 }
 
