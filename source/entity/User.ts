@@ -3,6 +3,7 @@ import { Field, ObjectType } from "type-graphql";
 import { TypeormLoader } from "type-graphql-dataloader";
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Board } from "./Board";
+import { Comment } from "./Comment";
 import { Favorite } from "./Favorite";
 
 @ObjectType()
@@ -38,6 +39,9 @@ export class User {
 
   @OneToMany(() => Favorite, favorite => favorite.user)
   favorites: Favorite[];
+
+  @OneToMany(() => Comment, comment => comment.user)
+  comments: Comment[]
 
   @Field(() => String)
   @CreateDateColumn()

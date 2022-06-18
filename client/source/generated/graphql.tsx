@@ -38,6 +38,7 @@ export type Board = {
 export type Card = {
   __typename?: 'Card';
   column: Column;
+  comments: Array<Comment>;
   description: Scalars['String'];
   id: Scalars['Float'];
   index: Scalars['Float'];
@@ -52,6 +53,16 @@ export type Column = {
   title: Scalars['String'];
 };
 
+export type Comment = {
+  __typename?: 'Comment';
+  card: Card;
+  content: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Float'];
+  updatedAt: Scalars['DateTime'];
+  user: User;
+};
+
 export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
@@ -62,6 +73,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addCard: Card;
   addColumn: Column;
+  addComment: Comment;
   addTask?: Maybe<Task>;
   addToFavorites: Scalars['Boolean'];
   createBoard: Board;
@@ -72,6 +84,7 @@ export type Mutation = {
   moveCard?: Maybe<Card>;
   removeCard?: Maybe<Scalars['Int']>;
   removeColumn?: Maybe<Scalars['Int']>;
+  removeComment: Scalars['Int'];
   removeFromFavorites: Scalars['Boolean'];
   removeTask: Scalars['Int'];
   resetPassword: AuthenticationResponse;
@@ -80,6 +93,7 @@ export type Mutation = {
   updateBoard?: Maybe<Board>;
   updateCard?: Maybe<Card>;
   updateColumn?: Maybe<Column>;
+  updateComment: Comment;
   updateTask: Task;
 };
 
@@ -94,6 +108,12 @@ export type MutationAddCardArgs = {
 export type MutationAddColumnArgs = {
   boardId: Scalars['Int'];
   title: Scalars['String'];
+};
+
+
+export type MutationAddCommentArgs = {
+  cardId: Scalars['Int'];
+  content: Scalars['String'];
 };
 
 
@@ -148,6 +168,11 @@ export type MutationRemoveColumnArgs = {
 };
 
 
+export type MutationRemoveCommentArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationRemoveFromFavoritesArgs = {
   id: Scalars['Int'];
 };
@@ -190,6 +215,12 @@ export type MutationUpdateCardArgs = {
 export type MutationUpdateColumnArgs = {
   id: Scalars['Int'];
   title?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateCommentArgs = {
+  content?: InputMaybe<Scalars['String']>;
+  id: Scalars['Int'];
 };
 
 
@@ -246,6 +277,8 @@ export type CardFragmentFragment = { __typename?: 'Card', id: number, title: str
 
 export type ColumnFragmentFragment = { __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> };
 
+export type CommentFragmentFragment = { __typename?: 'Comment', id: number, content: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } };
+
 export type TaskFragmentFragment = { __typename?: 'Task', id: number, content: string, completed: boolean };
 
 export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string };
@@ -266,6 +299,14 @@ export type AddColumnMutationVariables = Exact<{
 
 
 export type AddColumnMutation = { __typename?: 'Mutation', column: { __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } };
+
+export type AddCommentMutationVariables = Exact<{
+  cardId: Scalars['Int'];
+  content: Scalars['String'];
+}>;
+
+
+export type AddCommentMutation = { __typename?: 'Mutation', comment: { __typename?: 'Comment', id: number, content: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } } };
 
 export type AddTaskMutationVariables = Exact<{
   cardId: Scalars['Int'];
@@ -345,6 +386,13 @@ export type RemoveColumnMutationVariables = Exact<{
 
 
 export type RemoveColumnMutation = { __typename?: 'Mutation', id?: number | null };
+
+export type RemoveCommentMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type RemoveCommentMutation = { __typename?: 'Mutation', id: number };
 
 export type RemoveFromFavoritesMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -443,7 +491,7 @@ export type FindCardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string }, tasks: Array<{ __typename?: 'Task', id: number, content: string, completed: boolean }> } | null };
+export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string }, tasks: Array<{ __typename?: 'Task', id: number, content: string, completed: boolean }>, comments: Array<{ __typename?: 'Comment', id: number, content: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } }> } | null };
 
 export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
@@ -471,6 +519,18 @@ export const ColumnFragmentFragmentDoc = gql`
   }
 }
     ${CardFragmentFragmentDoc}`;
+export const CommentFragmentFragmentDoc = gql`
+    fragment CommentFragment on Comment {
+  id
+  content
+  user {
+    id
+    username
+  }
+  createdAt
+  updatedAt
+}
+    `;
 export const TaskFragmentFragmentDoc = gql`
     fragment TaskFragment on Task {
   id
@@ -508,6 +568,17 @@ export const AddColumnDocument = gql`
 
 export function useAddColumnMutation() {
   return Urql.useMutation<AddColumnMutation, AddColumnMutationVariables>(AddColumnDocument);
+};
+export const AddCommentDocument = gql`
+    mutation AddComment($cardId: Int!, $content: String!) {
+  comment: addComment(cardId: $cardId, content: $content) {
+    ...CommentFragment
+  }
+}
+    ${CommentFragmentFragmentDoc}`;
+
+export function useAddCommentMutation() {
+  return Urql.useMutation<AddCommentMutation, AddCommentMutationVariables>(AddCommentDocument);
 };
 export const AddTaskDocument = gql`
     mutation AddTask($cardId: Int!, $content: String!) {
@@ -631,6 +702,15 @@ export const RemoveColumnDocument = gql`
 
 export function useRemoveColumnMutation() {
   return Urql.useMutation<RemoveColumnMutation, RemoveColumnMutationVariables>(RemoveColumnDocument);
+};
+export const RemoveCommentDocument = gql`
+    mutation RemoveComment($id: Int!) {
+  id: removeComment(id: $id)
+}
+    `;
+
+export function useRemoveCommentMutation() {
+  return Urql.useMutation<RemoveCommentMutation, RemoveCommentMutationVariables>(RemoveCommentDocument);
 };
 export const RemoveFromFavoritesDocument = gql`
     mutation RemoveFromFavorites($id: Int!) {
@@ -797,9 +877,13 @@ export const FindCardByIdDocument = gql`
     tasks {
       ...TaskFragment
     }
+    comments {
+      ...CommentFragment
+    }
   }
 }
-    ${TaskFragmentFragmentDoc}`;
+    ${TaskFragmentFragmentDoc}
+${CommentFragmentFragmentDoc}`;
 
 export function useFindCardByIdQuery(options: Omit<Urql.UseQueryArgs<FindCardByIdQueryVariables>, 'query'>) {
   return Urql.useQuery<FindCardByIdQuery>({ query: FindCardByIdDocument, ...options });

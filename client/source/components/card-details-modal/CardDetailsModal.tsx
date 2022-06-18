@@ -17,14 +17,16 @@ import {
 } from "@chakra-ui/react";
 import { AutoResizeTextarea, NonEmptyEditable } from "../";
 import {
+  useAddCommentMutation,
   useAddTaskMutation,
   useFindCardByIdQuery,
+  useRemoveCommentMutation,
   useRemoveTaskMutation,
   useUpdateCardMutation,
   useUpdateTaskMutation,
 } from "../../generated/graphql";
 import { useToggle } from "../../hooks";
-import { EditableDesc, TaskAdder, TaskItem, TaskList } from "./components";
+import { CommentFrom, EditableDesc, TaskAdder, TaskItem, TaskList } from "./components";
 
 interface CardDetailsModalProps {
   id?: number;
@@ -38,9 +40,13 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
     pause: !id,
   });
   const [, updateCard] = useUpdateCardMutation();
+
   const [, addTask] = useAddTaskMutation();
   const [, updateTask] = useUpdateTaskMutation();
   const [, removeTask] = useRemoveTaskMutation();
+
+  const [, addComment] = useAddCommentMutation();
+  const [, removeComment] = useRemoveCommentMutation();
 
   const [showCompleted, toggleShowCompleted] = useToggle(true);
 
@@ -48,7 +54,7 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
   if (fetching) return null; // TODO: Show spinner
   if (!data || !data.card) return null; // TODO: not found error
 
-  const { title, description, column, tasks } = data.card;
+  const { title, description, column, tasks, comments } = data.card;
   const progress = (tasks.filter((task) => task.completed).length / tasks.length) * 100;
 
   return (
@@ -143,6 +149,16 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
           <Spacer h={5} />
 
           <TaskAdder onConfirm={(content) => addTask({ cardId: id, content })} />
+
+          <Spacer h={5} />
+
+          <Stack>
+            {comments.map((comment) => (
+              <Box key={comment.id}>{comment.content}</Box>
+            ))}
+          </Stack>
+
+          <CommentFrom onConfirm={(content) => addComment({ content, cardId: id })} />
         </ModalBody>
       </ModalContent>
     </Modal>

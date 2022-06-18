@@ -19,7 +19,7 @@ export class Comment {
   userId: number
 
   @Field(() => User)
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, user => user.comments, { onDelete: 'CASCADE' })
   @TypeormLoader()
   user: User
 
