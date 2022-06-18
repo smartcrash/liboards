@@ -49,7 +49,6 @@ export type Column = {
   __typename?: 'Column';
   cards: Array<Card>;
   id: Scalars['Float'];
-  index: Scalars['Float'];
   title: Scalars['String'];
 };
 
@@ -245,7 +244,7 @@ export type BoardFragmentFragment = { __typename?: 'Board', id: number, title: s
 
 export type CardFragmentFragment = { __typename?: 'Card', id: number, title: string, description: string, index: number };
 
-export type ColumnFragmentFragment = { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> };
+export type ColumnFragmentFragment = { __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> };
 
 export type TaskFragmentFragment = { __typename?: 'Task', id: number, content: string, completed: boolean };
 
@@ -266,7 +265,7 @@ export type AddColumnMutationVariables = Exact<{
 }>;
 
 
-export type AddColumnMutation = { __typename?: 'Mutation', column: { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } };
+export type AddColumnMutation = { __typename?: 'Mutation', column: { __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } };
 
 export type AddTaskMutationVariables = Exact<{
   cardId: Scalars['Int'];
@@ -406,7 +405,7 @@ export type UpdateColumnMutationVariables = Exact<{
 }>;
 
 
-export type UpdateColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } | null };
+export type UpdateColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } | null };
 
 export type UpdateTaskMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -437,7 +436,7 @@ export type FindBoardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, favorite: boolean, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, index: number, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> }> } | null };
+export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, favorite: boolean, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> }> } | null };
 
 export type FindCardByIdQueryVariables = Exact<{
   id: Scalars['Int'];
@@ -467,7 +466,6 @@ export const ColumnFragmentFragmentDoc = gql`
     fragment ColumnFragment on Column {
   id
   title
-  index
   cards {
     ...CardFragment
   }

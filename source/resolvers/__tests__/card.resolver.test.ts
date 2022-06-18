@@ -3,7 +3,7 @@ import { test } from "@japa/runner";
 import { In } from "typeorm";
 import { SESSION_COOKIE } from "../../constants";
 import { boardFactory, cardFactory, columnFactory, userFactory } from "../../factories";
-import { cardRepository } from "../../repository";
+import { cardRepository, columnRepository } from "../../repository";
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
 const FindCardByIdQuery = `
@@ -57,6 +57,9 @@ const MoveCardMutation = `
     card: moveCard(toIndex: $toIndex, toColumnId: $toColumnId, id: $id) {
       id
       index
+      column {
+        id
+      }
     }
   }
 `
@@ -273,7 +276,10 @@ test.group('updateCard', () => {
 })
 
 
-test.group('moveCard', () => {
+test.group('moveCard', (group) => {
+  // 👇 all this tests are pinned
+  group.tap((test) => test.pin())
+
   testThrowsIfNotAuthenticated({
     query: MoveCardMutation,
     variables: {
@@ -364,6 +370,64 @@ test.group('moveCard', () => {
     const toColumn = await columnFactory.create({ board })
 
     const card = await cardFactory.create({ column: fromColumn })
+
+    const queryData = {
+      query: MoveCardMutation,
+      variables: {
+        id: card.id,
+        toIndex: 0,
+        toColumnId: toColumn.id,
+      }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.card).toBeTruthy()
+    expect(data.card.id).toBe(card.id)
+    expect(data.card.index).toBe(0)
+    expect(data.card.column.id).toBe(toColumn.id)
+
+    expect(await cardRepository.countBy({ column: { id: fromColumn.id } })).toBe(0)
+    expect(await cardRepository.countBy({ column: { id: toColumn.id } })).toBe(1)
+  })
+
+  test('moves card to specific position to a another column (non-empty)', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const board = await boardFactory.create({ createdBy: user })
+    const fromColumn = await columnFactory.create({ board })
+    const toColumn = await columnFactory.create({ board })
+
+    await cardFactory.createMany(3, { column: toColumn })
+    const [, card,] = await cardFactory.createMany(3, { column: fromColumn })
+    const toIndex = 1
+
+    const queryData = {
+      query: MoveCardMutation,
+      variables: {
+        id: card.id,
+        toIndex,
+        toColumnId: toColumn.id,
+      }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.card).toBeTruthy()
+    expect(data.card.id).toBe(card.id)
+    expect(data.card.index).toBe(toIndex)
+    expect(data.card.column.id).toBe(toColumn.id)
+
+
+    const fromColumnCards = await cardRepository.find({ where: { column: { id: fromColumn.id } }, order: { index: 'ASC' } })
+    const toColumnCards = await cardRepository.find({ where: { column: { id: toColumn.id } }, order: { index: 'ASC' } })
+
+    expect(fromColumnCards).toHaveLength(2)
+    expect(toColumnCards).toHaveLength(4)
+
+    fromColumnCards.forEach((card, index) => expect(card.index).toBe(index))
+    toColumnCards.forEach((card, index) => expect(card.index).toBe(index))
   })
 })
 

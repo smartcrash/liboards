@@ -65,27 +65,38 @@ export class CardResolver {
     @Ctx() { }: ContextType): Promise<Card | null> {
     const card = await cardRepository.findOneBy({ id })
     const fromIndex = card.index
-    const isMovingUp = toIndex > fromIndex
+    const fromColumnId = card.columnId
 
     await dataSource.transaction(async (manager) => {
       const repository = manager.getRepository(Card)
 
-      let method: "increment" | 'decrement' = undefined
-      let operator: FindOperator<number> = undefined
+      // Is moving within the same column
+      if (fromColumnId === toColumnId) {
+        let method: "increment" | 'decrement' = undefined
+        let operator: FindOperator<number> = undefined
 
-      if (isMovingUp) {
-        method = 'decrement'
-        operator = Between(fromIndex + 1, toIndex)
+        const isMovingUp = toIndex > fromIndex
+        if (isMovingUp) {
+          method = 'decrement'
+          operator = Between(fromIndex + 1, toIndex)
+        } else {
+          method = 'increment'
+          operator = MoreThanOrEqual(toIndex)
+        }
+
+        await repository[method]({ index: operator, columnId: toColumnId }, 'index', 1)
       } else {
-        method = 'increment'
-        operator = MoreThanOrEqual(toIndex)
+        await repository.decrement({ index: MoreThan(fromIndex), columnId: fromColumnId }, 'index', 1)
+        await repository.increment({ index: MoreThanOrEqual(toIndex), columnId: toColumnId }, 'index', 1)
       }
 
-      await repository[method]({ index: operator, columnId: toColumnId }, 'index', 1)
-      await repository.update({ id }, { index: toIndex })
+      card.index = toIndex
+      card.columnId = toColumnId
+
+      await repository.save(card)
     })
 
-    return { ...card, index: toIndex }
+    return card
   }
 
   @UseMiddleware(Authenticate)
