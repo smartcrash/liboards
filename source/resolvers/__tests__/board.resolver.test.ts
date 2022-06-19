@@ -78,7 +78,10 @@ test.group('createBoard', () => {
     };
 
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
-    const { data } = response.body()
+    const { data, errors } = response.body()
+
+    expect(errors).toBeFalsy()
+    expect(data).toBeTruthy()
 
     expect(data.board).toBeDefined()
     expect(data.board.title).toBe(title)
@@ -324,7 +327,10 @@ test.group('restoreBoard', () => {
     };
 
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
-    const { data } = response.body()
+    const { data, errors } = response.body()
+
+    expect(errors).toBeFalsy()
+    expect(data).toBeTruthy()
 
     expect(data.id).toBeDefined()
     expect(data.id).toBe(id)

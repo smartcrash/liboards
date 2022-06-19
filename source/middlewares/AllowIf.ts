@@ -1,205 +1,52 @@
 
-import { MiddlewareFn, ResolverData } from "type-graphql";
-import { boardRepository, cardRepository, columnRepository, commentRepository, taskRepository } from "../repository";
+import { MiddlewareFn } from "type-graphql";
+import { dataSource } from "../dataSource";
+import { BoardPolicy, CardPolicy, ColumnPolicy, CommentPolicy, TaskPolicy } from "../policies";
 import { ContextType } from '../types';
 
-type GateFn = (action: ResolverData<ContextType>) => Promise<boolean>
+const policies = {
+  'board': BoardPolicy,
+  'column': ColumnPolicy,
+  'card': CardPolicy,
+  'task': TaskPolicy,
+  'comment': CommentPolicy,
+} as const
 
-const gates: Readonly<Record<string, GateFn>> = {
-  /* -------------------------------------------------------------------------- */
-  /*                                    Board                                   */
-  /* -------------------------------------------------------------------------- */
-
-  async 'view-board'({ context: { user }, args }) {
-    const { id } = args
-    const board = await boardRepository.findOneByOrFail({ id })
-
-    return user.id === board.createdById
-  },
-
-  async 'update-board'({ context: { user }, args }) {
-    const { id } = args
-    const board = await boardRepository.findOneByOrFail({ id })
-
-    return user.id === board.createdById
-  },
-
-  async 'delete-board'({ context: { user }, args }) {
-    const { id } = args
-    const board = await boardRepository.findOneByOrFail({ id })
-
-    return user.id === board.createdById
-  },
-
-  async 'restore-board'({ context: { user }, args }) {
-    const { id } = args
-    const board = await boardRepository.findOneOrFail({ where: { id }, withDeleted: true })
-
-    return user.id === board.createdById
-  },
-
-  /* -------------------------------------------------------------------------- */
-  /*                                   Column                                   */
-  /* -------------------------------------------------------------------------- */
-
-  async 'create-column'({ context: { user }, args }) {
-    const { boardId } = args
-    const board = await boardRepository.findOneByOrFail({ id: boardId, createdById: user.id })
-
-    return !!board
-  },
-
-  async 'update-column'({ context: { user }, args }) {
-    const { id } = args
-    const column = await columnRepository.findOneOrFail({ where: { id }, relations: ['board'] })
-
-    return column.board.createdById === user.id
-  },
-
-  async 'delete-column'({ context: { user }, args }) {
-    const { id } = args
-    const column = await columnRepository.findOneOrFail({ where: { id }, relations: ['board'] })
-
-    return column.board.createdById === user.id
-
-  },
-
-  /* -------------------------------------------------------------------------- */
-  /*                                    Card                                    */
-  /* -------------------------------------------------------------------------- */
-
-  async 'view-card'({ context: { user }, args }) {
-    const { id } = args
-
-    const card = await cardRepository.findOneByOrFail({ id })
-
-    const column = await columnRepository.findOneOrFail({
-      where: { id: card.columnId },
-      relations: { board: true }
-    })
-
-    return column.board.createdById === user.id
-  },
-
-  async 'create-card'({ context: { user }, args }) {
-    const { columnId } = args
-
-    const column = await columnRepository.findOneOrFail({
-      where: { id: columnId },
-      relations: { board: true }
-    })
-
-    return column.board.createdById === user.id
-  },
-
-  async 'update-card'({ context: { user }, args }) {
-    const { id } = args
-    const card = await cardRepository.findOneByOrFail({ id })
-
-    const column = await columnRepository.findOneOrFail({
-      where: { id: card.columnId },
-      relations: { board: true }
-    })
-
-    return column.board.createdById === user.id
-  },
-
-  async 'delete-card'({ context: { user }, args }) {
-    const { id } = args
-    const card = await cardRepository.findOneByOrFail({ id })
-
-    const column = await columnRepository.findOneOrFail({
-      where: { id: card.columnId },
-      relations: { board: true }
-    })
-
-    return column.board.createdById === user.id
-  },
-
-  /* -------------------------------------------------------------------------- */
-  /*                                    Task                                    */
-  /* -------------------------------------------------------------------------- */
-
-  async 'create-task'({ context: { user }, args }) {
-    const { cardId } = args
-    const card = await cardRepository.findOneByOrFail({ id: cardId })
-
-    const column = await columnRepository.findOneOrFail({
-      where: { id: card.columnId },
-      relations: { board: true }
-    })
-
-    return column.board.createdById === user.id
-  },
-
-  async 'update-task'({ context: { user }, args }) {
-    const { id } = args
-    const task = await taskRepository.findOneByOrFail({ id })
-    const card = await cardRepository.findOneByOrFail({ id: task.cardId })
-
-    const column = await columnRepository.findOneOrFail({
-      where: { id: card.columnId },
-      relations: { board: true }
-    })
-
-    return column.board.createdById === user.id
-  },
-
-  async 'delete-task'({ context: { user }, args }) {
-    const { id } = args
-    const task = await taskRepository.findOneByOrFail({ id })
-    const card = await cardRepository.findOneByOrFail({ id: task.cardId })
-
-    const column = await columnRepository.findOneOrFail({
-      where: { id: card.columnId },
-      relations: { board: true }
-    })
-
-    return column.board.createdById === user.id
-  },
-
-  /* -------------------------------------------------------------------------- */
-  /*                                  Comments                                  */
-  /* -------------------------------------------------------------------------- */
-
-  async 'create-comment'({ context: { user }, args }) {
-    const { cardId } = args
-    const card = await cardRepository.findOneByOrFail({ id: cardId })
-
-    const column = await columnRepository.findOneOrFail({
-      where: { id: card.columnId },
-      relations: { board: true }
-    })
-
-    return column.board.createdById === user.id
-  },
-
-  async 'update-comment'({ context: { user }, args }) {
-    const { id } = args
-    const comment = await commentRepository.findOneByOrFail({ id })
-
-    return comment.userId === user.id
-  },
-
-  async 'delete-comment'({ context: { user }, args }) {
-    const { id } = args
-    const comment = await commentRepository.findOneByOrFail({ id })
-
-    return comment.userId === user.id
-  },
-}
-
-export const AllowIf = (gateKey: keyof typeof gates): MiddlewareFn<ContextType> => {
+// TODO: Separate gateKey into to arguments for type safety
+export const AllowIf = (gateKey: string): MiddlewareFn<ContextType> => {
   return async (action, next) => {
-    const handler = gates[gateKey]
+    const [methodKey, entityName] = gateKey.split('-')
+    const policy = new policies[entityName]()
+    const repository = dataSource.getRepository(entityName)
+    let entity: unknown = null
+
+    if (methodKey === 'viewAny') {
+      // Do nothing, `entity` remains as `null`
+    }
+    // If is creating create a partial entity from the `args`
+    // We asume by convention that the `args` are the creation
+    // parameters.
+    else if (methodKey === 'create') {
+      entity = repository.create(action.args)
+    }
+    // If is not creating that means that the entity exists on database.
+    // Then we try to get it assuing that it's ID is on the `args`
+    else {
+      entity = await repository.findOne({
+        where: { id: action.args.id },
+        withDeleted: true, // Must add deleted ones for the `restore` method to works
+      })
+    }
+
+    const handler = policy[methodKey]
     let allowed = false
 
     try {
-      allowed = await handler(action)
+      allowed = await handler(action.context.user, entity)
     } catch (error) {
       // If the handler throws that means that one `findByOrFail` failed
       // because the entity was not faund. In that case we shouldn't allow
-      // the user to do anything eather.
+      // the user to do anything either.
     }
 
     if (!allowed) throw new Error("Forbidden");

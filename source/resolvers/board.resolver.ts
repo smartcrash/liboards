@@ -68,6 +68,7 @@ export class BoardResolver {
   }
 
   @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('create-board'))
   @Mutation(() => Board)
   async createBoard(
     @Arg('title') title: string,
