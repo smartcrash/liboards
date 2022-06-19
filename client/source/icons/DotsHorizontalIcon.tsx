@@ -1,7 +1,7 @@
 import { createIcon } from "@chakra-ui/react";
 
-export const DotsHorizontal = createIcon({
-  displayName: "DotsHorizontal",
+export const DotsHorizontalIcon = createIcon({
+  displayName: "DotsHorizontalIcon",
   viewBox: "0 0 24 24",
   path: (
     <svg

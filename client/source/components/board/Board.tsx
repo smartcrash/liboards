@@ -15,7 +15,7 @@ import { useEffect } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { NonEmptyEditable } from "../";
 import useRefState from "../../hooks/useRefState";
-import { DotsHorizontal } from "../../icons";
+import { DotsHorizontalIcon } from "../../icons";
 import { Card, Column } from "./components";
 import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
@@ -160,7 +160,7 @@ export const Board = ({
                   <Menu>
                     <MenuButton
                       as={IconButton}
-                      icon={<DotsHorizontal fontSize={"xl"} color={"gray.500"} />}
+                      icon={<DotsHorizontalIcon fontSize={"xl"} color={"gray.500"} />}
                       variant={"ghost"}
                       size={"sm"}
                       colorScheme={"gray"}

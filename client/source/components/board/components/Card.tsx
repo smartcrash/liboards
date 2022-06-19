@@ -14,7 +14,7 @@ import {
 import { useRef } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { useHover } from "../../../hooks";
-import { DotsHorizontal } from "../../../icons";
+import { DotsHorizontalIcon } from "../../../icons";
 
 interface CardProps extends BoxProps {
   title: string;
@@ -33,7 +33,7 @@ export const Card = ({ title, description, index, draggableId, onRemove, ...boxP
     <Draggable draggableId={draggableId} index={index}>
       {({ innerRef, draggableProps, dragHandleProps }) => (
         <Box ref={innerRef} {...boxProps} {...draggableProps} {...dragHandleProps}>
-          <Box py={3} px={3} borderWidth={1} borderRadius={"lg"} bg={"white"} position={"relative"} ref={hoverRef}>
+          <Box py={3} px={3} borderWidth={1} borderRadius={"sm"} bg={"white"} position={"relative"} ref={hoverRef}>
             <Box
               display={isHover || isOpen ? "block" : "none"}
               position={"absolute"}
@@ -45,7 +45,7 @@ export const Card = ({ title, description, index, draggableId, onRemove, ...boxP
               <Menu isOpen={isOpen} onOpen={onOpen} onClose={onClose}>
                 <MenuButton
                   as={IconButton}
-                  icon={<DotsHorizontal fontSize={"lg"} color={"gray.500"} />}
+                  icon={<DotsHorizontalIcon fontSize={"lg"} color={"gray.500"} />}
                   variant={"ghost"}
                   size={"sm"}
                   colorScheme={"gray"}

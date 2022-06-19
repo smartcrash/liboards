@@ -121,7 +121,7 @@ export const ShowProject = () => {
 
       <Stack spacing={6}>
         <HStack justifyContent={"space-between"}>
-          <HStack alignItems={"center"} spacing={3}>
+          <HStack alignItems={"flex-start"} spacing={3}>
             <NonEmptyEditable
               defaultValue={title}
               onSubmit={(title) => updateBoard({ id, title })}
