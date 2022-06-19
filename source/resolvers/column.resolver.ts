@@ -3,7 +3,7 @@ import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import { Column } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
-import { columnRepository } from "../repository";
+import { ColumnRepository } from "../repository";
 import { ContextType } from "../types";
 
 @Resolver(Column)
@@ -21,7 +21,7 @@ export class ColumnResolver {
     // column.index = await columnRepository.countBy({ boardId })
     column.boardId = boardId
 
-    await columnRepository.save(column)
+    await ColumnRepository.save(column)
 
     return column
   }
@@ -33,11 +33,11 @@ export class ColumnResolver {
     @Arg('id', () => Int) id: number,
     @Arg('title', { nullable: true }) title: string | null,
     @Ctx() { }: ContextType): Promise<Column | null> {
-    const column = await columnRepository.findOneBy({ id })
+    const column = await ColumnRepository.findOneBy({ id })
 
     column.title = title ?? column.title
 
-    await columnRepository.save(column)
+    await ColumnRepository.save(column)
 
     return column
   }
@@ -57,7 +57,7 @@ export class ColumnResolver {
     //   await repository.delete({ id })
     // })
 
-    await columnRepository.delete({ id })
+    await ColumnRepository.delete({ id })
 
     return id
   }

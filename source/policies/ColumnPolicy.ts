@@ -1,5 +1,5 @@
 import { Column, User } from "../entity";
-import { boardRepository } from "../repository";
+import { BoardRepository } from "../repository";
 import { Policy } from "../types";
 
 export class ColumnPolicy implements Policy {
@@ -8,7 +8,7 @@ export class ColumnPolicy implements Policy {
   }
 
   async view(user: User, column: Column) {
-    const board = await boardRepository.findOneByOrFail({
+    const board = await BoardRepository.findOneByOrFail({
       id: column.boardId,
       createdById: user.id
     })
@@ -17,7 +17,7 @@ export class ColumnPolicy implements Policy {
   }
 
   async create(user: User, column: Column) {
-    const board = await boardRepository.findOneByOrFail({
+    const board = await BoardRepository.findOneByOrFail({
       id: column.boardId,
       createdById: user.id
     })
@@ -26,7 +26,7 @@ export class ColumnPolicy implements Policy {
   }
 
   async update(user: User, column: Column) {
-    const board = await boardRepository.findOneByOrFail({
+    const board = await BoardRepository.findOneByOrFail({
       id: column.boardId,
       createdById: user.id
     })
@@ -35,7 +35,7 @@ export class ColumnPolicy implements Policy {
   }
 
   async delete(user: User, column: Column) {
-    const board = await boardRepository.findOneByOrFail({
+    const board = await BoardRepository.findOneByOrFail({
       id: column.boardId,
       createdById: user.id
     })
@@ -44,7 +44,7 @@ export class ColumnPolicy implements Policy {
   }
 
   async restore(user: User, column: Column) {
-    const board = await boardRepository.findOneByOrFail({
+    const board = await BoardRepository.findOneByOrFail({
       id: column.boardId,
       createdById: user.id
     })
@@ -53,7 +53,7 @@ export class ColumnPolicy implements Policy {
   }
 
   async forceDelete(user: User, column: Column) {
-    const board = await boardRepository.findOneByOrFail({
+    const board = await BoardRepository.findOneByOrFail({
       id: column.boardId,
       createdById: user.id
     })

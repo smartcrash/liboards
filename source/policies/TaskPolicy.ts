@@ -1,5 +1,5 @@
 import { Task, User } from "../entity";
-import { cardRepository, columnRepository } from "../repository";
+import { CardRepository, ColumnRepository } from "../repository";
 import { Policy } from "../types";
 
 export class TaskPolicy implements Policy {
@@ -8,9 +8,9 @@ export class TaskPolicy implements Policy {
   }
 
   async view(user: User, task: Task) {
-    const card = await cardRepository.findOneByOrFail({ id: task.cardId })
+    const card = await CardRepository.findOneByOrFail({ id: task.cardId })
 
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })
@@ -19,9 +19,9 @@ export class TaskPolicy implements Policy {
   }
 
   async create(user: User, task: Task) {
-    const card = await cardRepository.findOneByOrFail({ id: task.cardId })
+    const card = await CardRepository.findOneByOrFail({ id: task.cardId })
 
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })
@@ -30,9 +30,9 @@ export class TaskPolicy implements Policy {
   }
 
   async update(user: User, task: Task) {
-    const card = await cardRepository.findOneByOrFail({ id: task.cardId })
+    const card = await CardRepository.findOneByOrFail({ id: task.cardId })
 
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })
@@ -41,9 +41,9 @@ export class TaskPolicy implements Policy {
   }
 
   async delete(user: User, task: Task) {
-    const card = await cardRepository.findOneByOrFail({ id: task.cardId })
+    const card = await CardRepository.findOneByOrFail({ id: task.cardId })
 
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })
@@ -52,9 +52,9 @@ export class TaskPolicy implements Policy {
   }
 
   async restore(user: User, task: Task) {
-    const card = await cardRepository.findOneByOrFail({ id: task.cardId })
+    const card = await CardRepository.findOneByOrFail({ id: task.cardId })
 
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })
@@ -63,9 +63,9 @@ export class TaskPolicy implements Policy {
   }
 
   async forceDelete(user: User, task: Task) {
-    const card = await cardRepository.findOneByOrFail({ id: task.cardId })
+    const card = await CardRepository.findOneByOrFail({ id: task.cardId })
 
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })

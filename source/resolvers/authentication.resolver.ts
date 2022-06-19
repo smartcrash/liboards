@@ -5,7 +5,7 @@ import { z, ZodError } from 'zod';
 import { SESSION_COOKIE } from '../constants';
 import { User } from "../entity";
 import { redisClient } from '../redisClient';
-import { userRepository } from '../repository';
+import { UserRepository } from '../repository';
 import { sendMail } from '../sendMail';
 import { ContextType } from '../types';
 
@@ -32,7 +32,7 @@ export class AuthenticationResolver {
     const { userId } = req.session
 
     return userId ?
-      userRepository.findOneBy({ id: userId })
+      UserRepository.findOneBy({ id: userId })
       : null
   }
 
@@ -62,11 +62,11 @@ export class AuthenticationResolver {
       }
     }
 
-    if (await userRepository.findOneBy({ username })) {
+    if (await UserRepository.findOneBy({ username })) {
       errors.push({ field: 'username', message: 'This username already exists.' })
     }
 
-    if (await userRepository.findOneBy({ email })) {
+    if (await UserRepository.findOneBy({ email })) {
       errors.push({ field: 'email', message: 'This email is already in use.' })
     }
 
@@ -78,7 +78,7 @@ export class AuthenticationResolver {
     user.email = email
     user.password = password
 
-    await userRepository.save(user)
+    await UserRepository.save(user)
 
     req.session.userId = user.id
 
@@ -91,7 +91,7 @@ export class AuthenticationResolver {
     @Arg('password') password: string,
     @Ctx() { req }: ContextType
   ): Promise<AuthenticationResponse> {
-    const user = await userRepository.findOne({ where: [{ email }, { username: email }] })
+    const user = await UserRepository.findOne({ where: [{ email }, { username: email }] })
 
     if (!user) {
       return { errors: [{ field: 'email', message: "This user does\'nt exists." }] }
@@ -110,7 +110,7 @@ export class AuthenticationResolver {
   async sendResetPasswordEmail(
     @Arg('email') email: string,
   ): Promise<Boolean> {
-    const user = await userRepository.findOneBy({ email })
+    const user = await UserRepository.findOneBy({ email })
 
     if (!user) return false
 
@@ -145,7 +145,7 @@ export class AuthenticationResolver {
       }]
     }
 
-    const user = await userRepository.findOneBy({ id: +userId })
+    const user = await UserRepository.findOneBy({ id: +userId })
 
     if (!user) return {
       errors: [{
@@ -156,7 +156,7 @@ export class AuthenticationResolver {
 
     user.password = newPassword
 
-    await userRepository.save(user)
+    await UserRepository.save(user)
     await redisClient.del(`password_resets:${token}`)
 
     return { user }

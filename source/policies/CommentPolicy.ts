@@ -1,6 +1,6 @@
 
 import { Comment, User } from "../entity";
-import { cardRepository, columnRepository } from "../repository";
+import { CardRepository, ColumnRepository } from "../repository";
 import { Policy } from "../types";
 
 export class CommentPolicy implements Policy {
@@ -9,9 +9,9 @@ export class CommentPolicy implements Policy {
   }
 
   async view(user: User, comment: Comment) {
-    const card = await cardRepository.findOneByOrFail({ id: comment.cardId })
+    const card = await CardRepository.findOneByOrFail({ id: comment.cardId })
 
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })
@@ -20,9 +20,9 @@ export class CommentPolicy implements Policy {
   }
 
   async create(user: User, comment: Comment) {
-    const card = await cardRepository.findOneByOrFail({ id: comment.cardId })
+    const card = await CardRepository.findOneByOrFail({ id: comment.cardId })
 
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })

@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { test } from "@japa/runner";
 import { SESSION_COOKIE } from "../../constants";
 import { BoardFactory, ColumnFactory, CardFactory, CommentFactory, UserFactory } from "../../factories";
-import { commentRepository } from "../../repository";
+import { CommentRepository } from "../../repository";
 import { assertIsForbiddenExeption, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
 const AddCommentMutation = `
@@ -63,7 +63,7 @@ test.group('addComment', (group) => {
     expect(typeof data.comment.id).toBe('number')
     expect(data.comment.content).toBe(content)
 
-    const comments = await commentRepository.findBy({ cardId: card.id })
+    const comments = await CommentRepository.findBy({ cardId: card.id })
 
     expect(comments).toHaveLength(1)
     expect(comments[0].id).toBe(data.comment.id)
@@ -91,7 +91,7 @@ test.group('addComment', (group) => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const comments = await commentRepository.findBy({ cardId: card.id })
+    const comments = await CommentRepository.findBy({ cardId: card.id })
 
     expect(comments).toHaveLength(0)
   })
@@ -129,7 +129,7 @@ test.group('updateComment', (group) => {
     expect(data.comment.id).toBe(id)
     expect(data.comment.content).toBe(content)
 
-    const comment = await commentRepository.findOneBy({ id })
+    const comment = await CommentRepository.findOneBy({ id })
 
     expect(comment.content).toBe(content)
   })
@@ -156,7 +156,7 @@ test.group('updateComment', (group) => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const comment = await commentRepository.findOneBy({ id })
+    const comment = await CommentRepository.findOneBy({ id })
 
     expect(comment.content).toBe(content)
   })
@@ -193,7 +193,7 @@ test.group('removeComment', (group) => {
 
     expect(data.id).toBe(id)
 
-    const comment = await commentRepository.findOneBy({ id })
+    const comment = await CommentRepository.findOneBy({ id })
 
     expect(comment).toBeFalsy()
   })
@@ -219,7 +219,7 @@ test.group('removeComment', (group) => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const comment = await commentRepository.findOneBy({ id })
+    const comment = await CommentRepository.findOneBy({ id })
 
     expect(comment).toBeTruthy()
   })

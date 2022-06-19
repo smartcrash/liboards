@@ -1,4 +1,4 @@
 import { dataSource } from "../dataSource";
 import { Favorite } from "../entity";
 
-export const favoritesRepository = dataSource.getRepository(Favorite)
+export const FavoritesRepository = dataSource.getRepository(Favorite)

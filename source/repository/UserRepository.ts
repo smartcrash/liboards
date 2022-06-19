@@ -1,4 +1,4 @@
 import { dataSource } from "../dataSource";
 import { User } from "../entity";
 
-export const userRepository = dataSource.getRepository(User)
+export const UserRepository = dataSource.getRepository(User)

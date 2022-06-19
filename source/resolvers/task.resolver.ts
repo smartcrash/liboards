@@ -2,7 +2,7 @@ import { Arg, Ctx, FieldResolver, Int, Mutation, Resolver, Root, UseMiddleware }
 import { Task } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
-import { taskRepository } from "../repository";
+import { TaskRepository } from "../repository";
 import { ContextType } from "../types";
 
 @Resolver(Task)
@@ -26,7 +26,7 @@ export class TaskResolver {
     task.content = content
     task.cardId = cardId
     task.createdById = user.id
-    await taskRepository.save(task)
+    await TaskRepository.save(task)
 
     return task
   }
@@ -39,13 +39,13 @@ export class TaskResolver {
     @Arg('content', () => String, { nullable: true }) content: string | null,
     @Arg('completed', () => Boolean, { nullable: true }) completed: boolean | null,
   ): Promise<Task> {
-    const task = await taskRepository.findOneBy({ id })
+    const task = await TaskRepository.findOneBy({ id })
 
     task.content = content && content.length ? content : task.content
     if (completed) task.completedAt = task.completedAt ?? new Date()
     if (!completed) task.completedAt = null
 
-    await taskRepository.save(task)
+    await TaskRepository.save(task)
 
     return task
   }
@@ -54,7 +54,7 @@ export class TaskResolver {
   @UseMiddleware(AllowIf('delete-task'))
   @Mutation(() => Int)
   async removeTask(@Arg('id', () => Int) id: number): Promise<number> {
-    await taskRepository.delete({ id })
+    await TaskRepository.delete({ id })
 
     return id
   }

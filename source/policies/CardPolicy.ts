@@ -1,5 +1,5 @@
 import { Card, User } from "../entity";
-import { columnRepository } from "../repository";
+import { ColumnRepository } from "../repository";
 import { Policy } from "../types";
 
 export class CardPolicy implements Policy {
@@ -8,7 +8,7 @@ export class CardPolicy implements Policy {
   }
 
   async view(user: User, card: Card) {
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })
@@ -17,7 +17,7 @@ export class CardPolicy implements Policy {
   }
 
   async create(user: User, card: Card) {
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })
@@ -26,7 +26,7 @@ export class CardPolicy implements Policy {
   }
 
   async update(user: User, card: Card) {
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })
@@ -35,7 +35,7 @@ export class CardPolicy implements Policy {
   }
 
   async delete(user: User, card: Card) {
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })
@@ -44,7 +44,7 @@ export class CardPolicy implements Policy {
   }
 
   async restore(user: User, card: Card) {
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })
@@ -53,7 +53,7 @@ export class CardPolicy implements Policy {
   }
 
   async forceDelete(user: User, card: Card) {
-    const column = await columnRepository.findOneOrFail({
+    const column = await ColumnRepository.findOneOrFail({
       where: { id: card.columnId },
       relations: { board: true }
     })

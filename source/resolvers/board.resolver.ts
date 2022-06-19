@@ -6,7 +6,7 @@ import { In, IsNull, Not } from "typeorm";
 import { Board } from "../entity";
 import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
-import { boardRepository, favoritesRepository } from "../repository";
+import { BoardRepository, FavoritesRepository } from "../repository";
 import { ContextType } from '../types';
 
 @Resolver(Board)
@@ -15,7 +15,7 @@ export class BoardResolver {
   @Loader<number, boolean>(async (ids, { context }) => {
     const { id: userId } = (context as ContextType).user
 
-    const favorites = await favoritesRepository.find({
+    const favorites = await FavoritesRepository.find({
       where: {
         userId,
         boardId: In([...ids])
@@ -34,7 +34,7 @@ export class BoardResolver {
   async allBoards(
     @Ctx() { user }: ContextType
   ): Promise<Board[]> {
-    const boards = await boardRepository.findBy({ createdById: user.id })
+    const boards = await BoardRepository.findBy({ createdById: user.id })
 
     return boards
   }
@@ -44,7 +44,7 @@ export class BoardResolver {
   async allDeletedBoards(
     @Ctx() { user }: ContextType
   ): Promise<Board[]> {
-    return boardRepository
+    return BoardRepository
       .find({
         where: {
           createdById: user.id,
@@ -60,7 +60,7 @@ export class BoardResolver {
     @Arg('id', () => Int) id: number,
     @Ctx() { user }: ContextType
   ): Promise<Board> {
-    return boardRepository
+    return BoardRepository
       .findOne({
         relations: { createdBy: true },
         where: { id, createdById: user.id }
@@ -79,7 +79,7 @@ export class BoardResolver {
     board.title = title
     board.createdById = user.id
 
-    await boardRepository.save(board)
+    await BoardRepository.save(board)
 
     return board
   }
@@ -92,13 +92,13 @@ export class BoardResolver {
     @Arg('title', () => String, { nullable: true }) title: string | null,
     @Ctx() { user }: ContextType
   ): Promise<Board | null> {
-    const board = await boardRepository.findOneBy({ id, createdById: user.id })
+    const board = await BoardRepository.findOneBy({ id, createdById: user.id })
 
     if (!board) return null
 
     board.title = title ?? board.title
 
-    await boardRepository.save(board)
+    await BoardRepository.save(board)
 
     return board
   }
@@ -110,7 +110,7 @@ export class BoardResolver {
     @Arg('id', () => Int) id: number,
     @Ctx() { user }: ContextType
   ): Promise<number | null> {
-    await boardRepository.softDelete({ id, createdById: user.id })
+    await BoardRepository.softDelete({ id, createdById: user.id })
 
     return id
   }
@@ -122,7 +122,7 @@ export class BoardResolver {
     @Arg('id', () => Int) id: number,
     @Ctx() { user }: ContextType
   ): Promise<number | null> {
-    await boardRepository.restore({ id, createdById: user.id })
+    await BoardRepository.restore({ id, createdById: user.id })
 
     return id
   }

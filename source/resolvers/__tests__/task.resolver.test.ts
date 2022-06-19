@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker"
 import { test } from "@japa/runner"
 import { SESSION_COOKIE } from "../../constants"
 import { BoardFactory, CardFactory, ColumnFactory, TaskFactory, UserFactory } from "../../factories"
-import { cardRepository, taskRepository } from "../../repository"
+import { CardRepository, TaskRepository } from "../../repository"
 import { assertIsForbiddenExeption, testThrowsIfNotAuthenticated } from "../../utils/testUtils"
 
 const AddTaskMutation = `
@@ -64,7 +64,7 @@ test.group('addCard', () => {
     expect(data.task.completed).toBe(false)
     expect(data.task.card.id).toBe(card.id)
 
-    const { createdById, cardId } = await taskRepository.findOneBy({ id: data.task.id })
+    const { createdById, cardId } = await TaskRepository.findOneBy({ id: data.task.id })
 
     expect(createdById).toBe(user.id)
     expect(cardId).toBe(card.id)
@@ -89,7 +89,7 @@ test.group('addCard', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const { tasks } = await cardRepository.findOne({
+    const { tasks } = await CardRepository.findOne({
       where: { id: card.id },
       relations: { tasks: true }
     })
@@ -128,7 +128,7 @@ test.group('updateCard', () => {
     expect(data.task.content).toBe(content)
     expect(data.task.completed).toBe(false)
 
-    const task = await taskRepository.findOneBy({ id })
+    const task = await TaskRepository.findOneBy({ id })
 
     expect(task.content).toBe(content)
   })
@@ -153,7 +153,7 @@ test.group('updateCard', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const task = await taskRepository.findOneBy({ id })
+    const task = await TaskRepository.findOneBy({ id })
 
     expect(task.content).toBe(content)
   })
@@ -181,7 +181,7 @@ test.group('updateCard', () => {
     expect(data.task.id).toBe(id)
     expect(data.task.completed).toBe(true)
 
-    const task = await taskRepository.findOneBy({ id })
+    const task = await TaskRepository.findOneBy({ id })
 
     expect(task.completedAt.toDateString()).toBe(new Date().toDateString())
   })
@@ -209,7 +209,7 @@ test.group('updateCard', () => {
     expect(data.task.id).toBe(id)
     expect(data.task.completed).toBe(false)
 
-    const task = await taskRepository.findOneBy({ id })
+    const task = await TaskRepository.findOneBy({ id })
 
     expect(task.completedAt).toBeNull()
   })
@@ -241,7 +241,7 @@ test.group('removeTask', () => {
 
     expect(data.id).toBe(id)
 
-    const task = await taskRepository.findOneBy({ id })
+    const task = await TaskRepository.findOneBy({ id })
 
     expect(task).toBeFalsy()
   })
@@ -263,7 +263,7 @@ test.group('removeTask', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const task = await taskRepository.findOneBy({ id })
+    const task = await TaskRepository.findOneBy({ id })
 
     expect(task).toBeTruthy()
   })

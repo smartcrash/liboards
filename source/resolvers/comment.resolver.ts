@@ -2,7 +2,7 @@ import { Arg, Ctx, FieldResolver, Int, Mutation, Resolver, Root, UseMiddleware }
 import { Comment } from "../entity";
 import { AllowIf, Authenticate } from "../middlewares";
 import { CommentPolicy } from "../policies";
-import { commentRepository } from "../repository";
+import { CommentRepository } from "../repository";
 import { ContextType } from "../types";
 
 @Resolver(Comment)
@@ -37,7 +37,7 @@ export class CommentResolver {
     comment.content = content
     comment.userId = user.id
     comment.cardId = cardId
-    await commentRepository.save(comment)
+    await CommentRepository.save(comment)
 
     return comment
   }
@@ -49,9 +49,9 @@ export class CommentResolver {
     @Arg('id', () => Int) id: number,
     @Arg('content', { nullable: true }) content: string | null,
   ): Promise<Comment> {
-    const comment = await commentRepository.findOneBy({ id })
+    const comment = await CommentRepository.findOneBy({ id })
     comment.content = content ?? comment.content
-    await commentRepository.save(comment)
+    await CommentRepository.save(comment)
 
     return comment
   }
@@ -60,7 +60,7 @@ export class CommentResolver {
   @UseMiddleware(AllowIf('delete-comment'))
   @Mutation(() => Int)
   async removeComment(@Arg('id', () => Int) id: number): Promise<number> {
-    await commentRepository.delete({ id })
+    await CommentRepository.delete({ id })
 
     return id
   }

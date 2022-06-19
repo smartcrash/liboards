@@ -3,7 +3,7 @@ import { test } from "@japa/runner";
 import { In } from "typeorm";
 import { SESSION_COOKIE } from "../../constants";
 import { BoardFactory, CardFactory, ColumnFactory } from "../../factories";
-import { cardRepository } from "../../repository";
+import { CardRepository } from "../../repository";
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
 
 const FindCardByIdQuery = `
@@ -161,7 +161,7 @@ test.group('addCard', () => {
     expect(data.card.description).toBe(description)
 
     const { id } = data.card
-    const card = await cardRepository.findOneBy({ id })
+    const card = await CardRepository.findOneBy({ id })
 
     expect(card).toBeTruthy()
     expect(card.columnId).toBe(columnId)
@@ -245,7 +245,7 @@ test.group('updateCard', () => {
     expect(data.card.title).toBe(title)
     expect(data.card.description).toBe(description)
 
-    const card = await cardRepository.findOneBy({ id })
+    const card = await CardRepository.findOneBy({ id })
 
     expect(card).toMatchObject({ title, description })
   })
@@ -269,7 +269,7 @@ test.group('updateCard', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const card = await cardRepository.findOneBy({ id })
+    const card = await CardRepository.findOneBy({ id })
 
     expect(card.title).toBe(title)
   })
@@ -314,7 +314,7 @@ test.group('moveCard', () => {
     expect(data.card.id).toBe(card1.id)
     expect(data.card.index).toBe(toIndex)
 
-    const cards = await cardRepository.find({
+    const cards = await CardRepository.find({
       select: { id: true, index: true, title: true },
       where: { id: In([card1.id, card2.id, card3.id]) },
       order: { index: 'ASC' },
@@ -351,7 +351,7 @@ test.group('moveCard', () => {
     expect(data.card.id).toBe(card3.id)
     expect(data.card.index).toBe(toIndex)
 
-    const cards = await cardRepository.find({
+    const cards = await CardRepository.find({
       select: { id: true, index: true, title: true },
       where: { id: In([card1.id, card2.id, card3.id]) },
       order: { index: 'ASC' },
@@ -385,8 +385,8 @@ test.group('moveCard', () => {
     expect(data.card.index).toBe(0)
     expect(data.card.column.id).toBe(toColumn.id)
 
-    expect(await cardRepository.countBy({ column: { id: fromColumn.id } })).toBe(0)
-    expect(await cardRepository.countBy({ column: { id: toColumn.id } })).toBe(1)
+    expect(await CardRepository.countBy({ column: { id: fromColumn.id } })).toBe(0)
+    expect(await CardRepository.countBy({ column: { id: toColumn.id } })).toBe(1)
   })
 
   test('moves card to specific position to a another column (non-empty)', async ({ expect, client, createUser }) => {
@@ -417,8 +417,8 @@ test.group('moveCard', () => {
     expect(data.card.column.id).toBe(toColumn.id)
 
 
-    const fromColumnCards = await cardRepository.find({ where: { column: { id: fromColumn.id } }, order: { index: 'ASC' } })
-    const toColumnCards = await cardRepository.find({ where: { column: { id: toColumn.id } }, order: { index: 'ASC' } })
+    const fromColumnCards = await CardRepository.find({ where: { column: { id: fromColumn.id } }, order: { index: 'ASC' } })
+    const toColumnCards = await CardRepository.find({ where: { column: { id: toColumn.id } }, order: { index: 'ASC' } })
 
     expect(fromColumnCards).toHaveLength(2)
     expect(toColumnCards).toHaveLength(4)
@@ -451,7 +451,7 @@ test.group('removeCard', () => {
     expect(errors).toBeFalsy()
     expect(data.id).toBe(id)
 
-    const card = await cardRepository.findOneBy({ id })
+    const card = await CardRepository.findOneBy({ id })
 
     expect(card).toBeFalsy()
   })
@@ -472,7 +472,7 @@ test.group('removeCard', () => {
 
     await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
 
-    const cards = await cardRepository.find({
+    const cards = await CardRepository.find({
       select: { id: true, index: true },
       where: { columnId },
       order: { index: "ASC" }
@@ -498,7 +498,7 @@ test.group('removeCard', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const card = await cardRepository.findOneBy({ id })
+    const card = await CardRepository.findOneBy({ id })
 
     expect(card).toBeTruthy()
   })

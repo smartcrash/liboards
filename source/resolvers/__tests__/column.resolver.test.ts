@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import { In } from 'typeorm';
 import { SESSION_COOKIE } from '../../constants';
-import { cardRepository, columnRepository } from '../../repository';
+import { CardRepository, ColumnRepository } from '../../repository';
 import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
 
 const AddColumnMutation = `
@@ -62,7 +62,7 @@ test.group('addColumn', () => {
     expect(data.column.title).toBe(title)
 
     const { id } = data.column
-    const column = await columnRepository.findOneBy({ id })
+    const column = await ColumnRepository.findOneBy({ id })
 
     expect(column).toBeTruthy()
     expect(column.boardId).toBe(boardId)
@@ -142,7 +142,7 @@ test.group('updateColumn', () => {
     expect(data.column.id).toBe(id)
     expect(data.column.title).toBe(title)
 
-    const column = await columnRepository.findOneBy({ id })
+    const column = await ColumnRepository.findOneBy({ id })
 
     expect(column.title).toBe(title)
   })
@@ -166,7 +166,7 @@ test.group('updateColumn', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const column = await columnRepository.findOneBy({ id })
+    const column = await ColumnRepository.findOneBy({ id })
 
     expect(column.title).toBe(title)
   })
@@ -194,7 +194,7 @@ test.group('removeColumn', () => {
     expect(errors).toBeFalsy()
     expect(data.id).toBe(id)
 
-    const column = await columnRepository.findOneBy({ id })
+    const column = await ColumnRepository.findOneBy({ id })
 
     expect(column).toBeFalsy()
   })
@@ -239,7 +239,7 @@ test.group('removeColumn', () => {
 
     assertIsForbiddenExeption({ response, expect })
 
-    const column = await columnRepository.findOneBy({ id })
+    const column = await ColumnRepository.findOneBy({ id })
 
     expect(column).toBeTruthy()
   })
@@ -261,7 +261,7 @@ test.group('removeColumn', () => {
 
     await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
 
-    const cards = await cardRepository.findBy({ id: In(cardIds) })
+    const cards = await CardRepository.findBy({ id: In(cardIds) })
 
     expect(cards).toHaveLength(0)
   })
