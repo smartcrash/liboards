@@ -10,18 +10,17 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  useUpdateEffect,
 } from "@chakra-ui/react";
 import { cloneDeep } from "lodash-es";
+import { useEffect } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import useRefState from "../../hooks/useRefState";
 import { NonEmptyEditable } from "../";
+import useRefState from "../../hooks/useRefState";
 import { Card, Column } from "./components";
 import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
 import { addCard, addColumn, changeColumn, moveCard, removeCard, removeColumn } from "./helpers";
 import { BoardType, CardType, ColumnType } from "./types";
-import { useEffect } from "react";
 
 export type ColumnNewHandler = (newColumn: { title: string }) => Promise<ColumnType>;
 

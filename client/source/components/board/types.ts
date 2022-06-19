@@ -10,6 +10,6 @@ export type CardType = {
 export type ColumnType = {
   id: number;
   title: string;
-  index: number,
+  // index: number,
   cards: CardType[]
 }
