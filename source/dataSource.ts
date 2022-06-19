@@ -10,7 +10,7 @@ export const config = {
   username: DB_USERNAME,
   password: DB_PASSWORD,
   logging: false,
-  synchronize: true,
+  synchronize: false,
   dropSchema: false,
   migrationsRun: true,
   entities: ["source/entity/*.ts"],
