@@ -2,13 +2,15 @@ import { Avatar, Heading, HStack, Text, VStack } from "@chakra-ui/react";
 import { useState } from "react";
 import { CommentFragmentFragment } from "../../../generated/graphql";
 import { CommentControls } from "./CommentControls";
+import { CommentEditForm } from "./CommentEditForm";
 
 interface CommentItemProps {
   comment: CommentFragmentFragment;
+  onEdit: (content: string) => void;
   onRemove: () => void;
 }
 
-export const CommentItem = ({ comment, onRemove }: CommentItemProps) => {
+export const CommentItem = ({ comment, onEdit, onRemove }: CommentItemProps) => {
   const { content, user, createdAt } = comment;
   const [isEditing, setEditing] = useState(false);
 
@@ -17,6 +19,7 @@ export const CommentItem = ({ comment, onRemove }: CommentItemProps) => {
   const canDelete = true;
 
   const confirmEdit = (content: string) => {
+    onEdit(content);
     setEditing(false);
   };
 
@@ -48,9 +51,22 @@ export const CommentItem = ({ comment, onRemove }: CommentItemProps) => {
             />
           </>
         ) : (
-          <></>
-          // <CommentFrom onConfirm={confirmEdit} />
-          // <AdderForm w={"full"} onConfirm={confirmEdit} onCancel={() => setEditing(false)} confirmText={"Save"} />
+          <>
+            {/*
+              NOTE: Here we may reuse the <CommentForm/> to edit the comment due
+                    is very similar to <CommentEditForm/>, but we might add
+                    more functionality to <CommentForm/> like attachments and
+                    grow in complexity, while <CommentEditForm/> will always
+                    be this simple.
+                    That's why I didn't reuse the <CommentForm/> component for
+                    editing.
+           */}
+            <CommentEditForm
+              defaultValue={comment.content}
+              onConfirm={confirmEdit}
+              onCancel={() => setEditing(false)}
+            />
+          </>
         )}
       </VStack>
     </HStack>

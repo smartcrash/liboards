@@ -24,6 +24,8 @@ import {
   useRemoveCommentMutation,
   useRemoveTaskMutation,
   useUpdateCardMutation,
+  useUpdateColumnMutation,
+  useUpdateCommentMutation,
   useUpdateTaskMutation,
 } from "../../generated/graphql";
 import { useToggle } from "../../hooks";
@@ -48,6 +50,7 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
   const [, removeTask] = useRemoveTaskMutation();
 
   const [, addComment] = useAddCommentMutation();
+  const [, updateComment] = useUpdateCommentMutation();
   const [, removeComment] = useRemoveCommentMutation();
 
   const [showCompleted, toggleShowCompleted] = useToggle(true);
@@ -169,7 +172,12 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
 
               <Stack spacing={5}>
                 {comments.map((comment) => (
-                  <CommentItem comment={comment} onRemove={() => removeComment(comment)} key={comment.id} />
+                  <CommentItem
+                    comment={comment}
+                    onEdit={(content) => updateComment({ ...comment, content })}
+                    onRemove={() => removeComment(comment)}
+                    key={comment.id}
+                  />
                 ))}
               </Stack>
 

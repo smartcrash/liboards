@@ -455,6 +455,14 @@ export type UpdateColumnMutationVariables = Exact<{
 
 export type UpdateColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> } | null };
 
+export type UpdateCommentMutationVariables = Exact<{
+  content: Scalars['String'];
+  id: Scalars['Int'];
+}>;
+
+
+export type UpdateCommentMutation = { __typename?: 'Mutation', comment: { __typename?: 'Comment', id: number, content: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } } };
+
 export type UpdateTaskMutationVariables = Exact<{
   id: Scalars['Int'];
   content?: InputMaybe<Scalars['String']>;
@@ -797,6 +805,17 @@ export const UpdateColumnDocument = gql`
 
 export function useUpdateColumnMutation() {
   return Urql.useMutation<UpdateColumnMutation, UpdateColumnMutationVariables>(UpdateColumnDocument);
+};
+export const UpdateCommentDocument = gql`
+    mutation UpdateComment($content: String!, $id: Int!) {
+  comment: updateComment(content: $content, id: $id) {
+    ...CommentFragment
+  }
+}
+    ${CommentFragmentFragmentDoc}`;
+
+export function useUpdateCommentMutation() {
+  return Urql.useMutation<UpdateCommentMutation, UpdateCommentMutationVariables>(UpdateCommentDocument);
 };
 export const UpdateTaskDocument = gql`
     mutation UpdateTask($id: Int!, $content: String, $completed: Boolean) {

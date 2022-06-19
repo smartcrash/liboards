@@ -1,0 +1,5 @@
+mutation UpdateComment($content: String!, $id: Int!) {
+  comment: updateComment(content: $content, id: $id) {
+    ...CommentFragment
+  }
+}
