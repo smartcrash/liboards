@@ -1,5 +1,5 @@
-import { BoxProps, Button, ButtonGroup, ChakraInputProps, Input, Stack, useEventListener } from "@chakra-ui/react";
-import { FormEventHandler, useRef } from "react";
+import { BoxProps, Button, ButtonGroup, ChakraInputProps, Input, Stack } from "@chakra-ui/react";
+import { FormEventHandler, KeyboardEventHandler, useRef } from "react";
 
 interface AdderFormProps extends BoxProps {
   onConfirm: (inputValue: string) => void;
@@ -19,11 +19,7 @@ export const AdderForm = ({
 }: AdderFormProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  useEventListener("keydown", (event) => {
-    if (event.key === "Escape") onCancel();
-  });
-
-  const addColumn: FormEventHandler = (event) => {
+  const onSubmit: FormEventHandler = (event) => {
     event.preventDefault();
 
     const value = inputRef.current?.value;
@@ -32,9 +28,14 @@ export const AdderForm = ({
     else inputRef.current?.focus();
   };
 
+  const onKeyDown: KeyboardEventHandler<HTMLInputElement> = (event) => {
+    if (event.key === "Escape") onCancel();
+  };
+
   return (
-    <Stack as={"form"} onSubmit={addColumn} {...props}>
-      <Input type={"text"} ref={inputRef} autoFocus={true} {...inputProps} />
+    <Stack as={"form"} onSubmit={onSubmit} {...props}>
+      <Input type={"text"} ref={inputRef} autoFocus={true} onKeyDown={onKeyDown} {...inputProps} />
+
       <ButtonGroup size={"sm"} spacing={1}>
         <Button type={"submit"}>{confirmText}</Button>
         <Button colorScheme={"gray"} onClick={onCancel}>
