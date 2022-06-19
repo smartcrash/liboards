@@ -39,7 +39,7 @@ const authPlugin = (): PluginFn => (config, runner, { Test, TestContext, Group }
     const { data } = response.body()
 
     const user: User = data.createUser.user
-    const cookie: string = response.cookie(SESSION_COOKIE).value
+    const cookie: string = response.cookie(SESSION_COOKIE)?.value
 
     return [{ ...user, password }, cookie]
   })

@@ -10,7 +10,7 @@ import { createClient as createRedisClient } from 'redis';
 import "reflect-metadata";
 import { buildSchema } from 'type-graphql';
 import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
-import { NODE_ENV, PORT, SESSION_COOKIE } from './constants';
+import { NODE_ENV, PORT, SESSION_COOKIE, SESSION_SECRET } from './constants';
 import { dataSource } from './dataSource';
 import { ContextType } from './types';
 
@@ -30,7 +30,7 @@ async function createServer() {
   app.use(
     session({
       name: SESSION_COOKIE,
-      secret: "keyboard cat", // TODO: Move to .env
+      secret: SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
       store: new RedisStore({

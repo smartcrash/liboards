@@ -1,9 +1,14 @@
 
 import { DataSourceOptions } from "typeorm";
+import { DB_CONNECTION, DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from "./source/constants";
 
 const config = {
-  type: "sqlite", // TODO: Move to .env
-  database: "database.sqlite",
+  type: DB_CONNECTION,
+  database: DB_DATABASE,
+  host: DB_HOST,
+  port: DB_PORT,
+  username: DB_USERNAME,
+  password: DB_PASSWORD,
   logging: false,
   synchronize: true,
   dropSchema: false,
@@ -14,6 +19,5 @@ const config = {
   seeds: ['source/seeds/*.ts'],
   factories: ['source/factories/*.ts'],
 } as DataSourceOptions
-
 
 export default config
