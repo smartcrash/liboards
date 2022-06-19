@@ -18,3 +18,6 @@ export const MAIL_PORT = parseInt(process.env.MAIL_PORT)
 export const MAIL_USER = process.env.MAIL_USER
 export const MAIL_PASSWORD = process.env.MAIL_PASSWORD
 export const MAIL_FROM_ADDRESS = process.env.MAIL_FROM_ADDRESS
+
+export const REDIS_HOST = process.env.REDIS_HOST
+export const REDIS_PORT = parseInt(process.env.REDIS_PORT)
