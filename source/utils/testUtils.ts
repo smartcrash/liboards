@@ -20,7 +20,7 @@ export const createRandomColumn = async (boardId: number, index = faker.datatype
   const column = new Column()
 
   column.title = faker.lorem.words()
-  column.index = index
+  // column.index = index
   column.boardId = boardId
 
   await ColumnRepository.save(column)
