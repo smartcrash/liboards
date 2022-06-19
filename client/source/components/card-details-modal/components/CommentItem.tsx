@@ -1,4 +1,5 @@
 import { Avatar, Heading, HStack, Text, VStack } from "@chakra-ui/react";
+import { format } from "date-fns";
 import { useState } from "react";
 import { CommentFragmentFragment } from "../../../generated/graphql";
 import { CommentControls } from "./CommentControls";
@@ -31,7 +32,7 @@ export const CommentItem = ({ comment, onEdit, onRemove }: CommentItemProps) => 
                 {user.username}
               </Heading>
               <Text fontSize={"xs"} color={"gray.500"} lineHeight={"shorter"}>
-                {createdAt}
+                {format(new Date(createdAt), "MMM d p")}
               </Text>
             </HStack>
 
