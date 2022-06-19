@@ -17,6 +17,7 @@ export const CommentEditForm = ({ defaultValue, onConfirm, onCancel }: CommentEd
     const value = textAreaRef.current?.value;
 
     if (value?.trim()) onConfirm(value);
+    else textAreaRef.current?.focus();
   };
 
   const onKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
