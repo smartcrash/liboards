@@ -183,24 +183,7 @@ export const Board = ({
                     draggableId={`${card.id}`}
                     index={cardIndex}
                     onClick={() => onCardClick(card, column)}
-                    contextMenu={
-                      <Menu>
-                        <MenuButton
-                          as={IconButton}
-                          icon={<DotsHorizontal fontSize={"lg"} color={"gray.500"} />}
-                          variant={"ghost"}
-                          size={"sm"}
-                          colorScheme={"gray"}
-                          aria-label={"More card actions"}
-                          title={"More card actions"}
-                        />
-                        <MenuList>
-                          <MenuItem data-testid={"remove-card"} onClick={() => handleCardRemove(column, card)}>
-                            Delete
-                          </MenuItem>
-                        </MenuList>
-                      </Menu>
-                    }
+                    onRemove={() => handleCardRemove(column, card)}
                     key={card.id}
                     data-testid={`card-${cardIndex}`}
                   />
