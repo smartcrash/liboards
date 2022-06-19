@@ -1,11 +1,28 @@
-import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import { Arg, Ctx, FieldResolver, Int, Mutation, Resolver, Root, UseMiddleware } from "type-graphql";
 import { Comment } from "../entity";
 import { AllowIf, Authenticate } from "../middlewares";
+import { CommentPolicy } from "../policies";
 import { commentRepository } from "../repository";
 import { ContextType } from "../types";
 
 @Resolver(Comment)
 export class CommentResolver {
+  @FieldResolver(() => Boolean)
+  canUpdate(
+    @Root() root: Comment,
+    @Ctx() { user }: ContextType
+  ): boolean {
+    return new CommentPolicy().update(user, root)
+  }
+
+  @FieldResolver(() => Boolean)
+  canDelete(
+    @Root() root: Comment,
+    @Ctx() { user }: ContextType
+  ): boolean {
+    return new CommentPolicy().delete(user, root)
+  }
+
   @UseMiddleware(Authenticate)
   @UseMiddleware(AllowIf('create-comment'))
   @Mutation(() => Comment)

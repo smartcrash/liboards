@@ -11,12 +11,8 @@ interface CommentItemProps {
 }
 
 export const CommentItem = ({ comment, onEdit, onRemove }: CommentItemProps) => {
-  const { content, user, createdAt } = comment;
+  const { content, user, createdAt, canUpdate, canDelete } = comment;
   const [isEditing, setEditing] = useState(false);
-
-  // TODO: Use authorization flag from server
-  const canUpdate = true;
-  const canDelete = true;
 
   const confirmEdit = (content: string) => {
     onEdit(content);

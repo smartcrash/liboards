@@ -55,6 +55,8 @@ export type Column = {
 
 export type Comment = {
   __typename?: 'Comment';
+  canDelete: Scalars['Boolean'];
+  canUpdate: Scalars['Boolean'];
   card: Card;
   content: Scalars['String'];
   createdAt: Scalars['DateTime'];
@@ -277,7 +279,7 @@ export type CardFragmentFragment = { __typename?: 'Card', id: number, title: str
 
 export type ColumnFragmentFragment = { __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> };
 
-export type CommentFragmentFragment = { __typename?: 'Comment', id: number, content: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } };
+export type CommentFragmentFragment = { __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } };
 
 export type TaskFragmentFragment = { __typename?: 'Task', id: number, content: string, completed: boolean };
 
@@ -306,7 +308,7 @@ export type AddCommentMutationVariables = Exact<{
 }>;
 
 
-export type AddCommentMutation = { __typename?: 'Mutation', comment: { __typename?: 'Comment', id: number, content: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } } };
+export type AddCommentMutation = { __typename?: 'Mutation', comment: { __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } } };
 
 export type AddTaskMutationVariables = Exact<{
   cardId: Scalars['Int'];
@@ -461,7 +463,7 @@ export type UpdateCommentMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCommentMutation = { __typename?: 'Mutation', comment: { __typename?: 'Comment', id: number, content: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } } };
+export type UpdateCommentMutation = { __typename?: 'Mutation', comment: { __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } } };
 
 export type UpdateTaskMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -499,7 +501,7 @@ export type FindCardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string }, tasks: Array<{ __typename?: 'Task', id: number, content: string, completed: boolean }>, comments: Array<{ __typename?: 'Comment', id: number, content: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } }> } | null };
+export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string }, tasks: Array<{ __typename?: 'Task', id: number, content: string, completed: boolean }>, comments: Array<{ __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } }> } | null };
 
 export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
@@ -535,6 +537,8 @@ export const CommentFragmentFragmentDoc = gql`
     id
     username
   }
+  canUpdate
+  canDelete
   createdAt
   updatedAt
 }

@@ -5,6 +5,8 @@ fragment CommentFragment on Comment {
     id
     username
   }
+  canUpdate
+  canDelete
   createdAt
   updatedAt
 }
