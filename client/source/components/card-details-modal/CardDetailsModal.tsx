@@ -27,7 +27,8 @@ import {
   useUpdateTaskMutation,
 } from "../../generated/graphql";
 import { useToggle } from "../../hooks";
-import { CommentFrom, CommentItem, EditableDesc, TaskAdder, TaskItem, TaskList } from "./components";
+import { CommentItem, EditableDesc, TaskAdder, TaskItem, TaskList } from "./components";
+import { CommentAdder } from "./components/CommentAdder";
 
 interface CardDetailsModalProps {
   id?: number;
@@ -176,7 +177,7 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
             </>
           )}
 
-          <CommentFrom onConfirm={(content) => addComment({ content, cardId: id })} />
+          <CommentAdder onConfirm={(content) => addComment({ content, cardId: id })} />
         </ModalBody>
       </ModalContent>
     </Modal>
