@@ -20,6 +20,7 @@ export const Card = ({ title, description, index, draggableId, contextMenu, ...b
           py={3}
           px={3}
           borderWidth={1}
+          borderRadius={"lg"}
           bg={"white"}
           ref={innerRef}
           position={"relative"}

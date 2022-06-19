@@ -1,4 +1,3 @@
-import { HamburgerIcon } from "@chakra-ui/icons";
 import {
   Box,
   EditableInput,
@@ -16,6 +15,7 @@ import { useEffect } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { NonEmptyEditable } from "../";
 import useRefState from "../../hooks/useRefState";
+import { DotsHorizontal } from "../../icons";
 import { Card, Column } from "./components";
 import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
@@ -160,7 +160,7 @@ export const Board = ({
                   <Menu>
                     <MenuButton
                       as={IconButton}
-                      icon={<HamburgerIcon />}
+                      icon={<DotsHorizontal fontSize={"xl"} color={"gray.500"} />}
                       variant={"ghost"}
                       size={"sm"}
                       colorScheme={"gray"}
@@ -187,7 +187,7 @@ export const Board = ({
                       <Menu>
                         <MenuButton
                           as={IconButton}
-                          icon={<HamburgerIcon />}
+                          icon={<DotsHorizontal fontSize={"lg"} color={"gray.500"} />}
                           variant={"ghost"}
                           size={"sm"}
                           colorScheme={"gray"}
