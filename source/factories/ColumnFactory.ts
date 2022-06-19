@@ -10,4 +10,4 @@ define(Column, () => {
   return column
 })
 
-export const columnFactory = factory(Column)()
+export const ColumnFactory = factory(Column)

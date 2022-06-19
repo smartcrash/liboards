@@ -9,4 +9,4 @@ define(Comment, () => {
   return comment
 })
 
-export const CommentFactory = factory(Comment)()
+export const CommentFactory = factory(Comment)
