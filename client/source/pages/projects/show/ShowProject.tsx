@@ -48,6 +48,7 @@ import {
   useUpdateColumnMutation,
 } from "../../../generated/graphql";
 import { route } from "../../../routes";
+import { TrashIcon } from "../../../icons";
 
 export const ShowProject = () => {
   const navigate = useNavigate();
@@ -139,7 +140,7 @@ export const ShowProject = () => {
 
           <Popover>
             <PopoverTrigger>
-              <Button leftIcon={<DeleteIcon mb={1} mr={1} />} colorScheme={"gray"} variant={"ghost"}>
+              <Button leftIcon={<TrashIcon mb={1} mr={1} />} colorScheme={"gray"} variant={"ghost"}>
                 Delete project
               </Button>
             </PopoverTrigger>
@@ -152,7 +153,7 @@ export const ShowProject = () => {
                   <Text fontSize={"sm"} color={"gray.500"}>
                     You can find and reopen closed boards at the bottom of{" "}
                     <Link as={RouterLink} to={route("projects.list")} color={"gray.700"} textDecoration={"underline"}>
-                      your boards page
+                      your projects page
                     </Link>
                   </Text>
 

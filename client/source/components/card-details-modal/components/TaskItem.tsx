@@ -1,17 +1,8 @@
-import { DeleteIcon } from "@chakra-ui/icons";
-import {
-  Box,
-  ButtonGroup,
-  Checkbox,
-  EditablePreview,
-  EditableTextarea,
-  HStack,
-  IconButton,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, ButtonGroup, Checkbox, EditablePreview, EditableTextarea, IconButton } from "@chakra-ui/react";
 import { useRef } from "react";
 import { TaskFragmentFragment } from "../../../generated/graphql";
 import { useHover } from "../../../hooks";
+import { TrashIcon } from "../../../icons";
 import { AutoResizeTextarea } from "../../AutoResizeTextarea";
 import { NonEmptyEditable } from "../../non-empty-editable";
 
@@ -67,7 +58,7 @@ export const TaskItem = ({ task, onUpdate, onRemove }: TaskItemProps) => {
       <Box pos={"absolute"} top={0} right={0} hidden={!isHover}>
         <ButtonGroup size={"xs"} colorScheme={"gray"} variant={"ghost"}>
           <IconButton
-            icon={<DeleteIcon />}
+            icon={<TrashIcon fontSize={"sm"} />}
             aria-label={"Delete this task"}
             title={"Delete this task"}
             onClick={() => onRemove(task)}
