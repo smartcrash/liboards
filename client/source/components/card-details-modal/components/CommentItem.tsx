@@ -24,7 +24,7 @@ export const CommentItem = ({ comment, onEdit, onRemove }: CommentItemProps) => 
     <HStack alignItems={"flex-start"} spacing={4}>
       <Avatar size={"sm"} />
 
-      <VStack alignItems={"flex-start"} flexGrow={1}>
+      <VStack alignItems={"flex-start"} flexGrow={1} spacing={1}>
         {!isEditing ? (
           <>
             <HStack alignItems={"center"}>

@@ -184,7 +184,7 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
                   ))}
                 </Stack>
 
-                <Spacer h={3} />
+                <Spacer h={5} />
               </>
             )}
 
