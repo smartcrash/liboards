@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "start": "nodemon",
+    "build": "tsc",
     "test": "node -r ts-node/register bin/test.ts",
     "migration:generate": "npx typeorm-ts-node-esm migration:generate -d ./source/dataSource.ts",
     "migration:revert": "npx typeorm-ts-node-esm migration:revert -d ./source/dataSource.ts",
