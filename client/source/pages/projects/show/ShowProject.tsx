@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet";
 import { DeleteIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -115,6 +116,8 @@ export const ShowProject = () => {
 
   return (
     <>
+      <Helmet title={data.board.title} />
+
       <Stack spacing={6}>
         <HStack justifyContent={"space-between"}>
           <HStack alignItems={"center"} spacing={3}>

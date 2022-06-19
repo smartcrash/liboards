@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet";
 import { Button, Container, Heading, Stack, Text } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -31,29 +32,33 @@ export const CreateProject = () => {
   });
 
   return (
-    <Container maxW={"lg"}>
-      <Stack mb={12}>
-        <Heading fontSize={"3xl"}>Create new project</Heading>
-        <Text color={"gray.500"}>
-          A project contains a board, and a board is made up of cards ordered on lists. Use it to manage your project,
-          track information, or organize antthing.
-        </Text>
-      </Stack>
+    <>
+      <Helmet title={"New project"} />
 
-      <Stack as={"form"} onSubmit={onSubmit} spacing={6}>
-        <Input
-          label={"Project name"}
-          name={"title"}
-          control={control}
-          rules={{ required: true }}
-          autoFocus
-          data-testid={"title"}
-        />
+      <Container maxW={"lg"}>
+        <Stack mb={12}>
+          <Heading fontSize={"3xl"}>Create new project</Heading>
+          <Text color={"gray.500"}>
+            A project contains a board, and a board is made up of cards ordered on lists. Use it to manage your project,
+            track information, or organize antthing.
+          </Text>
+        </Stack>
 
-        <Button isDisabled={isSubmitting} type={"submit"} data-testid={"submit"}>
-          Create project
-        </Button>
-      </Stack>
-    </Container>
+        <Stack as={"form"} onSubmit={onSubmit} spacing={6}>
+          <Input
+            label={"Project name"}
+            name={"title"}
+            control={control}
+            rules={{ required: true }}
+            autoFocus
+            data-testid={"title"}
+          />
+
+          <Button isDisabled={isSubmitting} type={"submit"} data-testid={"submit"}>
+            Create project
+          </Button>
+        </Stack>
+      </Container>
+    </>
   );
 };
