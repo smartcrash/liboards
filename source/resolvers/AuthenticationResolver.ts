@@ -2,7 +2,7 @@ import { verify } from 'argon2';
 import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import { v4 as uuid } from 'uuid';
 import { z, ZodError } from 'zod';
-import { SESSION_COOKIE } from '../constants';
+import { CORS_ORIGIN, SESSION_COOKIE } from '../constants';
 import { User } from "../entity";
 import { redisClient } from '../redisClient';
 import { UserRepository } from '../repository';
@@ -124,7 +124,7 @@ export class AuthenticationResolver {
       subject: 'Reset password',
       html: `
         <p>Here is your reset password link:</p>
-        <a href="http://localhost:3000/reset-password/${token}">Resert password</a>
+        <a href="${CORS_ORIGIN}/reset-password/${token}">Resert password</a>
       `
     })
 
@@ -145,7 +145,7 @@ export class AuthenticationResolver {
       }]
     }
 
-    const user = await UserRepository.findOneBy({ id: +userId })
+    const user = await UserRepository.findOneBy({ id: parseInt(userId, 10) })
 
     if (!user) return {
       errors: [{
