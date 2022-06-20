@@ -40,7 +40,7 @@ export const CreateProject = () => {
           <Heading fontSize={"3xl"}>Create new project</Heading>
           <Text color={"gray.500"}>
             A project contains a board, and a board is made up of cards ordered on lists. Use it to manage your project,
-            track information, or organize antthing.
+            track information, or organize anything.
           </Text>
         </Stack>
 
