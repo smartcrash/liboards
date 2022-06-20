@@ -1,12 +1,10 @@
 import { faker } from '@faker-js/faker'
-import { define, factory } from 'typeorm-seeding'
 import { Card } from '../entity'
+import { EntityFactory } from '../EntityFactory'
 
-define(Card, () => {
+export const CardFactory = () => new EntityFactory(Card, () => {
   const card = new Card()
   card.title = faker.lorem.words(2)
   card.description = faker.lorem.sentences()
   return card
 })
-
-export const CardFactory = factory(Card)

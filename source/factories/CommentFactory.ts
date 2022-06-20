@@ -1,12 +1,10 @@
 
 import { faker } from '@faker-js/faker'
-import { define, factory } from 'typeorm-seeding'
 import { Comment } from '../entity'
+import { EntityFactory } from '../EntityFactory'
 
-define(Comment, () => {
+export const CommentFactory = () => new EntityFactory(Comment, () => {
   const comment = new Comment()
   comment.content = faker.lorem.sentence()
   return comment
 })
-
-export const CommentFactory = factory(Comment)

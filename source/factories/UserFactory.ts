@@ -1,13 +1,11 @@
 import { faker } from '@faker-js/faker'
-import { define, factory } from 'typeorm-seeding'
 import { User } from '../entity'
+import { EntityFactory } from '../EntityFactory'
 
-define(User, () => {
+export const UserFactory = () => new EntityFactory(User, () => {
   const user = new User()
   user.username = faker.internet.userName()
   user.email = faker.internet.email()
   user.password = faker.internet.password()
   return user
 })
-
-export const UserFactory = factory(User)
