@@ -1,11 +1,8 @@
-import { Column, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { Board, User } from "./";
 
 @Entity()
 export class Favorite {
-  // @PrimaryGeneratedColumn()
-  // id: number
-
   @PrimaryColumn()
   userId: number
 
