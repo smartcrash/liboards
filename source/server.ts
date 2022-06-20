@@ -49,7 +49,7 @@ async function createServer() {
   )
 
   const schema = await buildSchema({
-    resolvers: [__dirname + "/resolvers/*.ts"],
+    resolvers: [__dirname + "/resolvers/*{.ts,.js}"],
     dateScalarMode: 'isoDate',
     validate: false
   })

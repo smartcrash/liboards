@@ -13,13 +13,13 @@ export const config = {
   synchronize: false,
   dropSchema: false,
   migrationsRun: true,
-  entities: ["source/entity/*.ts"],
-  migrations: ["source/migrations/*.ts"],
-  subscribers: ["source/subscribers/*.ts"],
+  entities: [__dirname + "/entity/*{.ts,.js}"],
+  migrations: [__dirname + "/migrations/*{.ts,.js}"],
+  subscribers: [__dirname + "/subscribers/*{.ts,.js}"],
 
   // See: https://www.npmjs.com/package/typeorm-seeding#%E2%9D%AF-installation
-  seeds: ['source/seeds/*.ts'],
-  factories: ['source/factories/*.ts'],
+  seeds: [__dirname + '/seeds/*{.ts,.js}'],
+  factories: [__dirname + '/factories/*{.ts,.js}'],
 } as DataSourceOptions
 
 export const dataSource = new DataSource(config)
