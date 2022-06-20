@@ -169,10 +169,10 @@ test.group('addCard', () => {
 
   test('assigns correct `index` by default', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await BoardFactory().create({ createdBy: user })
-    const column = await ColumnFactory().create({ board })
+    const board = await BoardFactory.create({ createdBy: user })
+    const column = await ColumnFactory.create({ board })
 
-    await CardFactory().createMany(3, { column })
+    await CardFactory.createMany(3, { column })
 
     const queryData = {
       query: AddCardMutation,
@@ -362,11 +362,11 @@ test.group('moveCard', () => {
 
   test('moves the card to another column (empty)', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await BoardFactory().create({ createdBy: user })
-    const fromColumn = await ColumnFactory().create({ board })
-    const toColumn = await ColumnFactory().create({ board })
+    const board = await BoardFactory.create({ createdBy: user })
+    const fromColumn = await ColumnFactory.create({ board })
+    const toColumn = await ColumnFactory.create({ board })
 
-    const card = await CardFactory().create({ column: fromColumn })
+    const card = await CardFactory.create({ column: fromColumn })
 
     const queryData = {
       query: MoveCardMutation,
@@ -391,12 +391,12 @@ test.group('moveCard', () => {
 
   test('moves card to specific position to a another column (non-empty)', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await BoardFactory().create({ createdBy: user })
-    const fromColumn = await ColumnFactory().create({ board })
-    const toColumn = await ColumnFactory().create({ board })
+    const board = await BoardFactory.create({ createdBy: user })
+    const fromColumn = await ColumnFactory.create({ board })
+    const toColumn = await ColumnFactory.create({ board })
 
-    await CardFactory().createMany(3, { column: toColumn })
-    const [, card,] = await CardFactory().createMany(3, { column: fromColumn })
+    await CardFactory.createMany(3, { column: toColumn })
+    const [, card,] = await CardFactory.createMany(3, { column: fromColumn })
     const toIndex = 1
 
     const queryData = {

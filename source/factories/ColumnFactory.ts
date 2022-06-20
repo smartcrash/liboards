@@ -3,7 +3,7 @@ import { Column } from '../entity'
 import { EntityFactory } from '../EntityFactory'
 
 
-export const ColumnFactory = () => new EntityFactory(Column, () => {
+export const ColumnFactory = new EntityFactory(Column, () => {
   const column = new Column()
   column.title = faker.lorem.words(2)
   column.cards = []

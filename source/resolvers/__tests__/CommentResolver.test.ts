@@ -40,9 +40,9 @@ test.group('addComment', (group) => {
 
   test('add comment to card', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await BoardFactory().create({ createdBy: user })
-    const column = await ColumnFactory().create({ board })
-    const card = await CardFactory().create({ column })
+    const board = await BoardFactory.create({ createdBy: user })
+    const column = await ColumnFactory.create({ board })
+    const card = await CardFactory.create({ column })
 
     const content = faker.lorem.sentence()
 
@@ -75,9 +75,9 @@ test.group('addComment', (group) => {
   test('add comment to someone else\'s card', async ({ expect, client, createUser }) => {
     const [otherUser] = await createUser(client)
     const [, cookie] = await createUser(client)
-    const board = await BoardFactory().create({ createdBy: otherUser })
-    const column = await ColumnFactory().create({ board })
-    const card = await CardFactory().create({ column })
+    const board = await BoardFactory.create({ createdBy: otherUser })
+    const column = await ColumnFactory.create({ board })
+    const card = await CardFactory.create({ column })
 
     const queryData = {
       query: AddCommentMutation,
@@ -105,10 +105,10 @@ test.group('updateComment', (group) => {
 
   test('update comment\'s content', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await BoardFactory().create({ createdBy: user })
-    const column = await ColumnFactory().create({ board })
-    const card = await CardFactory().create({ column })
-    const { id } = await CommentFactory().create({ card, user })
+    const board = await BoardFactory.create({ createdBy: user })
+    const column = await ColumnFactory.create({ board })
+    const card = await CardFactory.create({ column })
+    const { id } = await CommentFactory.create({ card, user })
 
     const content = faker.lorem.sentence()
 
@@ -138,11 +138,11 @@ test.group('updateComment', (group) => {
   test('can only update own comments', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
 
-    const otherUser = await UserFactory().create()
-    const board = await BoardFactory().create({ createdBy: user })
-    const column = await ColumnFactory().create({ board })
-    const card = await CardFactory().create({ column })
-    const { id, content } = await CommentFactory().create({ card, user: otherUser })
+    const otherUser = await UserFactory.create()
+    const board = await BoardFactory.create({ createdBy: user })
+    const column = await ColumnFactory.create({ board })
+    const card = await CardFactory.create({ column })
+    const { id, content } = await CommentFactory.create({ card, user: otherUser })
 
     const queryData = {
       query: UpdateCommentMutation,
@@ -170,10 +170,10 @@ test.group('removeComment', (group) => {
 
   test('removes a comment from card', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await BoardFactory().create({ createdBy: user })
-    const column = await ColumnFactory().create({ board })
-    const card = await CardFactory().create({ column })
-    const { id } = await CommentFactory().create({ card, user })
+    const board = await BoardFactory.create({ createdBy: user })
+    const column = await ColumnFactory.create({ board })
+    const card = await CardFactory.create({ column })
+    const { id } = await CommentFactory.create({ card, user })
 
     const content = faker.lorem.sentence()
 
@@ -202,11 +202,11 @@ test.group('removeComment', (group) => {
   test('can only remove own comments', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
 
-    const otherUser = await UserFactory().create()
-    const board = await BoardFactory().create({ createdBy: user })
-    const column = await ColumnFactory().create({ board })
-    const card = await CardFactory().create({ column })
-    const { id } = await CommentFactory().create({ card, user: otherUser })
+    const otherUser = await UserFactory.create()
+    const board = await BoardFactory.create({ createdBy: user })
+    const column = await ColumnFactory.create({ board })
+    const card = await CardFactory.create({ column })
+    const { id } = await CommentFactory.create({ card, user: otherUser })
 
     const queryData = {
       query: RemoveCommentMutation,
