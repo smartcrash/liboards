@@ -1,6 +1,6 @@
 
 import { DataSource, DataSourceOptions } from "typeorm";
-import { APP_DEBUG, DB_CONNECTION, DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from "./constants";
+import { APP_DEBUG, APP_ENV, DB_CONNECTION, DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from "./constants";
 
 export const config = {
   type: DB_CONNECTION,
@@ -10,16 +10,12 @@ export const config = {
   username: DB_USERNAME,
   password: DB_PASSWORD,
   logging: APP_DEBUG,
-  synchronize: false,
-  dropSchema: false,
-  migrationsRun: true,
+  synchronize: APP_ENV === 'test',
+  dropSchema: APP_ENV === 'test',
+  migrationsRun: APP_ENV !== 'test',
   entities: [__dirname + "/entity/*{.ts,.js}"],
   migrations: [__dirname + "/migrations/*{.ts,.js}"],
   subscribers: [__dirname + "/subscribers/*{.ts,.js}"],
-
-  // See: https://www.npmjs.com/package/typeorm-seeding#%E2%9D%AF-installation
-  seeds: [__dirname + '/seeds/*{.ts,.js}'],
-  factories: [__dirname + '/factories/*{.ts,.js}'],
 } as DataSourceOptions
 
 export const dataSource = new DataSource(config)
