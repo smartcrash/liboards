@@ -12,7 +12,7 @@
     "migration:revert": "npx typeorm-ts-node-esm migration:revert -d ./source/dataSource.ts",
     "schema:drop": "npx typeorm-ts-node-esm schema:drop -d ./source/dataSource.ts",
     "schema:sync": "npx typeorm-ts-node-esm schema:sync -d ./source/dataSource.ts",
-    "seed:config": "ts-node ./node_modules/typeorm-seeding/dist/cli.js config",
+    "seed:config": "NODE_ENV=test ts-node ./node_modules/typeorm-seeding/dist/cli.js config -n ormconfig.ts",
     "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
     "cypress": "cypress run",
     "cypress:open": "cypress open"
@@ -41,8 +41,8 @@
     "nodemon": "^2.0.16",
     "sinon": "^14.0.0",
     "ts-node": "^10.8.0",
-    "typescript": "^4.7.2",
-    "typeorm-seeding": "^1.6.1"
+    "typeorm-seeding": "^1.6.1",
+    "typescript": "^4.7.2"
   },
   "dependencies": {
     "apollo-server-core": "^3.8.1",
