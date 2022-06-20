@@ -10,7 +10,7 @@ import { createClient as createRedisClient } from 'redis';
 import "reflect-metadata";
 import { buildSchema } from 'type-graphql';
 import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
-import { NODE_ENV, PORT, SESSION_COOKIE, SESSION_SECRET } from './constants';
+import { CORS_ORIGIN, NODE_ENV, PORT, SESSION_COOKIE, SESSION_SECRET } from './constants';
 import { dataSource } from './dataSource';
 import { ContextType } from './types';
 
@@ -21,7 +21,7 @@ async function createServer() {
   app.set('proxy', 1)
 
   app.use(cors({
-    origin: ['http://localhost:3000', 'https://studio.apollographql.com'],
+    origin: [CORS_ORIGIN, 'https://studio.apollographql.com'],
     credentials: true,
   }))
 

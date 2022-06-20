@@ -2,6 +2,7 @@ import 'dotenv/config'
 
 export const PORT: number = parseInt(process.env.PORT)
 export const NODE_ENV: 'development' | 'production' = process.env.NODE_ENV as any || 'development'
+export const CORS_ORIGIN = process.env.CORS_ORIGIN
 
 export const SESSION_SECRET = process.env.SESSION_SECRET
 export const SESSION_COOKIE = process.env.SESSION_COOKIE
