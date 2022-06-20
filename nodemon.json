@@ -3,5 +3,5 @@
   "ext": "ts",
   "quiet": true,
   "ignore": ["source/**/*.test.ts"],
-  "exec": "ts-node source/main.ts"
+  "exec": "NODE_ENV=development ts-node source/main.ts"
 }

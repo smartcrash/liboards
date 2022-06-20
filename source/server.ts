@@ -10,7 +10,7 @@ import { createClient as createRedisClient } from 'redis';
 import "reflect-metadata";
 import { buildSchema } from 'type-graphql';
 import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
-import { CORS_ORIGIN, NODE_ENV, PORT, SESSION_COOKIE, SESSION_SECRET } from './constants';
+import { CORS_ORIGIN, APP_ENV, APP_PORT, SESSION_COOKIE, SESSION_SECRET } from './constants';
 import { dataSource } from './dataSource';
 import { ContextType } from './types';
 
@@ -43,7 +43,7 @@ async function createServer() {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true,
         sameSite: 'lax',
-        secure: NODE_ENV === 'production', // Whether the cookie is only visible over https
+        secure: APP_ENV === 'production', // Whether the cookie is only visible over https
       },
     })
   )
@@ -67,7 +67,7 @@ async function createServer() {
 
   server.applyMiddleware({ app, cors: false });
 
-  await new Promise<void>(resolve => httpServer.listen(PORT, resolve));
+  await new Promise<void>(resolve => httpServer.listen(APP_PORT, resolve));
 
   return server
 }

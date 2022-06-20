@@ -1,6 +1,6 @@
 
 import { DataSource, DataSourceOptions } from "typeorm";
-import { DB_CONNECTION, DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from "./constants";
+import { APP_DEBUG, DB_CONNECTION, DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from "./constants";
 
 export const config = {
   type: DB_CONNECTION,
@@ -9,7 +9,7 @@ export const config = {
   port: DB_PORT,
   username: DB_USERNAME,
   password: DB_PASSWORD,
-  logging: false,
+  logging: APP_DEBUG,
   synchronize: false,
   dropSchema: false,
   migrationsRun: true,

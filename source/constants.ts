@@ -1,7 +1,19 @@
-import 'dotenv/config'
+import { config } from 'dotenv'
+import { resolve } from 'path'
 
-export const PORT: number = parseInt(process.env.PORT)
-export const NODE_ENV: 'development' | 'production' = process.env.NODE_ENV as any || 'development'
+config()
+
+// Override env vars with envoriment specific definitions
+config({
+  override: true,
+  path: resolve(process.cwd(), `.env.${process.env.NODE_ENV || 'development'}`),
+  debug: true
+})
+
+// TODO: Validate with zod
+export const APP_ENV: 'development' | 'production' | 'test' = process.env.NODE_ENV as any || 'local'
+export const APP_PORT: number = parseInt(process.env.APP_PORT)
+export const APP_DEBUG = !!process.env.APP_DEBUG
 export const CORS_ORIGIN = process.env.CORS_ORIGIN
 
 export const SESSION_SECRET = process.env.SESSION_SECRET

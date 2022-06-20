@@ -5,7 +5,7 @@ import { runFailedTests } from '@japa/run-failed-tests'
 import { configure, PluginFn, processCliArgs, run } from '@japa/runner'
 import { specReporter } from '@japa/spec-reporter'
 import sinon from 'sinon'
-import { PORT, SESSION_COOKIE } from '../source/constants'
+import { APP_PORT, SESSION_COOKIE } from '../source/constants'
 import { dataSource } from '../source/dataSource'
 import { User } from '../source/entity'
 import { createServer } from '../source/server'
@@ -91,7 +91,7 @@ configure({
   ...processCliArgs(process.argv.slice(2)),
   ...{
     files: ['source/**/*.test.ts'],
-    plugins: [expect(), runFailedTests(), apiClient(`http://localhost:${PORT}/graphql`), authPlugin()],
+    plugins: [expect(), runFailedTests(), apiClient(`http://localhost:${APP_PORT}/graphql`), authPlugin()],
     reporters: [specReporter()],
     forceExit: true,
     importer: (filePath) => import(filePath),
