@@ -15,8 +15,6 @@ COPY tsconfig.json ./tsconfig.json
 # Build production code
 RUN npm run build
 
-RUN ls -a
-
 EXPOSE 4000
 
 CMD ["node", "dist/main.js"]
