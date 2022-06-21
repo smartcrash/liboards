@@ -6,7 +6,7 @@ export class PasswordReset {
   email: string
 
   @Column()
-  token: number
+  token: string
 
   @CreateDateColumn()
   createdAt: Date
