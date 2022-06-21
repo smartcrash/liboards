@@ -18,11 +18,7 @@
     "sourceMap": true,
   },
   "include": [
-    "./source/**/*.ts",
-  ],
-  "exclude": [
-    "./source/**/*.test.ts",
-    "node_modules",
+    "source/**/*.ts",
   ],
   // By default, ts-node will perform type-checking every time you run tests.
   // However, type-checking is usually slow, and you can turn it off by adding

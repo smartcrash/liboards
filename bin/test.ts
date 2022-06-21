@@ -90,7 +90,7 @@ const authPlugin = (): PluginFn => (config, runner, { Test, TestContext, Group }
 configure({
   ...processCliArgs(process.argv.slice(2)),
   ...{
-    files: ['source/**/*.test.ts'],
+    files: ['tests/**/*.test.ts'],
     plugins: [expect(), runFailedTests(), apiClient(`http://localhost:${APP_PORT}/graphql`), authPlugin()],
     reporters: [specReporter()],
     forceExit: true,

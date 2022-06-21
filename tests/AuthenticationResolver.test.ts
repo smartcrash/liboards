@@ -2,10 +2,10 @@ import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import { verify } from 'argon2';
 import sinon from 'sinon';
-import { SESSION_COOKIE } from '../../constants';
-import { User } from '../../entity';
-import { redisClient } from '../../redisClient';
-import { UserRepository } from '../../repository';
+import { SESSION_COOKIE } from '../source/constants';
+import { User } from '../source/entity';
+import { redisClient } from '../source/redisClient';
+import { UserRepository } from '../source/repository';
 
 test.group('createUser', () => {
   test('should create user', async ({ expect, client }) => {

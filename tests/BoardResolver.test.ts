@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
-import { SESSION_COOKIE } from '../../constants';
-import { BoardRepository } from '../../repository';
-import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
+import { SESSION_COOKIE } from '../source/constants';
+import { BoardRepository } from '../source/repository';
+import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from '../source/utils/testUtils';
 
 const CreateBoardMutation = `
   mutation CreateBoard($title: String!) {

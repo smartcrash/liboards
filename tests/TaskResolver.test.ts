@@ -1,9 +1,9 @@
 import { faker } from "@faker-js/faker"
 import { test } from "@japa/runner"
-import { SESSION_COOKIE } from "../../constants"
-import { BoardFactory, CardFactory, ColumnFactory, TaskFactory, UserFactory } from "../../factories"
-import { CardRepository, TaskRepository } from "../../repository"
-import { assertIsForbiddenExeption, testThrowsIfNotAuthenticated } from "../../utils/testUtils"
+import { SESSION_COOKIE } from "../source/constants"
+import { BoardFactory, CardFactory, ColumnFactory, TaskFactory, UserFactory } from "../source/factories"
+import { CardRepository, TaskRepository } from "../source/repository"
+import { assertIsForbiddenExeption, testThrowsIfNotAuthenticated } from "../source/utils/testUtils"
 
 const AddTaskMutation = `
   mutation AddTask($cardId: Int!, $content: String!) {

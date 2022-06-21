@@ -1,10 +1,10 @@
 import { faker } from "@faker-js/faker";
 import { test } from "@japa/runner";
 import { In } from "typeorm";
-import { SESSION_COOKIE } from "../../constants";
-import { BoardFactory, CardFactory, ColumnFactory } from "../../factories";
-import { CardRepository } from "../../repository";
-import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
+import { SESSION_COOKIE } from "../source/constants";
+import { BoardFactory, CardFactory, ColumnFactory } from "../source/factories";
+import { CardRepository } from "../source/repository";
+import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../source/utils/testUtils";
 
 const FindCardByIdQuery = `
   query FindQueryById($id: Int!) {

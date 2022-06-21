@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import { In } from 'typeorm';
-import { SESSION_COOKIE } from '../../constants';
-import { CardRepository, ColumnRepository } from '../../repository';
-import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from '../../utils/testUtils';
+import { SESSION_COOKIE } from '../source/constants';
+import { CardRepository, ColumnRepository } from '../source/repository';
+import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from '../source/utils/testUtils';
 
 const AddColumnMutation = `
   mutation AddColumn($boardId: Int!, $title: String!) {

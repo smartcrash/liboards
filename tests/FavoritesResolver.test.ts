@@ -1,7 +1,7 @@
 import { test } from "@japa/runner"
-import { SESSION_COOKIE } from "../../constants"
-import { FavoritesRepository, UserRepository } from "../../repository"
-import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from "../../utils/testUtils"
+import { SESSION_COOKIE } from "../source/constants"
+import { FavoritesRepository, UserRepository } from "../source/repository"
+import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from "../source/utils/testUtils"
 
 const AllFavoritesQuery = `
   query AllFavorites {

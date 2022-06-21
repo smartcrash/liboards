@@ -1,9 +1,9 @@
 import { faker } from "@faker-js/faker";
 import { test } from "@japa/runner";
-import { SESSION_COOKIE } from "../../constants";
-import { BoardFactory, ColumnFactory, CardFactory, CommentFactory, UserFactory } from "../../factories";
-import { CommentRepository } from "../../repository";
-import { assertIsForbiddenExeption, testThrowsIfNotAuthenticated } from "../../utils/testUtils";
+import { SESSION_COOKIE } from "../source/constants";
+import { BoardFactory, ColumnFactory, CardFactory, CommentFactory, UserFactory } from "../source/factories";
+import { CommentRepository } from "../source/repository";
+import { assertIsForbiddenExeption, testThrowsIfNotAuthenticated } from "../source/utils/testUtils";
 
 const AddCommentMutation = `
   mutation AddComment($cardId: Int!, $content: String!) {
