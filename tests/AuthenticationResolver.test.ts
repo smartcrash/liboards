@@ -1,11 +1,25 @@
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import { verify } from 'argon2';
-import sinon from 'sinon';
+import { subHours } from 'date-fns';
 import { SESSION_COOKIE } from '../source/constants';
 import { User } from '../source/entity';
-import { redisClient } from '../source/redisClient';
+import { PasswordResetFactory, UserFactory } from '../source/factories';
 import { UserRepository } from '../source/repository';
+
+const ResetPasswordMutation = `
+  mutation ResetPassword($newPassword: String!, $token: String!) {
+    resetPassword(newPassword: $newPassword, token: $token) {
+      errors {
+        field
+        message
+      }
+      user {
+        id
+      }
+    }
+  }
+`
 
 test.group('createUser', () => {
   test('should create user', async ({ expect, client }) => {
@@ -302,23 +316,12 @@ test.group('loginWithPassword', () => {
   })
 })
 
-test.group('resetPassword', () => {
-  test('should return error is token is expired', async ({ expect, client }) => {
-    sinon.replace(redisClient, 'get', sinon.fake.resolves('') as any)
+test.group('resetPassword', (group) => {
+  group.tap(test => test.pin())
 
+  test('should return error is token does not exists', async ({ expect, client }) => {
     const queryData = {
-      query: `
-        mutation ResetPassword($newPassword: String!, $token: String!) {
-          resetPassword(newPassword: $newPassword, token: $token) {
-            errors {
-              field
-              message
-            }
-            user {
-              id
-            }
-          }
-        }`,
+      query: ResetPasswordMutation,
       variables: {
         token: 'invalid token',
         newPassword: '12345'
@@ -332,24 +335,32 @@ test.group('resetPassword', () => {
     expect(data.resetPassword.errors).toContainEqual({ field: 'token', message: 'Sorry, your token seems to have expired. Please try again.' })
   })
 
-  test('should handle non-existing user', async ({ expect, client }) => {
-    sinon.replace(redisClient, 'get', sinon.fake.resolves('9999999999') as any)
+  test('should return error is token is expired', async ({ expect, client }) => {
+    const user = await UserFactory.create()
+    const pwdReset = await PasswordResetFactory.create({ email: user.email, createdAt: subHours(new Date(), 5) })
 
     const queryData = {
-      query: `
-        mutation ResetPassword($newPassword: String!, $token: String!) {
-          resetPassword(newPassword: $newPassword, token: $token) {
-            errors {
-              field
-              message
-            }
-            user {
-              id
-            }
-          }
-        }`,
+      query: ResetPasswordMutation,
       variables: {
-        token: 'invalid token',
+        token: pwdReset.email,
+        newPassword: '12345'
+      }
+    }
+    const response = await client.post('/').json(queryData)
+    const { data } = response.body()
+
+    expect(data.resetPassword.errors).toBeDefined()
+    expect(data.resetPassword.errors).toHaveLength(1)
+    expect(data.resetPassword.errors).toContainEqual({ field: 'token', message: 'Sorry, your token seems to have expired. Please try again.' })
+  })
+
+  test('should handle non-existing user', async ({ expect, client }) => {
+    const pwdReset = await PasswordResetFactory.create()
+
+    const queryData = {
+      query: ResetPasswordMutation,
+      variables: {
+        token: pwdReset.token,
         newPassword: '12345'
       }
     }
@@ -365,31 +376,13 @@ test.group('resetPassword', () => {
     const oldPassword = faker.internet.password()
     const newPassword = faker.internet.password()
 
-    const user = new User()
-
-    user.username = faker.internet.userName()
-    user.email = faker.internet.exampleEmail()
-    user.password = oldPassword
-
-    const { id } = await UserRepository.save(user)
-
-    sinon.replace(redisClient, 'get', sinon.fake.resolves(`${id}`) as any)
+    const user = await UserFactory.create()
+    const pwdReset = await PasswordResetFactory.create({ email: user.email })
 
     const queryData = {
-      query: `
-        mutation ResetPassword($newPassword: String!, $token: String!) {
-          resetPassword(newPassword: $newPassword, token: $token) {
-            errors {
-              field
-              message
-            }
-            user {
-              id
-            }
-          }
-        }`,
+      query: ResetPasswordMutation,
       variables: {
-        token: 'valid token',
+        token: pwdReset.token,
         newPassword,
       }
     }
@@ -398,29 +391,20 @@ test.group('resetPassword', () => {
 
     expect(data.resetPassword.errors).toBeNull()
     expect(data.resetPassword.user).toBeDefined()
-    expect(data.resetPassword.user.id).toBe(id)
+    expect(data.resetPassword.user.id).toBe(user.id)
 
-    const { password } = await UserRepository.findOneBy({ id })
+    const { password } = await UserRepository.findOneBy({ id: user.id })
     expect(await verify(password, oldPassword)).toBe(false)
     expect(await verify(password, newPassword)).toBe(true)
-
-    sinon.restore()
   })
 })
 
 test.group('logout', () => {
   test('should end session', async ({ expect, client }) => {
-    const username = faker.internet.userName()
     const email = faker.internet.exampleEmail()
     const password = faker.internet.password()
 
-    const user = new User()
-
-    user.username = username
-    user.email = email
-    user.password = password
-
-    await UserRepository.save(user)
+    await UserFactory.create({ email, password })
 
     {
       const queryData = {

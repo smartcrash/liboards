@@ -10,4 +10,12 @@ export class PasswordReset {
 
   @CreateDateColumn()
   createdAt: Date
+
+  get expired(): boolean {
+    const now = new Date()
+    const diffInMs = now.valueOf() - this.createdAt.valueOf()
+    const diffInHours = diffInMs / 1000 / 60 / 60
+
+    return diffInHours > 1
+  }
 }

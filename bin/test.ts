@@ -4,7 +4,6 @@ import { expect } from '@japa/expect'
 import { runFailedTests } from '@japa/run-failed-tests'
 import { configure, PluginFn, processCliArgs, run } from '@japa/runner'
 import { specReporter } from '@japa/spec-reporter'
-import sinon from 'sinon'
 import { APP_PORT, SESSION_COOKIE } from '../source/constants'
 import { dataSource } from '../source/dataSource'
 import { User } from '../source/entity'
@@ -96,8 +95,6 @@ configure({
     forceExit: true,
     importer: (filePath) => import(filePath),
     configureSuite(suite) {
-      suite.onGroup((group) => group.each.teardown(() => sinon.restore()))
-
       suite.setup(async () => {
         await dataSource.initialize()
         const server = await createServer()

@@ -3,9 +3,9 @@ import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-gra
 import { v4 as uuid } from 'uuid';
 import { z, ZodError } from 'zod';
 import { CORS_ORIGIN, SESSION_COOKIE } from '../constants';
-import { User } from "../entity";
-import { redisClient } from '../redisClient';
+import { PasswordReset, User } from "../entity";
 import { UserRepository } from '../repository';
+import { PasswordResetRepository } from '../repository/PasswordResetRepository';
 import { sendMail } from '../sendMail';
 import { ContextType } from '../types';
 
@@ -116,9 +116,10 @@ export class AuthenticationResolver {
 
     const token = uuid()
 
-    await redisClient.set(`password_resets:${token}`, `${user.id}`, {
-      EX: 60 * 60 // 1 hour
-    })
+    const pwdReset = new PasswordReset()
+    pwdReset.email = user.email
+    pwdReset.token = token
+    await PasswordResetRepository.save(pwdReset)
 
     await sendMail(user.email, {
       subject: 'Reset password',
@@ -136,16 +137,17 @@ export class AuthenticationResolver {
     @Arg('token') token: string,
     @Arg('newPassword') newPassword: string,
   ): Promise<AuthenticationResponse> {
-    const userId = await redisClient.get(`password_resets:${token}`)
+    // TODO: Create join to get user
+    const pwdReset = await PasswordResetRepository.findOneBy({ token })
 
-    if (!userId) return {
+    if (!pwdReset || pwdReset.expired) return {
       errors: [{
         field: 'token',
         message: "Sorry, your token seems to have expired. Please try again."
       }]
     }
 
-    const user = await UserRepository.findOneBy({ id: parseInt(userId, 10) })
+    const user = await UserRepository.findOneBy({ email: pwdReset.email })
 
     if (!user) return {
       errors: [{
@@ -157,7 +159,7 @@ export class AuthenticationResolver {
     user.password = newPassword
 
     await UserRepository.save(user)
-    await redisClient.del(`password_resets:${token}`)
+    await PasswordResetRepository.delete({ token })
 
     return { user }
   }
