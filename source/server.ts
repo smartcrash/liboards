@@ -25,9 +25,9 @@ async function createServer() {
     credentials: true,
   }))
 
-  const RedisStore = connectRedis(session)
-  const client = createRedisClient({ url: REDIS_URL, legacyMode: true })
-  await client.connect()
+  // const RedisStore = connectRedis(session)
+  // const client = createRedisClient({ url: REDIS_URL, legacyMode: true })
+  // await client.connect()
 
   app.use(
     session({
@@ -35,10 +35,16 @@ async function createServer() {
       secret: SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
-      store: new RedisStore({
-        client,
-        disableTouch: true
-      }),
+      /*
+        WARNING: The default server-side session storage, MemoryStore, is
+        purposely not designed for a production environment. It will leak
+        memory under most conditions, does not scale past a single process,
+        and is meant for debugging and developing.
+      */
+      // store: new RedisStore({
+      //   client,
+      //   disableTouch: true
+      // }),
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true,

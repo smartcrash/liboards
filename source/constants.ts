@@ -7,7 +7,6 @@ config()
 config({
   override: true,
   path: resolve(process.cwd(), `.env.${process.env.NODE_ENV || 'development'}`),
-  debug: true
 })
 
 // TODO: Validate with zod
