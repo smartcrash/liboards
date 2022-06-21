@@ -2,8 +2,8 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 import { APP_DEBUG, APP_ENV, DB_CONNECTION, DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from "./constants";
 
-export const config = {
-  type: DB_CONNECTION,
+export const config: DataSourceOptions = {
+  type: DB_CONNECTION as any,
   database: DB_DATABASE,
   host: DB_HOST,
   port: DB_PORT,
@@ -16,6 +16,11 @@ export const config = {
   entities: [__dirname + "/entity/*{.ts,.js}"],
   migrations: [__dirname + "/migrations/*{.ts,.js}"],
   subscribers: [__dirname + "/subscribers/*{.ts,.js}"],
-} as DataSourceOptions
+
+  // This enable connect to Heroku postgres from outside of Heroku.
+  // See: https://github.com/typeorm/typeorm/issues/278
+  ssl: true,
+  extra: { ssl: { rejectUnauthorized: false } }
+}
 
 export const dataSource = new DataSource(config)
