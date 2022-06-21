@@ -1,16 +1,14 @@
 
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
-import connectRedis from 'connect-redis';
 import cors from 'cors';
 import express from 'express';
 import session from "express-session";
 import http from 'http';
-import { createClient as createRedisClient } from 'redis';
 import "reflect-metadata";
 import { buildSchema } from 'type-graphql';
 import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
-import { APP_ENV, APP_PORT, CORS_ORIGIN, REDIS_URL, SESSION_COOKIE, SESSION_SECRET } from './constants';
+import { APP_ENV, APP_PORT, CORS_ORIGIN, SESSION_COOKIE, SESSION_SECRET } from './constants';
 import { dataSource } from './dataSource';
 import { ContextType } from './types';
 
