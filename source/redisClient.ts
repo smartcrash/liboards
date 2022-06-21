@@ -1,10 +1,9 @@
 
 import { createClient } from 'redis';
-import { REDIS_HOST, REDIS_PORT } from './constants';
+import { REDIS_URL } from './constants';
 
-const redisClient = createClient({ url: `redis://${REDIS_HOST}:${REDIS_PORT}` })
-
+const redisClient = createClient({ url: REDIS_URL })
 redisClient.on('error', (error) => console.log('Redis Client Error', error));
 redisClient.connect()
 
-export { redisClient }
+export { redisClient };

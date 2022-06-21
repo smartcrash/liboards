@@ -10,7 +10,7 @@ import { createClient as createRedisClient } from 'redis';
 import "reflect-metadata";
 import { buildSchema } from 'type-graphql';
 import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
-import { CORS_ORIGIN, APP_ENV, APP_PORT, SESSION_COOKIE, SESSION_SECRET } from './constants';
+import { APP_ENV, APP_PORT, CORS_ORIGIN, REDIS_URL, SESSION_COOKIE, SESSION_SECRET } from './constants';
 import { dataSource } from './dataSource';
 import { ContextType } from './types';
 
@@ -26,7 +26,7 @@ async function createServer() {
   }))
 
   const RedisStore = connectRedis(session)
-  const client = createRedisClient({ legacyMode: true })
+  const client = createRedisClient({ url: REDIS_URL, legacyMode: true })
   await client.connect()
 
   app.use(
