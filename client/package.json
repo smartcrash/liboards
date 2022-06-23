@@ -8,9 +8,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
-    "generate": "graphql-codegen --config codegen.yml",
-    "prebuild": "npm run  generate",
-    "predev": "npm run generate"
+    "generate": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.1",
