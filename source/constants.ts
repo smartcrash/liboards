@@ -11,7 +11,7 @@ config({
 
 // TODO: Validate with zod
 export const APP_ENV: 'development' | 'production' | 'test' = process.env.NODE_ENV as any || 'local'
-export const APP_PORT: number = parseInt(process.env.APP_PORT)
+export const APP_PORT: number = parseInt(process.env.PORT || process.env.APP_PORT)
 export const APP_DEBUG = process.env.APP_DEBUG === 'true'
 export const CORS_ORIGIN = process.env.CORS_ORIGIN
 
