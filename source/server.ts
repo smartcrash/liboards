@@ -16,7 +16,7 @@ async function createServer() {
   const app = express();
   const httpServer = http.createServer(app);
 
-  app.set('proxy', 1)
+  app.set('trust proxy', 1)
 
   app.use(cors({
     origin: [CORS_ORIGIN, 'https://studio.apollographql.com'],
