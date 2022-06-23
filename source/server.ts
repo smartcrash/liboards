@@ -48,6 +48,7 @@ async function createServer() {
         httpOnly: true,
         sameSite: 'lax',
         secure: APP_ENV === 'production', // Whether the cookie is only visible over https
+        domain: '.vercel.app'
       },
     })
   )
