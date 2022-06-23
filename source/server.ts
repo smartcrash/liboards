@@ -44,11 +44,11 @@ async function createServer() {
       //   disableTouch: true
       // }),
       cookie: {
+        path: '/',
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true,
         sameSite: 'lax',
         secure: APP_ENV === 'production', // Whether the cookie is only visible over https
-        domain: '.vercel.app'
       },
     })
   )
