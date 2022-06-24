@@ -1,12 +1,16 @@
 import { Helmet } from "react-helmet";
-import { Box } from "@chakra-ui/react";
+import { Box, Center, Spinner } from "@chakra-ui/react";
 
 export const Loading = () => {
   return (
     <>
       <Helmet title={"Loading..."} />
-      {/* TODO: Be nicer */}
-      <Box>Wait a little bitch</Box>;
+      <Box w={"100vw"} h={"100vh"}>
+        <Center h={"full"}>
+          <Spinner color={"primary.500"} size={"xl"} thickness={"2px"} />
+        </Center>
+      </Box>
+      ;
     </>
   );
 };
