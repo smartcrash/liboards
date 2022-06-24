@@ -27,10 +27,8 @@ import {
   AllDeletedBoardsQuery,
   AllFavoritesDocument,
   AllFavoritesQuery,
-  BoardFragmentFragmentDoc,
-  Column,
-  ColumnFragmentFragmentDoc,
-  CreateBoardMutation,
+  Board,
+  BoardFragmentFragmentDoc, CreateBoardMutation,
   CreateUserMutation,
   CurrentUserDocument,
   CurrentUserQuery,
@@ -115,16 +113,30 @@ export const createUrqlClient = () => createClient({
             )
           },
 
-          deleteBoard: (result, args: DeleteBoardMutationVariables, cache, info) => {
+          deleteBoard(result: DeleteBoardMutation, args: DeleteBoardMutationVariables, cache) {
+            // Remove deleted board from cache
             cache.invalidate('Query', 'findBoardById', { id: args.id })
-            // TODO: Update query instead of invalidate is board is on cache
-            cache.invalidate('Query', 'allDeletedBoards')
 
-            updateQuery<DeleteBoardMutation, AllBoardsQuery>(
-              cache,
+            // Remove board from allBoardsQuery
+            cache.updateQuery(
               { query: AllBoardsDocument },
-              result, (result, data) => ({ boards: (data?.boards || []).filter((board) => board.id !== args.id) })
+              (data: AllBoardsQuery | null) => ({ boards: (data?.boards || []).filter((board) => board.id !== args.id) })
             )
+
+            // Append board to allDeletedBoards query if is in cache
+            const board = cache.readFragment(BoardFragmentFragmentDoc, { id: args.id }) as Board | null
+
+            if (board) {
+              cache.updateQuery({ query: AllDeletedBoardsDocument }, (data: AllDeletedBoardsQuery | null) => {
+                if (!data) return data
+                data.boards.unshift({ __typename: 'Board', ...board })
+                return data
+              })
+            } else {
+              // If is not in cache, just invalidate the whole list
+              // so is re-fetch again and update the UI
+              cache.invalidate('Query', 'allDeletedBoards')
+            }
           },
 
           restoreBoard: (result, args: RestoreBoardMutationVariables, cache, info) => {

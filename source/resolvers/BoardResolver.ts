@@ -50,6 +50,7 @@ export class BoardResolver {
           createdById: user.id,
           deletedAt: Not(IsNull()),
         },
+        order: { deletedAt: 'DESC' },
         withDeleted: true
       })
   }
