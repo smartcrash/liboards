@@ -317,8 +317,6 @@ test.group('loginWithPassword', () => {
 })
 
 test.group('resetPassword', (group) => {
-  group.tap(test => test.pin())
-
   test('should return error is token does not exists', async ({ expect, client }) => {
     const queryData = {
       query: ResetPasswordMutation,
