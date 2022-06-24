@@ -123,6 +123,11 @@ export const createUrqlClient = () => createClient({
               (data: AllBoardsQuery | null) => ({ boards: (data?.boards || []).filter((board) => board.id !== args.id) })
             )
 
+            // Remove board from allFavorites
+            cache.updateQuery(
+              { query: AllFavoritesDocument },
+              (data: AllFavoritesQuery | null) => ({ favorites: (data?.favorites || []).filter((board) => board.id !== args.id) })
+            )
             // Append board to allDeletedBoards query if is in cache
             const board = cache.readFragment(BoardFragmentFragmentDoc, { id: args.id }) as Board | null
 
