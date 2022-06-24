@@ -14,8 +14,6 @@ import {
 } from "urql";
 import { API_URL } from './constants';
 import {
-  AddCardMutation,
-  AddCardMutationVariables,
   AddCommentMutation,
   AddCommentMutationVariables,
   AddTaskMutation,
@@ -33,8 +31,7 @@ import {
   CurrentUserDocument,
   CurrentUserQuery,
   DeleteBoardMutation,
-  DeleteBoardMutationVariables,
-  FindCardByIdDocument,
+  DeleteBoardMutationVariables, FindCardByIdDocument,
   FindCardByIdQuery,
   LoginWithPasswordMutation,
   LogoutMutation,
@@ -237,13 +234,6 @@ export const createUrqlClient = () => createClient({
                 return data
               }
             )
-          },
-
-          addCard(result: AddCardMutation, args: AddCardMutationVariables, cache) {
-            cache.invalidate({
-              __typename: 'Column',
-              id: args.columnId
-            })
           },
 
           removeComment(result: RemoveColumnMutation, args: RemoveCardMutationVariables, cache, info) {
