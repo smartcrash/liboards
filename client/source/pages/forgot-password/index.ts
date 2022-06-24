@@ -1,1 +1,1 @@
-export * from './ForgorPassword'
+export { ForgotPassword as default } from './ForgorPassword'

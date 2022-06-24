@@ -1,1 +1,1 @@
-export * from './CreateProject'
+export { CreateProject as default } from './CreateProject'
