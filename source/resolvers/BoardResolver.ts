@@ -111,6 +111,7 @@ export class BoardResolver {
     @Arg('id', () => Int) id: number,
     @Ctx() { user }: ContextType
   ): Promise<number | null> {
+    await FavoritesRepository.delete({ userId: user.id, boardId: id })
     await BoardRepository.softDelete({ id, createdById: user.id })
 
     return id
