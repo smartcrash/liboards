@@ -10,15 +10,15 @@ export class FavoritesResolver {
   @UseMiddleware(Authenticate)
   @Query(() => [Board])
   async allFavorites(
-    @Ctx() { req }: ContextType): Promise<Board[]> {
-    const { userId } = req.session
-
+    @Ctx() { user }: ContextType): Promise<Board[]> {
     const favorites = await FavoritesRepository.find({
-      where: { userId },
+      where: { user: { id: user.id } },
       relations: { board: true }
     })
 
-    return favorites.map(({ board }) => board)
+    return favorites
+      .map(({ board }) => board)
+      .filter(board => !!board) // Some boards may be soft-deleted, that's why we filter the falsy elements
   }
 
   @UseMiddleware(Authenticate)
@@ -26,10 +26,13 @@ export class FavoritesResolver {
   @Mutation(() => Boolean)
   async addToFavorites(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req }: ContextType): Promise<Boolean | null> {
-    const { userId } = req.session
-
-    await FavoritesRepository.upsert({ userId, boardId: id }, ['userId', 'boardId'])
+    @Ctx() { user }: ContextType): Promise<Boolean | null> {
+    await FavoritesRepository.upsert({
+      userId: user.id,
+      boardId: id,
+    },
+      ['userId', 'boardId']
+    )
 
     return true
   }
@@ -39,10 +42,8 @@ export class FavoritesResolver {
   @Mutation(() => Boolean)
   async removeFromFavorites(
     @Arg('id', () => Int) id: number,
-    @Ctx() { req }: ContextType): Promise<Boolean | null> {
-    const { userId } = req.session
-
-    await FavoritesRepository.delete({ userId, boardId: id })
+    @Ctx() { user }: ContextType): Promise<Boolean | null> {
+    await FavoritesRepository.delete({ userId: user.id, boardId: id })
 
     return true
   }

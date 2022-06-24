@@ -1,6 +1,7 @@
 import { test } from "@japa/runner"
 import { SESSION_COOKIE } from "../source/constants"
-import { FavoritesRepository, UserRepository } from "../source/repository"
+import { BoardFactory } from "../source/factories"
+import { BoardRepository, FavoritesRepository, UserRepository } from "../source/repository"
 import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from "../source/utils/testUtils"
 
 const AllFavoritesQuery = `
@@ -56,6 +57,29 @@ test.group('allFavorites', () => {
     expect(Array.isArray(data.favorites)).toBeTruthy()
     expect(data.favorites).toHaveLength(2)
     expect(data.favorites).not.toContain(expect.arrayContaining([{ id: board1.id }]))
+  })
+
+  test('should work if contains soft-deleted elements', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+
+    const board = await BoardFactory.create({ createdBy: user })
+    await BoardRepository.softDelete({ id: board.id })
+
+    await FavoritesRepository.insert({ userId: user.id, boardId: board.id })
+
+    const queryData = {
+      query: AllFavoritesQuery,
+      variables: {}
+    }
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data, errors } = response.body()
+
+    expect(errors).toBeFalsy()
+    expect(data).toBeTruthy()
+
+    expect(Array.isArray(data.favorites)).toBe(true)
+    expect(data.favorites).toHaveLength(0)
   })
 })
 
