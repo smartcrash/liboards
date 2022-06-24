@@ -13,6 +13,8 @@ import {
   fetchExchange
 } from "urql";
 import {
+  AddCardMutation,
+  AddCardMutationVariables,
   AddCommentMutation,
   AddCommentMutationVariables,
   AddTaskMutation,
@@ -25,13 +27,24 @@ import {
   AllFavoritesDocument,
   AllFavoritesQuery,
   BoardFragmentFragmentDoc,
+  Column,
+  ColumnFragmentFragmentDoc,
   CreateBoardMutation,
   CreateUserMutation,
   CurrentUserDocument,
   CurrentUserQuery,
   DeleteBoardMutation,
-  DeleteBoardMutationVariables, FindCardByIdDocument, FindCardByIdQuery, LoginWithPasswordMutation,
-  LogoutMutation, RemoveCardMutationVariables, RemoveColumnMutation, RemoveFromFavoritesMutationVariables, RemoveTaskMutation, RemoveTaskMutationVariables, RestoreBoardMutation,
+  DeleteBoardMutationVariables,
+  FindCardByIdDocument,
+  FindCardByIdQuery,
+  LoginWithPasswordMutation,
+  LogoutMutation,
+  RemoveCardMutationVariables,
+  RemoveColumnMutation,
+  RemoveFromFavoritesMutationVariables,
+  RemoveTaskMutation,
+  RemoveTaskMutationVariables,
+  RestoreBoardMutation,
   RestoreBoardMutationVariables
 } from "./generated/graphql";
 
@@ -206,6 +219,13 @@ export const createUrqlClient = () => createClient({
                 return data
               }
             )
+          },
+
+          addCard(result: AddCardMutation, args: AddCardMutationVariables, cache) {
+            cache.invalidate({
+              __typename: 'Column',
+              id: args.columnId
+            })
           },
 
           removeComment(result: RemoveColumnMutation, args: RemoveCardMutationVariables, cache, info) {
