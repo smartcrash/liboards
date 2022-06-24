@@ -1,12 +1,13 @@
 import {
   Box,
-  BoxProps,
   Heading,
   IconButton,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
+  Skeleton,
+  SkeletonText,
   Stack,
   Text,
   useDisclosure,
@@ -28,7 +29,13 @@ export const Card = ({ id, onRemove, onClick }: CardProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [{ data, fetching }] = useFindCardByIdQuery({ variables: { id } });
 
-  if (fetching) return <>Loading...</>; // TODO: Show skeleton
+  if (fetching)
+    return (
+      <Box py={4} px={3} borderWidth={1} borderRadius={"sm"} bg={"white"}>
+        <Skeleton height={"15px"} mb={3} />
+        <SkeletonText noOfLines={2} />
+      </Box>
+    );
   if (!data || !data.card) return <>Error: Card not found :c</>; // TODO: Handle error
 
   const { title, description } = data.card;
