@@ -1,10 +1,10 @@
 /// <reference types="vitest" />
 
-import { defineConfig } from 'vite'
+import { defineConfig, splitVendorChunkPlugin } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
+// See: https://vitejs.dev/config
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), splitVendorChunkPlugin()],
   test: { environment: 'jsdom' }
 })
