@@ -10,7 +10,6 @@ import {
   MenuList,
   Stack,
 } from "@chakra-ui/react";
-import { cloneDeep } from "lodash-es";
 import { useEffect } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { NonEmptyEditable } from "../";
@@ -67,7 +66,7 @@ export const Board = ({
   const [boardRef, setBoardRef] = useRefState<BoardType>({ columns: [] });
 
   useEffect(() => {
-    const board = cloneDeep(initialBoard);
+    const board = structuredClone(initialBoard);
     board.columns.forEach((column) => column.cards.sort((a, b) => a.index - b.index));
     setBoardRef(board);
   }, [initialBoard]);
