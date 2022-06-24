@@ -163,13 +163,13 @@ export const createUrqlClient = () => createClient({
             cache.updateQuery({ query: AllFavoritesDocument }, (data: AllFavoritesQuery | null) => {
               if (!data || !data.favorites) return data
 
-              const entity = cache.readFragment(BoardFragmentFragmentDoc, { id })
+              const board = cache.readFragment(BoardFragmentFragmentDoc, { id })
 
-              if (!entity) return data
+              if (!board) return data
 
               data.favorites.push({
                 __typename: 'Board' as const,
-                ...(entity as any)
+                ...(board as any)
               })
 
               return data
