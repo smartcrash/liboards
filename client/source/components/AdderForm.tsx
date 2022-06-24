@@ -1,4 +1,4 @@
-import { BoxProps, Button, ButtonGroup, ChakraInputProps, Input, Stack } from "@chakra-ui/react";
+import { BoxProps, Button, ButtonGroup, Input, Stack } from "@chakra-ui/react";
 import { FormEventHandler, KeyboardEventHandler, useRef } from "react";
 
 interface AdderFormProps extends BoxProps {
@@ -6,7 +6,7 @@ interface AdderFormProps extends BoxProps {
   onCancel: () => void;
   confirmText?: string;
   cancelText?: string;
-  inputProps?: ChakraInputProps;
+  inputProps?: any;
 }
 
 export const AdderForm = ({

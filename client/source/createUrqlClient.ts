@@ -12,6 +12,7 @@ import {
   errorExchange,
   fetchExchange
 } from "urql";
+import { API_URL } from './constants';
 import {
   AddCardMutation,
   AddCardMutationVariables,
@@ -63,7 +64,7 @@ function updateQuery<R extends DataFields, Q>(
 }
 
 export const createUrqlClient = () => createClient({
-  url: "http://localhost:4000/graphql", // TODO: Move to .env or something
+  url: API_URL,
   fetchOptions: { credentials: "include" },
   exchanges: [
     dedupExchange,

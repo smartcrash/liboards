@@ -1,5 +1,5 @@
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import {
-  ChakraInputProps,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -10,15 +10,11 @@ import {
   useDisclosure,
   useMergeRefs,
 } from "@chakra-ui/react";
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useRef } from "react";
-import { useController, UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
+import { InputProps } from "./Input";
 
-interface PasswordInputProps<T>
-  extends UseControllerProps<T>,
-    Omit<ChakraInputProps, keyof UseControllerProps<T>> {
-  label?: string;
-}
+interface PasswordInputProps<T> extends InputProps<T> {}
 
 export function PasswordInput<T>({
   control,
