@@ -9,9 +9,9 @@ export class Favorite {
   @PrimaryColumn()
   boardId: number
 
-  @ManyToOne(() => User, (user) => user.favorites)
+  @ManyToOne(() => User, (user) => user.favorites, { onDelete: "CASCADE" })
   user: User
 
-  @ManyToOne(() => Board, (board) => board.favorites)
+  @ManyToOne(() => Board, (board) => board.favorites, { onDelete: 'CASCADE' })
   board: Board
 }
