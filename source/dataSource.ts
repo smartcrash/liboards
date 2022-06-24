@@ -2,7 +2,7 @@
 import { DataSource, DataSourceOptions } from "typeorm";
 import { APP_DEBUG, APP_ENV, DB_CONNECTION, DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from "./constants";
 
-export const config: DataSourceOptions = {
+const config: DataSourceOptions = {
   type: DB_CONNECTION as any,
   database: DB_DATABASE,
   host: DB_HOST,
