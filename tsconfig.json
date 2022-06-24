@@ -11,15 +11,11 @@
       "esnext.asynciterable"
     ],
     "moduleResolution": "node",
-    "rootDir": "./source",
     "outDir": "./dist",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "sourceMap": true,
   },
-  "include": [
-    "source/**/*.ts",
-  ],
   // By default, ts-node will perform type-checking every time you run tests.
   // However, type-checking is usually slow, and you can turn it off by adding
   // the following configuration block.
