@@ -34,7 +34,7 @@ const RemoveTaskMutation = `
   }
 `
 
-test.group('addCard', () => {
+test.group('addTodo', () => {
   testThrowsIfNotAuthenticated({
     query: AddTaskMutation,
     variables: { content: '', cardId: 0 }
@@ -98,7 +98,7 @@ test.group('addCard', () => {
   })
 })
 
-test.group('updateCard', () => {
+test.group('updateTask', () => {
   testThrowsIfNotAuthenticated({
     query: UpdateTaskMutation,
     variables: { content: '', id: 0 }
