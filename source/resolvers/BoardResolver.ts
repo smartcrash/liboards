@@ -41,16 +41,12 @@ export class BoardResolver {
   }
 
   @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('viewAny-board'))
   @Query(() => [Board])
-  async allDeletedBoards(
-    @Ctx() { user }: ContextType
-  ): Promise<Board[]> {
+  async allDeletedBoards(@Ctx() { user }: ContextType): Promise<Board[]> {
     return BoardRepository
       .find({
-        where: {
-          createdById: user.id,
-          deletedAt: Not(IsNull()),
-        },
+        where: { deletedAt: Not(IsNull()), createdById: user.id },
         order: { deletedAt: 'DESC' },
         withDeleted: true
       })
@@ -59,15 +55,8 @@ export class BoardResolver {
   @UseMiddleware(Authenticate)
   @UseMiddleware(AllowIf('view-board'))
   @Query(() => Board, { nullable: true })
-  async findBoardById(
-    @Arg('id', () => Int) id: number,
-    @Ctx() { user }: ContextType
-  ): Promise<Board> {
-    return BoardRepository
-      .findOne({
-        relations: { createdBy: true },
-        where: { id, createdById: user.id }
-      })
+  async findBoardById(@Arg('id', () => Int) id: number): Promise<Board> {
+    return BoardRepository.findOneBy({ id })
   }
 
   @UseMiddleware(Authenticate)
