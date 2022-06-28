@@ -30,6 +30,7 @@ export class BoardResolver {
   }
 
   @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('viewAny-board'))
   @Query(() => [Board])
   async allBoards(
     @Ctx() { user }: ContextType
@@ -56,6 +57,7 @@ export class BoardResolver {
   }
 
   @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('view-board'))
   @Query(() => Board, { nullable: true })
   async findBoardById(
     @Arg('id', () => Int) id: number,
