@@ -1,11 +1,5 @@
-
 import { gql } from '@urql/core';
-import {
-  Cache,
-  cacheExchange,
-  DataFields,
-  QueryInput
-} from "@urql/exchange-graphcache";
+import { cacheExchange } from "@urql/exchange-graphcache";
 import {
   createClient,
   dedupExchange,
@@ -44,20 +38,6 @@ import {
   RestoreBoardMutationVariables
 } from "../generated/graphql";
 
-function updateQuery<R extends DataFields, Q>(
-  cache: Cache,
-  queryInput: QueryInput,
-  result: any,
-  // The `data` may be null if the cache doesn't actually have
-  // enough locally cached information to fulfil the query
-  fn: (result: R, data: Q | null) => Q | null
-) {
-  return cache.updateQuery(
-    queryInput,
-    (data) => fn(result, data as any) as any
-  );
-}
-
 export const createUrqlClient = () => createClient({
   url: API_URL,
   fetchOptions: { credentials: "include" },
@@ -66,48 +46,35 @@ export const createUrqlClient = () => createClient({
     cacheExchange({
       updates: {
         Mutation: {
-          loginWithPassword: (result, args, cache, info) => {
-            updateQuery<LoginWithPasswordMutation, CurrentUserQuery>(
-              cache,
-              { query: CurrentUserDocument },
-              result,
-              (result, data) => {
-                if (result.loginWithPassword.errors) return data;
-                else return { currentUser: result.loginWithPassword.user };
-              }
-            );
+          loginWithPassword(result: LoginWithPasswordMutation, args, cache, info) {
+            cache.updateQuery({ query: CurrentUserDocument }, (data: CurrentUserQuery | null) => {
+              if (result.loginWithPassword.errors) return data;
+              else return { currentUser: result.loginWithPassword.user };
+            })
           },
 
-          createUser: (result, args, cache, info) => {
-            updateQuery<CreateUserMutation, CurrentUserQuery>(
-              cache,
-              { query: CurrentUserDocument },
-              result,
-              (result, data) => {
-                if (result.createUser.errors) return data;
-                else return { currentUser: result.createUser.user };
-              }
-            );
+          createUser(result: CreateUserMutation, args, cache, info) {
+            cache.updateQuery({ query: CurrentUserDocument }, (data: CurrentUserQuery | null) => {
+              if (result.createUser.errors) return data;
+              else return { currentUser: result.createUser.user };
+            })
           },
 
-          logout: (result, args, cache, info) => {
-            updateQuery<LogoutMutation, CurrentUserQuery>(
-              cache,
-              { query: CurrentUserDocument },
-              result,
-              () => ({ currentUser: null })
-            );
+          logout(result: LogoutMutation, args, cache, info) {
+            cache.updateQuery({ query: CurrentUserDocument }, () => ({ currentUser: null }))
           },
 
-          createBoard: (result, args, cache, info) => {
-            updateQuery<CreateBoardMutation, AllBoardsQuery>(
-              cache,
-              { query: AllBoardsDocument },
+          createBoard(result: CreateBoardMutation, args, cache, info) {
+            cache.updateQuery({ query: AllBoardsDocument }, (data: AllBoardsQuery | null) => {
+              if (!data?.boards) return data
+
               // NOTE: This works under the assumpsion that the `allBoards` query
               // returns boards ordered by `createdAt`, this may change in the
               // future.
-              result, (result, data) => ({ boards: [result.board, ...(data?.boards || [])] })
-            )
+              data.boards.unshift(result.board)
+
+              return data
+            })
           },
 
           deleteBoard(result: DeleteBoardMutation, args: DeleteBoardMutationVariables, cache) {
@@ -141,14 +108,16 @@ export const createUrqlClient = () => createClient({
             }
           },
 
-          restoreBoard: (result, args: RestoreBoardMutationVariables, cache, info) => {
+          restoreBoard(result: RestoreBoardMutation, args: RestoreBoardMutationVariables, cache, info) {
             cache.invalidate('Query', 'allBoards')
 
-            updateQuery<RestoreBoardMutation, AllDeletedBoardsQuery>(
-              cache,
-              { query: AllDeletedBoardsDocument },
-              result, (result, data) => ({ boards: (data?.boards || []).filter((board) => board.id !== args.id) })
-            )
+            cache.updateQuery({ query: AllDeletedBoardsDocument }, (data: AllDeletedBoardsQuery | null) => {
+              if (!data?.boards) return data
+
+              data.boards = data.boards.filter((board) => board.id !== args.id)
+
+              return data
+            })
           },
 
           addToFavorites: (_, { id }: AddToFavoritesMutationVariables, cache) => {
@@ -178,7 +147,7 @@ export const createUrqlClient = () => createClient({
             })
           },
 
-          removeFromFavorites: (result, args: RemoveFromFavoritesMutationVariables, cache, info) => {
+          removeFromFavorites(result, args: RemoveFromFavoritesMutationVariables, cache, info) {
             const fragment = gql`
               fragment _ on Board {
                 id
