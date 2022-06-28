@@ -80,7 +80,8 @@ export type Mutation = {
   addToFavorites: Scalars['Boolean'];
   createBoard: Board;
   createUser: AuthenticationResponse;
-  deleteBoard?: Maybe<Scalars['Int']>;
+  deleteBoard: Scalars['Int'];
+  forceDeleteBoard: Scalars['Int'];
   loginWithPassword: AuthenticationResponse;
   logout: Scalars['Boolean'];
   moveCard?: Maybe<Card>;
@@ -92,7 +93,7 @@ export type Mutation = {
   resetPassword: AuthenticationResponse;
   restoreBoard?: Maybe<Scalars['Int']>;
   sendResetPasswordEmail: Scalars['Boolean'];
-  updateBoard?: Maybe<Board>;
+  updateBoard: Board;
   updateCard?: Maybe<Card>;
   updateColumn?: Maybe<Column>;
   updateComment: Comment;
@@ -143,6 +144,11 @@ export type MutationCreateUserArgs = {
 
 
 export type MutationDeleteBoardArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationForceDeleteBoardArgs = {
   id: Scalars['Int'];
 };
 
@@ -351,7 +357,14 @@ export type DeleteBoardMutationVariables = Exact<{
 }>;
 
 
-export type DeleteBoardMutation = { __typename?: 'Mutation', id?: number | null };
+export type DeleteBoardMutation = { __typename?: 'Mutation', id: number };
+
+export type ForceDeleteBoardMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type ForceDeleteBoardMutation = { __typename?: 'Mutation', id: number };
 
 export type LoginWithPasswordMutationVariables = Exact<{
   password: Scalars['String'];
@@ -438,7 +451,7 @@ export type UpdateBoardMutationVariables = Exact<{
 }>;
 
 
-export type UpdateBoardMutation = { __typename?: 'Mutation', board?: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean } | null };
+export type UpdateBoardMutation = { __typename?: 'Mutation', board: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean } };
 
 export type UpdateCardMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -659,6 +672,15 @@ export const DeleteBoardDocument = gql`
 
 export function useDeleteBoardMutation() {
   return Urql.useMutation<DeleteBoardMutation, DeleteBoardMutationVariables>(DeleteBoardDocument);
+};
+export const ForceDeleteBoardDocument = gql`
+    mutation ForceDeleteBoard($id: Int!) {
+  id: forceDeleteBoard(id: $id)
+}
+    `;
+
+export function useForceDeleteBoardMutation() {
+  return Urql.useMutation<ForceDeleteBoardMutation, ForceDeleteBoardMutationVariables>(ForceDeleteBoardDocument);
 };
 export const LoginWithPasswordDocument = gql`
     mutation LoginWithPassword($password: String!, $email: String!) {

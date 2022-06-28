@@ -1,9 +1,29 @@
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Grid,
+  Heading,
+  HStack,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+  Spacer,
+  Stack,
+  Text,
+  useDisclosure,
+  VStack,
+} from "@chakra-ui/react";
 import { Helmet } from "react-helmet";
-import { Box, Button, Grid, Heading, HStack, Spacer, Stack, Text, useDisclosure, VStack } from "@chakra-ui/react";
 import {
   useAllBoardsQuery,
   useAllDeletedBoardsQuery,
   useAllFavoritesQuery,
+  useForceDeleteBoardMutation,
   useRestoreBoardMutation,
 } from "../../../generated/graphql";
 import { BoardAdderItem } from "./BoardAdderItem";
@@ -17,6 +37,7 @@ export const ListProjects = () => {
   const [{ data: favorites }] = useAllFavoritesQuery();
   const [{ data: deleted }] = useAllDeletedBoardsQuery();
   const [{ fetching: restoring }, restoreBoard] = useRestoreBoardMutation();
+  const [{ fetching: deleting }, forceDeleteBoard] = useForceDeleteBoardMutation();
 
   // TODO: Add skeleton
 
@@ -64,7 +85,6 @@ export const ListProjects = () => {
                 base: "1fr",
                 sm: "repeat(2, 1fr)",
                 md: "repeat(3, 1fr)",
-                // sm: "repeat(auto-fit, minmax(100px, 300px))",
               }}
               gap={2}
               mt={4}
@@ -82,19 +102,53 @@ export const ListProjects = () => {
                   shadow={"md"}
                 >
                   <VStack alignItems={"flex-start"} spacing={0}>
-                    <Text fontSize={"md"}>{title}</Text>
+                    <Text fontSize={"sm"}>{title}</Text>
                   </VStack>
 
-                  <Button
-                    colorScheme={"blue"}
-                    size={"sm"}
-                    variant={"link"}
-                    onClick={() => restoreBoard({ id })}
-                    isLoading={restoring}
-                    data-testid={"restore"}
-                  >
-                    Restore
-                  </Button>
+                  <ButtonGroup size={"sm"} variant={"link"} spacing={6}>
+                    <Popover>
+                      <PopoverTrigger>
+                        <Button colorScheme={"red"} isLoading={deleting} data-testid={"force-delete"}>
+                          Delete
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent>
+                        <PopoverArrow />
+                        <PopoverCloseButton />
+                        <PopoverHeader>Are you absolutely sure?</PopoverHeader>
+
+                        <PopoverBody>
+                          <VStack spacing={3}>
+                            <Text fontSize={"sm"} color={"gray.500"}>
+                              This action cannot be undone. This will permanently delete the{" "}
+                              <strong>{title} project</strong>, columns, cards, and remove all collaborator
+                              associations.
+                            </Text>
+
+                            <Button
+                              colorScheme={"red"}
+                              w={"full"}
+                              size={"sm"}
+                              variant={"solid"}
+                              onClick={() => forceDeleteBoard({ id })}
+                              data-testid={"force-delete"}
+                            >
+                              Delete this project
+                            </Button>
+                          </VStack>
+                        </PopoverBody>
+                      </PopoverContent>
+                    </Popover>
+
+                    <Button
+                      colorScheme={"blackAlpha"}
+                      onClick={() => restoreBoard({ id })}
+                      isLoading={restoring}
+                      data-testid={"restore"}
+                    >
+                      Restore
+                    </Button>
+                  </ButtonGroup>
                 </HStack>
               ))}
 

@@ -1,5 +1,3 @@
-import { Helmet } from "react-helmet";
-import { DeleteIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -20,6 +18,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useRef } from "react";
+import { Helmet } from "react-helmet";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import {
   Board,
@@ -47,8 +46,8 @@ import {
   useUpdateBoardMutation,
   useUpdateColumnMutation,
 } from "../../../generated/graphql";
-import { route } from "../../../routes";
 import { TrashIcon } from "../../../icons";
+import { route } from "../../../routes";
 
 export const ShowProject = () => {
   const navigate = useNavigate();

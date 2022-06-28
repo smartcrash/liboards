@@ -27,6 +27,8 @@ import {
   DeleteBoardMutation,
   DeleteBoardMutationVariables, FindCardByIdDocument,
   FindCardByIdQuery,
+  ForceDeleteBoardMutation,
+  ForceDeleteBoardMutationVariables,
   LoginWithPasswordMutation,
   LogoutMutation,
   RemoveCardMutationVariables,
@@ -118,6 +120,10 @@ export const createUrqlClient = () => createClient({
 
               return data
             })
+          },
+
+          forceDeleteBoard(result: ForceDeleteBoardMutation, args: ForceDeleteBoardMutationVariables, cache, info) {
+            cache.invalidate({ __typename: 'Board', id: args.id })
           },
 
           addToFavorites: (_, { id }: AddToFavoritesMutationVariables, cache) => {
