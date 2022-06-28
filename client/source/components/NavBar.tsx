@@ -22,6 +22,14 @@ function NavBar() {
 
   if (!user) return null;
 
+  const onLogout = async () => {
+    await logout();
+
+    // After logout we force a reload of the page to invalidate the whole cache.
+    // See: https://github.com/FormidableLabs/urql/issues/2511
+    window.location.reload();
+  };
+
   return (
     <Container as={"nav"} bg={"primary.500"}>
       <HStack justifyContent={"space-between"} h={16}>
@@ -66,7 +74,7 @@ function NavBar() {
 
               <MenuDivider />
 
-              <MenuItem onClick={() => logout()} data-testid={"logout"}>
+              <MenuItem onClick={onLogout} data-testid={"logout"}>
                 Logout
               </MenuItem>
             </MenuList>
