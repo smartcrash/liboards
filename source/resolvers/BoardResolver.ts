@@ -78,13 +78,12 @@ export class BoardResolver {
 
   @UseMiddleware(Authenticate)
   @UseMiddleware(AllowIf('update-board'))
-  @Mutation(() => Board, { nullable: true })
+  @Mutation(() => Board)
   async updateBoard(
     @Arg('id', () => Int) id: number,
     @Arg('title', () => String, { nullable: true }) title: string | null,
-    @Ctx() { user }: ContextType
   ): Promise<Board | null> {
-    const board = await BoardRepository.findOneBy({ id, createdById: user.id })
+    const board = await BoardRepository.findOneBy({ id })
 
     if (!board) return null
 
@@ -97,13 +96,13 @@ export class BoardResolver {
 
   @UseMiddleware(Authenticate)
   @UseMiddleware(AllowIf('delete-board'))
-  @Mutation(() => Int, { nullable: true })
+  @Mutation(() => Int)
   async deleteBoard(
     @Arg('id', () => Int) id: number,
     @Ctx() { user }: ContextType
   ): Promise<number | null> {
     await FavoritesRepository.delete({ userId: user.id, boardId: id })
-    await BoardRepository.softDelete({ id, createdById: user.id })
+    await BoardRepository.softDelete({ id })
 
     return id
   }
@@ -111,11 +110,17 @@ export class BoardResolver {
   @UseMiddleware(Authenticate)
   @UseMiddleware(AllowIf('restore-board'))
   @Mutation(() => Int, { nullable: true })
-  async restoreBoard(
-    @Arg('id', () => Int) id: number,
-    @Ctx() { user }: ContextType
-  ): Promise<number | null> {
-    await BoardRepository.restore({ id, createdById: user.id })
+  async restoreBoard(@Arg('id', () => Int) id: number): Promise<number | null> {
+    await BoardRepository.restore({ id })
+
+    return id
+  }
+
+  @UseMiddleware(Authenticate)
+  @UseMiddleware(AllowIf('forceDelete-board'))
+  @Mutation(() => Int)
+  async forceDeleteBoard(@Arg('id', () => Int) id: number): Promise<number | null> {
+    await BoardRepository.delete({ id })
 
     return id
   }

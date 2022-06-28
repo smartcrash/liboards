@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import { SESSION_COOKIE } from '../source/constants';
+import { BoardFactory, UserFactory } from '../source/factories';
 import { BoardRepository } from '../source/repository';
 import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from '../source/utils/testUtils';
 
@@ -58,6 +59,12 @@ const DeleteBoardMutation = `
 const RestoreBoardMutation = `
   mutation RestoreBoard($id: Int!) {
     id: restoreBoard(id: $id)
+  }
+`
+
+const ForceDeleteBoardMutation = `
+  mutation ForceDeleteBoard($id: Int!) {
+    id: forceDeleteBoard(id: $id)
   }
 `
 
@@ -370,5 +377,53 @@ test.group('restoreBoard', () => {
 
     expect(board).not.toBeNull()
     expect(board.deletedAt).not.toBeNull()
+  })
+})
+
+test.group('forceDeletboard', () => {
+  testThrowsIfNotAuthenticated({
+    query: ForceDeleteBoardMutation,
+    variables: { id: -1 }
+  })
+
+  test('should delete (for real) the board', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const { id } = await BoardFactory.create({ createdBy: user })
+
+    const queryData = {
+      query: ForceDeleteBoardMutation,
+      variables: { id }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.id).toBeDefined()
+    expect(data.id).toBe(id)
+
+    const board = await BoardRepository.findOne({ where: { id }, withDeleted: true })
+
+    expect(board).toBeFalsy()
+  })
+
+  test('should not be able to delete someone else\'s booard', async ({ expect, client, createUser }) => {
+    const otherUser = await UserFactory.create()
+    const [, cookie] = await createUser(client)
+
+    const { id } = await BoardFactory.create({ createdBy: otherUser })
+
+    const queryData = {
+      query: ForceDeleteBoardMutation,
+      variables: { id }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+
+    assertIsForbiddenExeption({ response, expect })
+
+    const board = await BoardRepository.findOne({ where: { id }, withDeleted: true })
+
+    expect(board).toBeDefined()
+    expect(board.deletedAt).toBeNull()
   })
 })
