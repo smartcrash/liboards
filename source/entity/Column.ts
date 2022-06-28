@@ -23,7 +23,7 @@ export class Column {
   boardId: number
 
   // @Field(() => Board)
-  @ManyToOne(() => Board, board => board.columns)
+  @ManyToOne(() => Board, board => board.columns, { onDelete: 'CASCADE' })
   // @TypeormLoader()
   board: Board
 

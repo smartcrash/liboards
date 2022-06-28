@@ -19,6 +19,7 @@ export class Board {
   @Property()
   createdById: number
 
+  // TODO: Handle what should happen when a user is deleted
   @Field(() => User)
   @ManyToOne(() => User, user => user.boards)
   @TypeormLoader()
