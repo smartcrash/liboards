@@ -12,7 +12,7 @@ import {
   errorExchange,
   fetchExchange
 } from "urql";
-import { API_URL } from './constants';
+import { API_URL } from '../constants';
 import {
   AddCommentMutation,
   AddCommentMutationVariables,
@@ -42,7 +42,7 @@ import {
   RemoveTaskMutationVariables,
   RestoreBoardMutation,
   RestoreBoardMutationVariables
-} from "./generated/graphql";
+} from "../generated/graphql";
 
 function updateQuery<R extends DataFields, Q>(
   cache: Cache,
