@@ -10,6 +10,7 @@ interface CommentEditFormProps {
 
 export const CommentEditForm = ({ defaultValue, onConfirm, onCancel }: CommentEditFormProps) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
 
   const handleSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -24,6 +25,8 @@ export const CommentEditForm = ({ defaultValue, onConfirm, onCancel }: CommentEd
     if (event.key === "Escape") {
       event.stopPropagation();
       (event.target as HTMLTextAreaElement).blur();
+    } else if (event.key === "Enter" && event.ctrlKey) {
+      submitRef.current?.click();
     }
   };
 
@@ -44,7 +47,9 @@ export const CommentEditForm = ({ defaultValue, onConfirm, onCancel }: CommentEd
         <Button colorScheme={"gray"} onClick={onCancel}>
           Cancel
         </Button>
-        <Button type={"submit"}>Update</Button>
+        <Button type={"submit"} ref={submitRef}>
+          Update
+        </Button>
       </ButtonGroup>
     </Stack>
   );
