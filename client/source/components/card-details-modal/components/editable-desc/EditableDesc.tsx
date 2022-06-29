@@ -7,21 +7,25 @@ import {
   EditableTextarea,
   Text,
   useEditableControls,
+  useMergeRefs,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { KeyboardEventHandler, Ref, useRef, useState } from "react";
 import { AutoResizeTextarea } from "../../../";
 
 interface EditableDescProps {
   defaultValue: string;
   onSubmit: (nextValue: string) => void;
 }
-const EditableControls = ({ value }: { value: string }) => {
+const EditableControls = ({ value, submitRef }: { value: string; submitRef?: Ref<any> }) => {
   const { isEditing, getSubmitButtonProps, getCancelButtonProps, getEditButtonProps } = useEditableControls();
+  const { ref, ...submitButtonProps } = getSubmitButtonProps();
+
+  const submitRefs = useMergeRefs(submitRef, ref);
 
   if (isEditing) {
     return (
       <ButtonGroup size={"sm"} mt={2}>
-        <Button {...getSubmitButtonProps()} data-testid={"save"}>
+        <Button {...submitButtonProps} ref={submitRefs} data-testid={"save"}>
           Save
         </Button>
         <Button colorScheme={"gray"} {...getCancelButtonProps()} data-testid={"cancel"}>
@@ -43,13 +47,21 @@ const EditableControls = ({ value }: { value: string }) => {
 };
 
 export const EditableDesc = ({ defaultValue, onSubmit }: EditableDescProps) => {
+  const submitRef = useRef<HTMLButtonElement>();
   const [value, setValue] = useState(defaultValue);
+
+  // Trigger submit when Ctrl + Enter is pressed
+  const onKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
+    if (event.key === "Enter" && event.ctrlKey) {
+      submitRef.current?.click();
+    }
+  };
 
   return (
     <Editable onChange={setValue} defaultValue={defaultValue} onSubmit={onSubmit} color={"gray.600"}>
       {value && <EditablePreview data-testid={"preview"} whiteSpace={"pre-wrap"} w={"full"} lineHeight={"short"} />}
-      <EditableTextarea as={AutoResizeTextarea} minRows={5} px={0} data-testid={"textarea"} />
-      <EditableControls value={value} />
+      <EditableTextarea as={AutoResizeTextarea} minRows={5} px={0} data-testid={"textarea"} onKeyDown={onKeyDown} />
+      <EditableControls value={value} submitRef={submitRef} />
     </Editable>
   );
 };
