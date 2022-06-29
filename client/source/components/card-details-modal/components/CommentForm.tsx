@@ -8,6 +8,7 @@ interface CommentFormProps {
 
 export const CommentForm = ({ onConfirm }: CommentFormProps) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
 
   const handleSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -24,6 +25,8 @@ export const CommentForm = ({ onConfirm }: CommentFormProps) => {
     if (event.key === "Escape") {
       event.stopPropagation();
       (event.target as HTMLTextAreaElement).blur();
+    } else if (event.key === "Enter" && event.ctrlKey) {
+      submitRef.current?.click();
     }
   };
 
@@ -36,8 +39,11 @@ export const CommentForm = ({ onConfirm }: CommentFormProps) => {
         required
         onKeyDown={onKeyDown}
       />
-      <ButtonGroup size={"sm"}>
-        <Button type={"submit"}>Comment</Button>
+
+      <ButtonGroup>
+        <Button type={"submit"} ref={submitRef} size={"sm"}>
+          Comment
+        </Button>
       </ButtonGroup>
     </Stack>
   );
