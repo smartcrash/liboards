@@ -156,7 +156,7 @@ export const ShowProject = () => {
                     </Link>
                   </Text>
 
-                  <Button colorScheme={"red"} w={"full"} size={"sm"} onClick={onDelete} data-testid={"delete"}>
+                  <Button colorScheme={"red"} w={"full"} size={"sm"} onClick={onDelete} data-testid={"delete-project"}>
                     Delete
                   </Button>
                 </VStack>

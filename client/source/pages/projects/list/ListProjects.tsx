@@ -52,7 +52,7 @@ export const ListProjects = () => {
               <Heading fontSize={"2xl"} mb={4}>
                 Favorites
               </Heading>
-              <BoardList>
+              <BoardList data-testid="favorite-project-list">
                 {favorites?.favorites.map((board) => (
                   <BoardItem board={board} key={board.id} />
                 ))}
@@ -64,7 +64,7 @@ export const ListProjects = () => {
             <Heading fontSize={"2xl"} mb={4}>
               All projects
             </Heading>
-            <BoardList>
+            <BoardList data-testid="projects-list">
               {boards?.boards.map((board) => (
                 <BoardItem board={board} key={board.id} />
               ))}
@@ -88,6 +88,7 @@ export const ListProjects = () => {
               }}
               gap={2}
               mt={4}
+              data-testid="deleted-projects-list"
             >
               {deleted?.boards.map(({ id, title }) => (
                 <HStack
@@ -100,6 +101,7 @@ export const ListProjects = () => {
                   borderRadius={"md"}
                   borderWidth={1}
                   shadow={"md"}
+                  data-testid={"deleted-project-item"}
                 >
                   <VStack alignItems={"flex-start"} spacing={0}>
                     <Text fontSize={"sm"}>{title}</Text>
@@ -131,7 +133,7 @@ export const ListProjects = () => {
                               size={"sm"}
                               variant={"solid"}
                               onClick={() => forceDeleteBoard({ id })}
-                              data-testid={"force-delete"}
+                              data-testid={"force-delete-project"}
                             >
                               Delete this project
                             </Button>
@@ -144,7 +146,7 @@ export const ListProjects = () => {
                       colorScheme={"blackAlpha"}
                       onClick={() => restoreBoard({ id })}
                       isLoading={restoring}
-                      data-testid={"restore"}
+                      data-testid={"restore-project"}
                     >
                       Restore
                     </Button>

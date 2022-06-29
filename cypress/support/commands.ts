@@ -21,11 +21,14 @@ Cypress.Commands.add("createUser", (username = chance.name(), email = chance.ema
 });
 
 Cypress.Commands.add("loginWithPassword", (email, password) => {
-  cy.visit('/login');
+  cy.session([email, password], () => {
+    cy.visit('/login');
+    cy.getByTestId("email").clear().type(email);
+    cy.getByTestId("password").clear().type(password);
+    cy.getByTestId("submit").click();
+  })
 
-  cy.getByTestId("email").clear().type(email);
-  cy.getByTestId("password").clear().type(password);
-  cy.getByTestId("submit").click();
+  cy.visit('/')
 });
 
 
