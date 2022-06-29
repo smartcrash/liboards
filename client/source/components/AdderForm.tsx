@@ -29,7 +29,10 @@ export const AdderForm = ({
   };
 
   const onKeyDown: KeyboardEventHandler<HTMLInputElement> = (event) => {
-    if (event.key === "Escape") onCancel();
+    if (event.key === "Escape") {
+      event.stopPropagation();
+      onCancel();
+    }
   };
 
   return (
