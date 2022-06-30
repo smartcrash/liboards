@@ -7,6 +7,32 @@ import { User } from '../source/entity';
 import { PasswordResetFactory, UserFactory } from '../source/factories';
 import { UserRepository } from '../source/repository';
 
+const LoginWithPasswordMutation = `
+  mutation($email: String!, $password: String!) {
+    loginWithPassword(email: $email, password: $password) {
+      errors { field, message }
+      user {
+        id
+        username
+        email
+      }
+    }
+  }
+`
+
+const CreateUserMutation = `
+  mutation($username: String!, $email: String!, $password: String!) {
+    createUser(username: $username, email: $email, password: $password) {
+      errors { field, message }
+      user {
+        id
+        username
+        email
+      }
+    }
+  }
+`
+
 const ResetPasswordMutation = `
   mutation ResetPassword($newPassword: String!, $token: String!) {
     resetPassword(newPassword: $newPassword, token: $token) {
@@ -28,18 +54,7 @@ test.group('createUser', () => {
     const password = faker.internet.password()
 
     const queryData = {
-      query: `
-        mutation($username: String!, $email: String!, $password: String!) {
-          createUser(username: $username, email: $email, password: $password) {
-            errors { field, message }
-            user {
-              id
-              username
-              email
-            }
-          }
-        }
-      `,
+      query: CreateUserMutation,
       variables: {
         username,
         email,
@@ -72,18 +87,7 @@ test.group('createUser', () => {
     const password = '123'
 
     const queryData = {
-      query: `
-        mutation($username: String!, $email: String!, $password: String!) {
-          createUser(username: $username, email: $email, password: $password) {
-            errors { field, message }
-            user {
-              id
-              username
-              email
-            }
-          }
-        }
-      `,
+      query: CreateUserMutation,
       variables: {
         username,
         email,
@@ -118,18 +122,7 @@ test.group('createUser', () => {
     await UserRepository.save(user)
 
     const queryData = {
-      query: `
-        mutation($username: String!, $email: String!, $password: String!) {
-          createUser(username: $username, email: $email, password: $password) {
-            errors { field, message }
-            user {
-              id
-              username
-              email
-            }
-          }
-        }
-      `,
+      query: CreateUserMutation,
       variables: {
         username,
         email,
@@ -156,18 +149,7 @@ test.group('loginWithPassword', () => {
     const password = faker.internet.password()
 
     const queryData = {
-      query: `
-        mutation($email: String!, $password: String!) {
-          loginWithPassword(email: $email, password: $password) {
-            errors { field, message }
-            user {
-              id
-              username
-              email
-            }
-          }
-        }
-      `,
+      query: LoginWithPasswordMutation,
       variables: { email, password, }
     }
 
@@ -186,42 +168,13 @@ test.group('loginWithPassword', () => {
     const username = faker.internet.userName()
     const email = faker.internet.exampleEmail()
     const password = faker.internet.password()
-
-    // Create user
-    await client.post('/').json({
-      query: `
-        mutation($username: String!, $email: String!, $password: String!) {
-          createUser(username: $username, email: $email, password: $password) {
-            errors { field, message }
-            user {
-              id
-              username
-              email
-            }
-          }
-        }
-      `,
-      variables: {
-        username,
-        email,
-        password,
-      }
-    })
-
     const otherPassword = faker.internet.password()
+
+    await UserFactory.create({ username, email, password })
+
+
     const queryData = {
-      query: `
-        mutation($email: String!, $password: String!) {
-          loginWithPassword(email: $email, password: $password) {
-            errors { field, message }
-            user {
-              id
-              username
-              email
-            }
-          }
-        }
-      `,
+      query: LoginWithPasswordMutation,
       variables: { email, password: otherPassword }
     }
 
@@ -241,18 +194,7 @@ test.group('loginWithPassword', () => {
     const password = faker.internet.password()
 
     const queryData = {
-      query: `
-        mutation($email: String!, $password: String!) {
-          loginWithPassword(email: $email, password: $password) {
-            errors { field, message }
-            user {
-              id
-              username
-              email
-            }
-          }
-        }
-      `,
+      query: LoginWithPasswordMutation,
       variables: { email, password, }
     }
 
@@ -266,40 +208,10 @@ test.group('loginWithPassword', () => {
     const email = faker.internet.exampleEmail()
     const password = faker.internet.password()
 
-    // Create user
-    await client.post('/').json({
-      query: `
-        mutation($username: String!, $email: String!, $password: String!) {
-          createUser(username: $username, email: $email, password: $password) {
-            errors { field, message }
-            user {
-              id
-              username
-              email
-            }
-          }
-        }
-      `,
-      variables: {
-        username,
-        email,
-        password,
-      }
-    })
+    await UserFactory.create({ username, email, password })
 
     const queryData = {
-      query: `
-        mutation($email: String!, $password: String!) {
-          loginWithPassword(email: $email, password: $password) {
-            errors { field, message }
-            user {
-              id
-              username
-              email
-            }
-          }
-        }
-      `,
+      query: LoginWithPasswordMutation,
       variables: { email, password, }
     }
 
@@ -313,6 +225,69 @@ test.group('loginWithPassword', () => {
 
     expect(response.cookie(SESSION_COOKIE)).toBeDefined()
     expect(response.cookie(SESSION_COOKIE).value).not.toHaveLength(0)
+  })
+
+
+  test('can login with `userName` instead of `email`', async ({ expect, client }) => {
+    const username = faker.internet.userName()
+    const email = faker.internet.exampleEmail()
+    const password = faker.internet.password()
+
+    await UserFactory.create({ username, email, password })
+
+    const queryData = {
+      query: LoginWithPasswordMutation,
+      variables: { email: username, password, }
+    }
+
+    const response = await client.post('/').json(queryData)
+    const { data } = response.body()
+
+    expect(data.loginWithPassword.errors).toBeNull()
+    expect(data.loginWithPassword.user).toBeDefined()
+    expect(data.loginWithPassword.user).toMatchObject({ username, email })
+
+    expect(response.cookie(SESSION_COOKIE)).toBeDefined()
+    expect(response.cookie(SESSION_COOKIE).value).not.toHaveLength(0)
+
+  })
+
+  test('`email` is case-insensitive', async ({ expect, client }) => {
+    const username = faker.internet.userName()
+    const email = faker.internet.exampleEmail().toLowerCase()
+    const password = faker.internet.password()
+
+    await UserFactory.create({ username, email, password })
+
+    const queryData = {
+      query: LoginWithPasswordMutation,
+      variables: { email: email.toUpperCase(), password }
+    }
+
+    const response = await client.post('/').json(queryData)
+    const { data } = response.body()
+
+    expect(data.loginWithPassword.errors).toBeFalsy()
+    expect(data.loginWithPassword.user).toBeTruthy()
+  })
+
+  test('`userName` is case-insensitive', async ({ expect, client }) => {
+    const username = faker.internet.userName().toLowerCase()
+    const email = faker.internet.exampleEmail()
+    const password = faker.internet.password()
+
+    await UserFactory.create({ username, email, password })
+
+    const queryData = {
+      query: LoginWithPasswordMutation,
+      variables: { email: username.toUpperCase(), password }
+    }
+
+    const response = await client.post('/').json(queryData)
+    const { data } = response.body()
+
+    expect(data.loginWithPassword.errors).toBeFalsy()
+    expect(data.loginWithPassword.user).toBeTruthy()
   })
 })
 

@@ -34,18 +34,6 @@ describe('User authentication flow', () => {
     cy.contains(username)
   })
 
-  it('can login with username instead of email', () => {
-    const username = chance.name()
-    const email = chance.email()
-    const password = chance.word({ length: 5 })
-
-    cy.createUser(username, email, password)
-    cy.logout()
-
-    cy.loginWithPassword(username, password)
-    cy.location("pathname").should("equal", "/projects");
-  })
-
   it("should display login errors", () => {
     const username = chance.name()
     const email = chance.email()

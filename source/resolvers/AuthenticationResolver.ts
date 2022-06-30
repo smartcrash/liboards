@@ -97,7 +97,11 @@ export class AuthenticationResolver {
     @Arg('password') password: string,
     @Ctx() { req }: ContextType
   ): Promise<AuthenticationResponse> {
-    const user = await UserRepository.findOne({ where: [{ email }, { username: email }] })
+    const user = await UserRepository
+      .createQueryBuilder()
+      .where("LOWER(user.email) = LOWER(:email)", { email })
+      .orWhere("LOWER(user.username) = LOWER(:username)", { username: email })
+      .getOne()
 
     if (!user) {
       return { errors: [{ field: 'email', message: "This user does\'nt exists." }] }
