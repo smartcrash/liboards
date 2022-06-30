@@ -99,8 +99,8 @@ export class AuthenticationResolver {
   ): Promise<AuthenticationResponse> {
     const user = await UserRepository
       .createQueryBuilder()
-      .where("LOWER(user.email) = LOWER(:email)", { email })
-      .orWhere("LOWER(user.username) = LOWER(:username)", { username: email })
+      .where('LOWER("User"."email") = LOWER(:email)', { email })
+      .orWhere('LOWER("User"."username") = LOWER(:username)', { username: email })
       .getOne()
 
     if (!user) {
