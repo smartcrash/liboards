@@ -1,6 +1,7 @@
 
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
+import helmet from "helmet";
 import cors from 'cors';
 import express from 'express';
 import session from "express-session";
@@ -22,6 +23,8 @@ async function createServer() {
     origin: [CORS_ORIGIN, 'https://studio.apollographql.com'],
     credentials: true,
   }))
+
+  app.use(helmet())
 
   // const RedisStore = connectRedis(session)
   // const client = createRedisClient({ url: REDIS_URL, legacyMode: true })
