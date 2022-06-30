@@ -1,4 +1,3 @@
-import { Helmet } from "react-helmet";
 import {
   Box,
   Button,
@@ -17,6 +16,8 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { orderBy } from "lodash";
+import { Helmet } from "react-helmet";
 import { AutoResizeTextarea, NonEmptyEditable } from "../";
 import {
   useAddCommentMutation,
@@ -174,7 +175,7 @@ export const CardDetailsModal = ({ id, isOpen, onClose }: CardDetailsModalProps)
                 <Spacer h={5} />
 
                 <Stack spacing={5}>
-                  {comments.map((comment) => (
+                  {orderBy(comments, ({ createdAt }) => new Date(createdAt), "desc").map((comment) => (
                     <CommentItem
                       comment={comment}
                       onEdit={(content) => updateComment({ ...comment, content })}
