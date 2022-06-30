@@ -31,7 +31,7 @@ function NavBar() {
   };
 
   return (
-    <Container as={"nav"} bg={"primary.500"}>
+    <Container as={"nav"} bg={"primary.500"} w={"full"}>
       <HStack justifyContent={"space-between"} h={16}>
         <Logo color={"white"} />
 
