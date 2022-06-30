@@ -12,7 +12,7 @@ interface FieldValues {
 }
 
 export const Login = () => {
-  const { loginWithPassword } = useAuth();
+  const { loginWithPassword, loginWithGoogle } = useAuth();
   const {
     handleSubmit,
     setError,
@@ -35,6 +35,10 @@ export const Login = () => {
       <Container pt={{ base: 16, sm: 24 }} pb={10} px={6} maxW={"md"}>
         <Stack flexGrow={1} spacing={16}>
           <Heading fontSize={"3xl"}>Sign in to {APP_NAME}</Heading>
+
+          <Button onClick={loginWithGoogle} colorScheme={"messenger"}>
+            Google
+          </Button>
 
           <Stack as={"form"} onSubmit={onSubmit} spacing={5}>
             <Stack spacing={4}>

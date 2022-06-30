@@ -34,3 +34,5 @@ export const MAIL_FROM_ADDRESS = process.env.MAIL_FROM_ADDRESS
 export const REDIS_HOST = process.env.REDIS_HOST
 export const REDIS_PORT = parseInt(process.env.REDIS_PORT)
 export const REDIS_URL = `redis://${REDIS_HOST}:${REDIS_PORT}`
+
+export const MAGIC_SECRET_KEY = process.env.MAGIC_SECRET_KEY

@@ -83,6 +83,7 @@ export type Mutation = {
   deleteBoard: Scalars['Int'];
   forceDeleteBoard: Scalars['Int'];
   loginWithPassword: AuthenticationResponse;
+  loginWithToken: AuthenticationResponse;
   logout: Scalars['Boolean'];
   moveCard?: Maybe<Card>;
   removeCard?: Maybe<Scalars['Int']>;
@@ -156,6 +157,12 @@ export type MutationForceDeleteBoardArgs = {
 export type MutationLoginWithPasswordArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationLoginWithTokenArgs = {
+  token: Scalars['String'];
+  userInfo: UserInfo;
 };
 
 
@@ -279,6 +286,12 @@ export type User = {
   username: Scalars['String'];
 };
 
+export type UserInfo = {
+  email: Scalars['String'];
+  name: Scalars['String'];
+  picture: Scalars['String'];
+};
+
 export type BoardFragmentFragment = { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean };
 
 export type CardFragmentFragment = { __typename?: 'Card', id: number, title: string, description: string, index: number };
@@ -373,6 +386,14 @@ export type LoginWithPasswordMutationVariables = Exact<{
 
 
 export type LoginWithPasswordMutation = { __typename?: 'Mutation', loginWithPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null } };
+
+export type LoginWithTokenMutationVariables = Exact<{
+  token: Scalars['String'];
+  userInfo: UserInfo;
+}>;
+
+
+export type LoginWithTokenMutation = { __typename?: 'Mutation', loginWithToken: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -698,6 +719,23 @@ export const LoginWithPasswordDocument = gql`
 
 export function useLoginWithPasswordMutation() {
   return Urql.useMutation<LoginWithPasswordMutation, LoginWithPasswordMutationVariables>(LoginWithPasswordDocument);
+};
+export const LoginWithTokenDocument = gql`
+    mutation LoginWithToken($token: String!, $userInfo: UserInfo!) {
+  loginWithToken(token: $token, userInfo: $userInfo) {
+    errors {
+      field
+      message
+    }
+    user {
+      ...UserFragment
+    }
+  }
+}
+    ${UserFragmentFragmentDoc}`;
+
+export function useLoginWithTokenMutation() {
+  return Urql.useMutation<LoginWithTokenMutation, LoginWithTokenMutationVariables>(LoginWithTokenDocument);
 };
 export const LogoutDocument = gql`
     mutation Logout {

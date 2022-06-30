@@ -30,6 +30,7 @@ import {
   ForceDeleteBoardMutation,
   ForceDeleteBoardMutationVariables,
   LoginWithPasswordMutation,
+  LoginWithTokenMutation,
   LogoutMutation,
   RemoveCardMutationVariables,
   RemoveColumnMutation,
@@ -52,6 +53,13 @@ export const createUrqlClient = () => createClient({
             cache.updateQuery({ query: CurrentUserDocument }, (data: CurrentUserQuery | null) => {
               if (result.loginWithPassword.errors) return data;
               else return { currentUser: result.loginWithPassword.user };
+            })
+          },
+
+          loginWithToken(result: LoginWithTokenMutation, args, cache, info) {
+            cache.updateQuery({ query: CurrentUserDocument }, (data: CurrentUserQuery | null) => {
+              if (result.loginWithToken.errors) return data;
+              else return { currentUser: result.loginWithToken.user };
             })
           },
 

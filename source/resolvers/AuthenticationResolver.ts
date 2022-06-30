@@ -1,9 +1,10 @@
 import { verify } from 'argon2';
-import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import { v4 as uuid } from 'uuid';
 import { z, ZodError } from 'zod';
 import { CORS_ORIGIN, SESSION_COOKIE } from '../constants';
 import { PasswordReset, User } from "../entity";
+import { magic } from '../lib/magic';
 import { UserRepository } from '../repository';
 import { PasswordResetRepository } from '../repository/PasswordResetRepository';
 import { sendMail } from '../sendMail';
@@ -11,10 +12,15 @@ import { ContextType } from '../types';
 
 @ObjectType()
 class FieldError {
-  @Field()
-  field: string
-  @Field()
-  message: string
+  @Field() field: string
+  @Field() message: string
+}
+
+@InputType()
+class UserInfo {
+  @Field() email: string;
+  @Field() name: string;
+  @Field() picture: string;
 }
 
 @ObjectType()
@@ -104,6 +110,39 @@ export class AuthenticationResolver {
     req.session.userId = user.id
 
     return { user }
+  }
+
+  @Mutation(() => AuthenticationResponse)
+  async loginWithToken(
+    @Arg('token') token: string,
+    @Arg('userInfo', () => UserInfo) userInfo: UserInfo,
+    @Ctx() { req }: ContextType
+  ): Promise<AuthenticationResponse> {
+    try {
+      magic.token.validate(token)
+
+      const { email, name } = userInfo
+      // TODO: Add random string to ensure uniqueness
+      // TODO: Use `slugify` to normalize and remove spacial chars
+      const username = name.toLowerCase().replace(/\s+/g, '')
+
+      await UserRepository.upsert({ email, username }, ['email'])
+
+      const user = await UserRepository.findOneBy({ email })
+
+      req.session.userId = user.id
+
+      return { user }
+    } catch (error) {
+      console.error(error);
+
+      return {
+        errors: [{
+          field: 'token',
+          message: "Something went terribly wrong!"
+        }]
+      }
+    }
   }
 
   @Mutation(() => Boolean)

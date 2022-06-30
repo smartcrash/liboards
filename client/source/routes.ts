@@ -7,6 +7,7 @@ export const routes = {
   signUp: '/signup',
   forgotPwd: '/forgot-password',
   resetPwd: '/reset-password/:token',
+  'oauth.callback': '/oauth/callback',
 
   'projects.list': '/projects',
   'projects.create': '/projects/new',

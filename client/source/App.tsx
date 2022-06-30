@@ -23,6 +23,7 @@ const Dashboard = loadable(() => import("./pages/dashboard"));
 const ListProjects = loadable(() => import("./pages/projects/list"));
 const CreateProject = loadable(() => import("./pages/projects/create"));
 const ShowProject = loadable(() => import("./pages/projects/show"));
+const OAuthCallback = loadable(() => import("./pages/OAuthCallback"));
 
 function App() {
   const [{ data, fetching }] = useCurrentUserQuery();
@@ -49,6 +50,7 @@ function App() {
             <Route path={routes.signUp} element={<SignUp />} />
             <Route path={routes.forgotPwd} element={<ForgotPassword />} />
             <Route path={routes.resetPwd} element={<ResetPassword />} />
+            <Route path={routes["oauth.callback"]} element={<OAuthCallback />} />
             <Route path="*" element={<Navigate to={routes.login} replace />} />
           </>
         )}
