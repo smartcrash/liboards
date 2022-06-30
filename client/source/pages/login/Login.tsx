@@ -1,7 +1,8 @@
+import { Button, Heading, Stack, Text } from "@chakra-ui/react";
 import { Helmet } from "react-helmet";
-import { Box, Button, ButtonGroup, Heading, Hide, Spacer, Stack, Text, VStack } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { Container, Input, Link, PasswordInput } from "../../components";
+import { APP_NAME } from "../../constants";
 import { useAuth } from "../../hooks/useAuth";
 import { route } from "../../routes";
 
@@ -30,89 +31,53 @@ export const Login = () => {
   return (
     <>
       <Helmet title={"Sign in"} />
-      <Container pt={{ base: 16, sm: 24 }} pb={10} px={6} display={"flex"} h={"100vh"}>
-        <VStack alignItems={"stretch"} flexGrow={1} spacing={{ base: 0, sm: 20 }}>
-          <VStack alignItems={{ base: "flex-start", sm: "center" }}>
-            <Heading fontSize={{ base: "5xl", sm: "5xl" }}>Welcome back!</Heading>
-            <Text color={"gray.500"}>Login to your account</Text>
-          </VStack>
 
-          <Hide above={"sm"}>
-            <Spacer />
-          </Hide>
+      <Container pt={{ base: 16, sm: 24 }} pb={10} px={6} maxW={"md"}>
+        <Stack flexGrow={1} spacing={16}>
+          <Heading fontSize={"3xl"}>Sign in to {APP_NAME}</Heading>
 
-          <VStack
-            as={"form"}
-            onSubmit={onSubmit}
-            spacing={{ base: 2, sm: 6 }}
-            flexGrow={1}
-            justifyContent={{ base: "space-between", sm: "flex-start" }}
-          >
-            <Stack direction={{ base: "column", sm: "row" }} spacing={6} w={"full"} maxW={"3xl"}>
-              <Box flexGrow={1}>
-                <Input
-                  autoComplete={"email"}
-                  label={"Username or email"}
-                  placeholder={"Enter your username or email"}
-                  name={"email"}
+          <Stack as={"form"} onSubmit={onSubmit} spacing={5}>
+            <Stack spacing={4}>
+              <Input
+                autoComplete={"email"}
+                label={"Username or Email Address"}
+                name={"email"}
+                variant={"filled"}
+                autoFocus
+                control={control}
+                rules={{ required: true }}
+                data-testid={"email"}
+              />
+
+              <Stack spacing={2} alignItems={"flex-end"}>
+                <PasswordInput
+                  label={"Password"}
+                  autoComplete={"current-password"}
+                  name={"password"}
+                  variant={"filled"}
                   control={control}
                   rules={{ required: true }}
-                  data-testid={"email"}
-                  size={{ base: "lg", lg: "lg" }}
+                  data-testid={"password"}
                 />
-              </Box>
 
-              <Box flexGrow={1}>
-                <VStack spacing={{ base: 4, sm: 6 }} alignItems={{ base: "flex-end", sm: "flex-start" }}>
-                  <PasswordInput
-                    label={"Password"}
-                    autoComplete={"current-password"}
-                    placeholder={"••••••"}
-                    name={"password"}
-                    control={control}
-                    rules={{ required: true }}
-                    data-testid={"password"}
-                    size={{ base: "lg", lg: "lg" }}
-                  />
-
-                  <Link
-                    to={route("forgotPwd")}
-                    data-testid={"forgot-password"}
-                    color={"blackAlpha"}
-                    size={{ base: "md", md: "md" }}
-                    textDecor={"underline"}
-                  >
-                    Forgot password?
-                  </Link>
-                </VStack>
-              </Box>
+                <Link to={route("forgotPwd")} color={"blue"} data-testid={"forgot-password"} tabIndex={-1}>
+                  Forgot password?
+                </Link>
+              </Stack>
             </Stack>
 
-            <ButtonGroup
-              flexDir={"column"}
-              spacing={0}
-              rowGap={3}
-              size={{ base: "lg", md: "lg" }}
-              w={"full"}
-              maxW={"lg"}
-            >
-              <Button
-                isLoading={isSubmitting}
-                type={"submit"}
-                data-testid={"submit"}
-                bg={"gray.800"}
-                _hover={{ bg: "gray.900" }}
-                _active={{ bg: "gray.900" }}
-              >
-                Sign in
-              </Button>
+            <Button isLoading={isSubmitting} type={"submit"} data-testid={"submit"}>
+              Sign in
+            </Button>
 
-              <Button as={Link} to={route("signUp")} isDisabled={isSubmitting} data-testid={"go-to-signup"}>
-                Create new account
-              </Button>
-            </ButtonGroup>
-          </VStack>
-        </VStack>
+            <Text textAlign={"center"} pt={4}>
+              Not a member?{" "}
+              <Link to={route("signUp")} color={"blue"} data-testid={"go-to-signup"}>
+                Sign up now
+              </Link>
+            </Text>
+          </Stack>
+        </Stack>
       </Container>
     </>
   );
