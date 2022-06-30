@@ -24,7 +24,7 @@ export const CommentEditForm = ({ defaultValue, onConfirm, onCancel }: CommentEd
   const onKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     if (event.key === "Escape") {
       event.stopPropagation();
-      (event.target as HTMLTextAreaElement).blur();
+      onCancel();
     } else if (event.key === "Enter" && event.ctrlKey) {
       submitRef.current?.click();
     }
