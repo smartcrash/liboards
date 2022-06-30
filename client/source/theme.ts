@@ -24,13 +24,10 @@ const theme = extendTheme({
       900: "#63171B",
     },
   },
+
   components: {
-    Button: {
-      defaultProps: { colorScheme: 'primary' }
-    },
-    FormLabel: {
-      baseStyle: { fontWeight: 'bold' }
-    }
+    Button: { defaultProps: { colorScheme: 'primary' } },
+    FormLabel: { baseStyle: { fontWeight: 'bold' } }
   }
 });
 
