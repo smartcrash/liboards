@@ -2,9 +2,9 @@ import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import { In } from 'typeorm';
 import { SESSION_COOKIE } from '../source/constants';
-import { BoardFactory } from '../source/factories';
+import { BoardFactory, CardFactory, ColumnFactory } from '../source/factories';
 import { CardRepository, ColumnRepository } from '../source/repository';
-import { assertIsForbiddenExeption, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from '../source/utils/testUtils';
+import { assertIsForbiddenExeption, testThrowsIfNotAuthenticated } from '../source/utils/testUtils';
 
 const AddColumnMutation = `
   mutation AddColumn($boardId: Int!, $title: String!) {
@@ -91,9 +91,9 @@ test.group('addColumn', () => {
   //   const [user, cookie] = await createUser(client)
   //   const { id: boardId } = await BoardFactory.create({createdBy: user})
 
-  //   await createRandomColumn(boardId, 0)
-  //   await createRandomColumn(boardId, 1)
-  //   await createRandomColumn(boardId, 2)
+  //   await ColumnFactory.create({ boardId: boardId, 0})
+  //   await ColumnFactory.create({ boardId: boardId, 1})
+  //   await ColumnFactory.create({ boardId: boardId, 2})
 
 
   //   const queryData = {
@@ -122,7 +122,7 @@ test.group('updateColumn', () => {
   test('should update column', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
     const { id: boardId } = await BoardFactory.create({ createdBy: user })
-    const { id } = await createRandomColumn(boardId)
+    const { id } = await ColumnFactory.create({ boardId: boardId })
 
     const title = faker.lorem.words()
 
@@ -153,7 +153,7 @@ test.group('updateColumn', () => {
     const [, cookie] = await createUser(client)
 
     const { id: boardId } = await BoardFactory.create({ createdBy: user })
-    const { id, title } = await createRandomColumn(boardId)
+    const { id, title } = await ColumnFactory.create({ boardId: boardId })
 
     const queryData = {
       query: UpdateColumnMutation,
@@ -182,7 +182,7 @@ test.group('removeColumn', () => {
   test('should delete column', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
     const { id: boardId } = await BoardFactory.create({ createdBy: user })
-    const { id } = await createRandomColumn(boardId)
+    const { id } = await ColumnFactory.create({ boardId: boardId })
 
     const queryData = {
       query: RemoveColumnMutation,
@@ -203,9 +203,9 @@ test.group('removeColumn', () => {
   // test('shift remaining columm\'s indexes to keep sequense', async ({ expect, client, createUser }) => {
   //   const [user, cookie] = await createUser(client)
   //   const { id: boardId } = await BoardFactory.create({createdBy: user})
-  //   const column1 = await createRandomColumn(boardId, 0)
-  //   const column2 = await createRandomColumn(boardId, 1)
-  //   const column3 = await createRandomColumn(boardId, 2)
+  //   const column1 = await ColumnFactory.create({ boardId: boardId, 0})
+  //   const column2 = await ColumnFactory.create({ boardId: boardId, 1})
+  //   const column3 = await ColumnFactory.create({ boardId: boardId, 2})
 
   //   const queryData = {
   //     query: RemoveColumnMutation,
@@ -229,7 +229,7 @@ test.group('removeColumn', () => {
     const [, cookie] = await createUser(client)
 
     const { id: boardId } = await BoardFactory.create({ createdBy: user })
-    const { id } = await createRandomColumn(boardId)
+    const { id } = await ColumnFactory.create({ boardId: boardId })
 
     const queryData = {
       query: RemoveColumnMutation,
@@ -248,12 +248,8 @@ test.group('removeColumn', () => {
   test('cascades and deletes all related cards', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
     const { id: boardId } = await BoardFactory.create({ createdBy: user })
-    const { id } = await createRandomColumn(boardId)
-    const cardIds = [
-      await createRandomCard(id),
-      await createRandomCard(id),
-      await createRandomCard(id)
-    ].map((card) => card.id)
+    const { id } = await ColumnFactory.create({ boardId: boardId })
+    const cardIds = (await CardFactory.createMany(3, { columnId: id })).map((card) => card.id)
 
     const queryData = {
       query: RemoveColumnMutation,
