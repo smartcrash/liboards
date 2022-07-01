@@ -11,4 +11,5 @@ export * from './AutoResizeTextarea'
 export * from './HeartButton'
 export * from './AdderForm'
 export * from './ConfirmAlertDialog'
+export * from './Card'
 

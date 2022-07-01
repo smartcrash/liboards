@@ -13,10 +13,10 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRef } from "react";
-import { useFindCardByIdQuery } from "../../../generated/graphql";
-import { useHover } from "../../../hooks";
-import { DotsHorizontalIcon } from "../../../icons";
-import { ConfirmAlertDialog } from "../../ConfirmAlertDialog";
+import { useFindCardByIdQuery } from "../generated/graphql";
+import { useHover } from "../hooks";
+import { DotsHorizontalIcon } from "../icons";
+import { ConfirmAlertDialog } from "./ConfirmAlertDialog";
 
 interface CardProps {
   id: number;

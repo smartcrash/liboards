@@ -22,7 +22,7 @@ import { Helmet } from "react-helmet";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import {
   Board,
-  CardClickHandler,
+  Card,
   CardDetailsModal,
   CardDragEndHandler,
   CardNewHandler,
@@ -33,6 +33,7 @@ import {
   HeartButton,
   NonEmptyEditable,
 } from "../../../components";
+import { CardType } from "../../../components/board/types";
 import {
   useAddCardMutation,
   useAddColumnMutation,
@@ -122,7 +123,7 @@ export const ShowProject = () => {
     await moveCard({ id: cardId, toIndex, toColumnId });
   };
 
-  const onCardClick: CardClickHandler = (card) => {
+  const onCardClick = (card: CardType) => {
     cardIdRef.current = card.id;
     onOpen();
   };
@@ -175,13 +176,15 @@ export const ShowProject = () => {
 
         <Box>
           <Board
+            renderCard={(card, { removeCard }) => (
+              <Card id={card.id} onRemove={removeCard} onClick={() => onCardClick(card)} />
+            )}
             onColumnNew={onColumnNew}
             onColumnRemove={onColumnRemove}
             onColumnRename={onColumnRename}
             onCardNew={onCardNew}
             onCardRemove={onCardRemove}
             onCardDragEnd={onCardDragEnd}
-            onCardClick={onCardClick}
           >
             {data.board}
           </Board>

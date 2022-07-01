@@ -11,12 +11,12 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { DragDropContext, Draggable, DropResult } from "react-beautiful-dnd";
-import { NonEmptyEditable, ConfirmAlertDialog } from "../";
+import { ConfirmAlertDialog, NonEmptyEditable } from "../";
 import useRefState from "../../hooks/useRefState";
 import { DotsHorizontalIcon } from "../../icons";
-import { Card, Column } from "./components";
+import { Column } from "./components";
 import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
 import { addCard, addColumn, changeColumn, moveCard, removeCard, removeColumn } from "./helpers";
@@ -32,8 +32,6 @@ export type CardNewHandler = (newCard: { title: string; columnId: number }) => P
 
 export type CardRemoveHandler = (card: CardType) => void;
 
-export type CardClickHandler = (card: CardType, column: ColumnType) => void;
-
 export type CardDragEndHandler = (result: {
   cardId: number;
   fromColumnId: number;
@@ -46,24 +44,24 @@ const columnWidth = "2xs";
 
 interface BoardProps {
   children: BoardType;
+  renderCard: (card: CardType, actions: { removeCard: () => void }) => ReactNode;
   onColumnNew: ColumnNewHandler;
   onColumnRemove: ColumnRemoveHandler;
   onColumnRename: ColumnRenameHandler;
   onCardNew: CardNewHandler;
   onCardRemove: CardRemoveHandler;
   onCardDragEnd: CardDragEndHandler;
-  onCardClick: CardClickHandler;
 }
 
 export const Board = ({
   children: initialBoard,
+  renderCard,
   onColumnNew,
   onCardNew,
   onColumnRemove,
   onColumnRename,
   onCardRemove,
   onCardDragEnd,
-  onCardClick,
 }: BoardProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const columnRef = useRef<ColumnType | undefined>(undefined);
@@ -185,12 +183,7 @@ export const Board = ({
                     <Draggable draggableId={String(card.id)} index={cardIndex} key={card.id}>
                       {({ innerRef, draggableProps, dragHandleProps }) => (
                         <div ref={innerRef} {...draggableProps} {...dragHandleProps} data-testid={`card-${cardIndex}`}>
-                          {/* TODO: Add `renderCard` if needed */}
-                          <Card
-                            id={card.id}
-                            onClick={() => onCardClick(card, column)}
-                            onRemove={() => handleCardRemove(column, card)}
-                          />
+                          {renderCard(card, { removeCard: () => handleCardRemove(column, card) })}
                         </div>
                       )}
                     </Draggable>
