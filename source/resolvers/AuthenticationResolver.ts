@@ -81,7 +81,6 @@ export class AuthenticationResolver {
     const user = new User()
 
     user.userName = userName
-    user.displayName = userName
     user.email = email
     user.password = password
 

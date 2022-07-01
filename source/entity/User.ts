@@ -17,8 +17,8 @@ export class User {
   @Column({ unique: true })
   userName: string;
 
-  @Field()
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   displayName: string;
 
   @Field()
