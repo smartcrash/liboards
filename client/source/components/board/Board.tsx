@@ -9,23 +9,14 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogContent,
-  AlertDialogOverlay,
-  AlertDialogCloseButton,
-  Button,
   useDisclosure,
-  ButtonGroup,
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { DragDropContext, Draggable, DropResult } from "react-beautiful-dnd";
-import { NonEmptyEditable } from "../";
+import { NonEmptyEditable, ConfirmAlertDialog } from "../";
 import useRefState from "../../hooks/useRefState";
 import { DotsHorizontalIcon } from "../../icons";
-import { Column, Card } from "./components";
+import { Card, Column } from "./components";
 import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
 import { addCard, addColumn, changeColumn, moveCard, removeCard, removeColumn } from "./helpers";
@@ -75,7 +66,6 @@ export const Board = ({
   onCardClick,
 }: BoardProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = useRef<HTMLButtonElement>(null);
   const columnRef = useRef<ColumnType | undefined>(undefined);
   const [boardRef, setBoardRef] = useRefState<BoardType>(() => {
     const board = structuredClone(initialBoard);
@@ -218,34 +208,15 @@ export const Board = ({
         </DragDropContext>
       </HStack>
 
-      <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogCloseButton />
-
-            <AlertDialogHeader fontSize="lg" fontWeight="bold"></AlertDialogHeader>
-
-            <AlertDialogBody>
-              Are you sure you want to delete <strong>{columnRef.current?.title}</strong> with its cards?
-            </AlertDialogBody>
-
-            <AlertDialogFooter>
-              <ButtonGroup spacing={3} size={"sm"}>
-                <Button ref={cancelRef} onClick={onClose} variant={"ghost"} colorScheme={"gray"}>
-                  Cancel
-                </Button>
-                <Button
-                  colorScheme={"red"}
-                  onClick={() => [handleColumnRemove(columnRef.current!), onClose()]}
-                  data-testid={"confirm-remove-column"}
-                >
-                  Delete
-                </Button>
-              </ButtonGroup>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+      <ConfirmAlertDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={() => handleColumnRemove(columnRef.current!)}
+        confirmLabel={"Delete"}
+        contentProps={{ "data-testid": "confirm-remove-column-alert-dialog" } as any}
+      >
+        Are you sure you want to delete <strong>{columnRef.current?.title}</strong> with its cards?
+      </ConfirmAlertDialog>
     </>
   );
 };
