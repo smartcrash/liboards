@@ -1,6 +1,8 @@
+import { ChatIcon } from "@chakra-ui/icons";
 import {
   Box,
   Heading,
+  HStack,
   IconButton,
   Menu,
   MenuButton,
@@ -15,7 +17,7 @@ import {
 import { useRef } from "react";
 import { useFindCardByIdQuery } from "../generated/graphql";
 import { useHover } from "../hooks";
-import { DotsHorizontalIcon } from "../icons";
+import { CheckSquareIcon, DotsHorizontalIcon } from "../icons";
 import { ConfirmAlertDialog } from "./ConfirmAlertDialog";
 
 interface CardProps {
@@ -40,7 +42,20 @@ export const Card = ({ id, onRemove, onClick }: CardProps) => {
     );
   if (!data || !data.card) return <>Error: Card not found :c</>; // TODO: Handle error
 
-  const { title, description } = data.card;
+  const { title, description, tasks, comments } = data.card;
+
+  const metaTags: { icon: JSX.Element; label: string | number; visible: boolean }[] = [
+    {
+      label: tasks.filter(({ completed }) => completed).length + "/" + tasks.length,
+      icon: <CheckSquareIcon fontSize={"sm"} aria-label={`${tasks.length} task(s)`} />,
+      visible: !!tasks.length,
+    },
+    {
+      label: comments.length,
+      icon: <ChatIcon aria-label={`${comments.length} comment(s)`} />,
+      visible: !!comments.length,
+    },
+  ];
 
   return (
     <>
@@ -87,6 +102,19 @@ export const Card = ({ id, onRemove, onClick }: CardProps) => {
           <Text fontSize={"sm"} color={"gray.500"} hidden={!description} noOfLines={5}>
             {description}
           </Text>
+
+          {metaTags.some(({ visible }) => visible) && (
+            <HStack spacing={3} pt={2}>
+              {metaTags
+                .filter(({ visible }) => visible)
+                .map(({ label, icon }) => (
+                  <HStack fontSize={"xs"} spacing={1} color={"gray.500"} _hover={{ color: "gray.900" }}>
+                    {icon}
+                    <Text aria-hidden>{label}</Text>
+                  </HStack>
+                ))}
+            </HStack>
+          )}
         </Stack>
       </Box>
 
