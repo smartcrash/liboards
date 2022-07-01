@@ -11,7 +11,7 @@ export const routes = {
 
   'projects.list': '/projects',
   'projects.create': '/projects/new',
-  'projects.show': '/projects/:id',
+  'projects.show': '/projects/:slug',
 };
 
 export const route = (name: keyof typeof routes, params = {}) => {

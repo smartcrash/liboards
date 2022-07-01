@@ -51,8 +51,8 @@ import { route } from "../../../routes";
 
 export const ShowProject = () => {
   const navigate = useNavigate();
-  const params = useParams<{ id: string }>();
-  const id = parseInt(params.id!);
+  const { slug = "" } = useParams<{ slug: string }>();
+  const id = parseInt(slug.slice(slug.lastIndexOf("-") + 1)); // Extract ID from slug
   const [{ data, fetching }] = useFindBoardByIdQuery({ variables: { id } });
   const [, updateBoard] = useUpdateBoardMutation();
   const [, addToFavorites] = useAddToFavoritesMutation();
@@ -72,6 +72,19 @@ export const ShowProject = () => {
   if (!data?.board) return <>Something went wrong! :O</>;
 
   const { title, favorite } = data.board;
+
+  const onTitleUpdate = async (title: string) => {
+    const result = await updateBoard({ id, title });
+
+    // Update the URL to show the new project's slug
+    if (result.data?.board) {
+      const newSlug = result.data.board.slug;
+      const newUrl = route("projects.show", { slug: newSlug });
+
+      // Change the url but don't a new add the entry to the browser history
+      history.replaceState({}, "", newUrl);
+    }
+  };
 
   const onDelete = async () => {
     await deleteBoard({ id });
@@ -121,12 +134,7 @@ export const ShowProject = () => {
       <Stack spacing={6}>
         <HStack justifyContent={"space-between"}>
           <HStack alignItems={"flex-start"} spacing={3}>
-            <NonEmptyEditable
-              defaultValue={title}
-              onSubmit={(title) => updateBoard({ id, title })}
-              fontSize={"3xl"}
-              fontWeight={"bold"}
-            >
+            <NonEmptyEditable defaultValue={title} onSubmit={onTitleUpdate} fontSize={"3xl"} fontWeight={"bold"}>
               <EditablePreview />
               <EditableInput data-testid={"title"} />
             </NonEmptyEditable>

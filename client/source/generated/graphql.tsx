@@ -31,6 +31,7 @@ export type Board = {
   deletedAt: Scalars['DateTime'];
   favorite: Scalars['Boolean'];
   id: Scalars['Float'];
+  slug: Scalars['String'];
   title: Scalars['String'];
   updatedAt: Scalars['DateTime'];
 };
@@ -292,7 +293,7 @@ export type UserInfo = {
   picture: Scalars['String'];
 };
 
-export type BoardFragmentFragment = { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean };
+export type BoardFragmentFragment = { __typename?: 'Board', id: number, title: string, slug: string, createdAt: any, updatedAt: any, favorite: boolean };
 
 export type CardFragmentFragment = { __typename?: 'Card', id: number, title: string, description: string, index: number };
 
@@ -347,14 +348,14 @@ export type AddToFavoritesMutation = { __typename?: 'Mutation', addToFavorites: 
 export type AllFavoritesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AllFavoritesQuery = { __typename?: 'Query', favorites: Array<{ __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean }> };
+export type AllFavoritesQuery = { __typename?: 'Query', favorites: Array<{ __typename?: 'Board', id: number, title: string, slug: string, createdAt: any, updatedAt: any, favorite: boolean }> };
 
 export type CreateBoardMutationVariables = Exact<{
   title: Scalars['String'];
 }>;
 
 
-export type CreateBoardMutation = { __typename?: 'Mutation', board: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean } };
+export type CreateBoardMutation = { __typename?: 'Mutation', board: { __typename?: 'Board', id: number, title: string, slug: string, createdAt: any, updatedAt: any, favorite: boolean } };
 
 export type CreateUserMutationVariables = Exact<{
   password: Scalars['String'];
@@ -472,7 +473,7 @@ export type UpdateBoardMutationVariables = Exact<{
 }>;
 
 
-export type UpdateBoardMutation = { __typename?: 'Mutation', board: { __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean } };
+export type UpdateBoardMutation = { __typename?: 'Mutation', board: { __typename?: 'Board', id: number, title: string, slug: string, createdAt: any, updatedAt: any, favorite: boolean } };
 
 export type UpdateCardMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -511,12 +512,12 @@ export type UpdateTaskMutation = { __typename?: 'Mutation', task: { __typename?:
 export type AllBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AllBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean }> };
+export type AllBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, slug: string, createdAt: any, updatedAt: any, favorite: boolean }> };
 
 export type AllDeletedBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AllDeletedBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, createdAt: any, updatedAt: any, favorite: boolean }> };
+export type AllDeletedBoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: number, title: string, slug: string, createdAt: any, updatedAt: any, favorite: boolean }> };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -528,7 +529,7 @@ export type FindBoardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, favorite: boolean, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> }> } | null };
+export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, slug: string, favorite: boolean, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> }> } | null };
 
 export type FindCardByIdQueryVariables = Exact<{
   id: Scalars['Int'];
@@ -541,6 +542,7 @@ export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
   id
   title
+  slug
   createdAt
   updatedAt
   favorite
@@ -930,6 +932,7 @@ export const FindBoardByIdDocument = gql`
   board: findBoardById(id: $id) {
     id
     title
+    slug
     favorite
     createdBy {
       id
