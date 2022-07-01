@@ -108,6 +108,7 @@ describe('Cards & columns CRUD operations', () => {
       cy.wrap(column).getByTestId('add-card').click()
       cy.wrap(column).getByTestId('card-form').get('input[type="text"]').type(`${newCard}{enter}`)
       cy.wrap(column).getByTestId('card-0').getByTestId('remove-card').click({ force: true })
+      cy.getByTestId('confirm-remove-card-alert-dialog').contains('Delete').click()
     })
 
     cy.contains(newCard).should('not.exist')
