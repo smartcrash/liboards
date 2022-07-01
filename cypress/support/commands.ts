@@ -8,10 +8,10 @@ Cypress.Commands.add("getByTestId", (selector, ...args) => {
   return cy.get(`[data-testid="${selector}"]`, ...args);
 });
 
-Cypress.Commands.add("createUser", (username = chance.name(), email = chance.email(), password = chance.word({ length: 6 })) => {
+Cypress.Commands.add("createUser", (userName = chance.name(), email = chance.email(), password = chance.word({ length: 6 })) => {
   cy.visit('/signup');
 
-  cy.getByTestId("username").clear().type(username);
+  cy.getByTestId("userName").clear().type(userName);
   cy.getByTestId("email").clear().type(email);
   cy.getByTestId("password").clear().type(password);
   cy.getByTestId("passwordConfirm").clear().type(password);
@@ -39,7 +39,7 @@ Cypress.Commands.add("logout", () => {
 declare global {
   namespace Cypress {
     interface Chainable {
-      createUser(username?: string, email?: string, password?: string): Chainable<[string, string]>
+      createUser(userName?: string, email?: string, password?: string): Chainable<[string, string]>
       loginWithPassword(email: string, password: string): void
       logout(): void
 

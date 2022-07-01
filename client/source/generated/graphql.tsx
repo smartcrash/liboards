@@ -141,7 +141,7 @@ export type MutationCreateBoardArgs = {
 export type MutationCreateUserArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
-  username: Scalars['String'];
+  userName: Scalars['String'];
 };
 
 
@@ -281,10 +281,11 @@ export type User = {
   __typename?: 'User';
   boards: Array<Board>;
   createdAt: Scalars['String'];
+  displayName: Scalars['String'];
   email: Scalars['String'];
   id: Scalars['Float'];
   updatedAt: Scalars['String'];
-  username: Scalars['String'];
+  userName: Scalars['String'];
 };
 
 export type UserInfo = {
@@ -299,11 +300,11 @@ export type CardFragmentFragment = { __typename?: 'Card', id: number, title: str
 
 export type ColumnFragmentFragment = { __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> };
 
-export type CommentFragmentFragment = { __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } };
+export type CommentFragmentFragment = { __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, userName: string } };
 
 export type TaskFragmentFragment = { __typename?: 'Task', id: number, content: string, completed: boolean };
 
-export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string };
+export type UserFragmentFragment = { __typename?: 'User', id: number, userName: string, email: string, createdAt: string, updatedAt: string };
 
 export type AddCardMutationVariables = Exact<{
   title: Scalars['String'];
@@ -328,7 +329,7 @@ export type AddCommentMutationVariables = Exact<{
 }>;
 
 
-export type AddCommentMutation = { __typename?: 'Mutation', comment: { __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } } };
+export type AddCommentMutation = { __typename?: 'Mutation', comment: { __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, userName: string } } };
 
 export type AddTaskMutationVariables = Exact<{
   cardId: Scalars['Int'];
@@ -360,11 +361,11 @@ export type CreateBoardMutation = { __typename?: 'Mutation', board: { __typename
 export type CreateUserMutationVariables = Exact<{
   password: Scalars['String'];
   email: Scalars['String'];
-  username: Scalars['String'];
+  userName: Scalars['String'];
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, userName: string, email: string, createdAt: string, updatedAt: string } | null } };
 
 export type DeleteBoardMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -386,7 +387,7 @@ export type LoginWithPasswordMutationVariables = Exact<{
 }>;
 
 
-export type LoginWithPasswordMutation = { __typename?: 'Mutation', loginWithPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null } };
+export type LoginWithPasswordMutation = { __typename?: 'Mutation', loginWithPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, userName: string, email: string, createdAt: string, updatedAt: string } | null } };
 
 export type LoginWithTokenMutationVariables = Exact<{
   token: Scalars['String'];
@@ -394,7 +395,7 @@ export type LoginWithTokenMutationVariables = Exact<{
 }>;
 
 
-export type LoginWithTokenMutation = { __typename?: 'Mutation', loginWithToken: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null } };
+export type LoginWithTokenMutation = { __typename?: 'Mutation', loginWithToken: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, userName: string, email: string, createdAt: string, updatedAt: string } | null } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -451,7 +452,7 @@ export type ResetPasswordMutationVariables = Exact<{
 }>;
 
 
-export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null } };
+export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'AuthenticationResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: number, userName: string, email: string, createdAt: string, updatedAt: string } | null } };
 
 export type RestoreBoardMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -498,7 +499,7 @@ export type UpdateCommentMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCommentMutation = { __typename?: 'Mutation', comment: { __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } } };
+export type UpdateCommentMutation = { __typename?: 'Mutation', comment: { __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, userName: string } } };
 
 export type UpdateTaskMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -522,21 +523,21 @@ export type AllDeletedBoardsQuery = { __typename?: 'Query', boards: Array<{ __ty
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string } | null };
+export type CurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: number, userName: string, email: string, createdAt: string, updatedAt: string } | null };
 
 export type FindBoardByIdQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
 
 
-export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, slug: string, favorite: boolean, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, username: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> }> } | null };
+export type FindBoardByIdQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: number, title: string, slug: string, favorite: boolean, createdAt: any, updatedAt: any, createdBy: { __typename?: 'User', id: number, userName: string }, columns: Array<{ __typename?: 'Column', id: number, title: string, cards: Array<{ __typename?: 'Card', id: number, title: string, description: string, index: number }> }> } | null };
 
 export type FindCardByIdQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
 
 
-export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string }, tasks: Array<{ __typename?: 'Task', id: number, content: string, completed: boolean }>, comments: Array<{ __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, username: string } }> } | null };
+export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string }, tasks: Array<{ __typename?: 'Task', id: number, content: string, completed: boolean }>, comments: Array<{ __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, userName: string } }> } | null };
 
 export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
@@ -571,7 +572,7 @@ export const CommentFragmentFragmentDoc = gql`
   content
   user {
     id
-    username
+    userName
   }
   canUpdate
   canDelete
@@ -589,7 +590,7 @@ export const TaskFragmentFragmentDoc = gql`
 export const UserFragmentFragmentDoc = gql`
     fragment UserFragment on User {
   id
-  username
+  userName
   email
   createdAt
   updatedAt
@@ -671,8 +672,8 @@ export function useCreateBoardMutation() {
   return Urql.useMutation<CreateBoardMutation, CreateBoardMutationVariables>(CreateBoardDocument);
 };
 export const CreateUserDocument = gql`
-    mutation CreateUser($password: String!, $email: String!, $username: String!) {
-  createUser(password: $password, email: $email, username: $username) {
+    mutation CreateUser($password: String!, $email: String!, $userName: String!) {
+  createUser(password: $password, email: $email, userName: $userName) {
     errors {
       field
       message
@@ -936,7 +937,7 @@ export const FindBoardByIdDocument = gql`
     favorite
     createdBy {
       id
-      username
+      userName
     }
     columns {
       ...ColumnFragment

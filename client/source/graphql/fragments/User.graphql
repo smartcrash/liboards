@@ -1,6 +1,6 @@
 fragment UserFragment on User {
   id
-  username
+  userName
   email
   createdAt
   updatedAt

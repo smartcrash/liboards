@@ -44,7 +44,7 @@ export class AuthenticationResolver {
 
   @Mutation(() => AuthenticationResponse)
   async createUser(
-    @Arg('username') username: string,
+    @Arg('userName') userName: string,
     @Arg('email') email: string,
     @Arg('password') password: string,
     @Ctx() { req }: ContextType
@@ -53,10 +53,10 @@ export class AuthenticationResolver {
 
     try {
       await z.object({
-        username: z.string().min(4, 'The username must contain at least 4 characters.'),
+        userName: z.string().min(4, 'The userName must contain at least 4 characters.'),
         email: z.string().email('Invalid email.'),
         password: z.string().min(4, 'The password must contain at least 4 characters.')
-      }).parseAsync({ username, email, password })
+      }).parseAsync({ userName, email, password })
     } catch (error) {
       if (error instanceof ZodError) {
         return {
@@ -68,8 +68,8 @@ export class AuthenticationResolver {
       }
     }
 
-    if (await UserRepository.findOneBy({ username })) {
-      errors.push({ field: 'username', message: 'This username already exists.' })
+    if (await UserRepository.findOneBy({ userName: userName })) {
+      errors.push({ field: 'userName', message: 'This userName already exists.' })
     }
 
     if (await UserRepository.findOneBy({ email })) {
@@ -80,7 +80,8 @@ export class AuthenticationResolver {
 
     const user = new User()
 
-    user.username = username
+    user.userName = userName
+    user.displayName = userName
     user.email = email
     user.password = password
 
@@ -100,7 +101,7 @@ export class AuthenticationResolver {
     const user = await UserRepository
       .createQueryBuilder()
       .where('LOWER("User"."email") = LOWER(:email)', { email })
-      .orWhere('LOWER("User"."username") = LOWER(:username)', { username: email })
+      .orWhere('LOWER("User"."userName") = LOWER(:userName)', { userName: email })
       .getOne()
 
     if (!user) {
@@ -128,9 +129,9 @@ export class AuthenticationResolver {
       const { email, name } = userInfo
       // TODO: Add random string to ensure uniqueness
       // TODO: Use `slugify` to normalize and remove spacial chars
-      const username = name.toLowerCase().replace(/\s+/g, '')
+      const userName = name.toLowerCase().replace(/\s+/g, '')
 
-      await UserRepository.upsert({ email, username }, ['email'])
+      await UserRepository.upsert({ email, userName: userName }, ['email'])
 
       const user = await UserRepository.findOneBy({ email })
 

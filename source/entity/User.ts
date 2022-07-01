@@ -15,7 +15,11 @@ export class User {
 
   @Field()
   @Column({ unique: true })
-  username: string;
+  userName: string;
+
+  @Field()
+  @Column()
+  displayName: string;
 
   @Field()
   @Column({ unique: true })

@@ -8,7 +8,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { route } from "../../routes";
 
 interface FieldValues {
-  username: string;
+  userName: string;
   email: string;
   password: string;
   passwordConfirm: string;
@@ -22,13 +22,13 @@ export const SignUp = () => {
     control,
     formState: { isSubmitting },
   } = useForm<FieldValues>({});
-  const onSubmit = handleSubmit(async ({ username, email, password, passwordConfirm }) => {
+  const onSubmit = handleSubmit(async ({ userName, email, password, passwordConfirm }) => {
     if (password !== passwordConfirm) {
       setError("passwordConfirm", { message: "Passwords must match." });
       return;
     }
 
-    const response = await createUser(username, email, password);
+    const response = await createUser(userName, email, password);
 
     if (response?.errors?.length) {
       const { errors } = response;
@@ -55,14 +55,14 @@ export const SignUp = () => {
             <VStack alignItems={"stretch"} spacing={6}>
               <Input
                 label={"Username"}
-                name={"username"}
+                name={"userName"}
                 autoComplete={"username"}
                 autoFocus
                 placeholder={"jhon doe"}
                 control={control}
                 variant={"filled"}
                 rules={{ required: true }}
-                data-testid={"username"}
+                data-testid={"userName"}
               />
 
               <Input

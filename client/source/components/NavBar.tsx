@@ -54,17 +54,17 @@ function NavBar() {
             <MenuButton>
               <HStack>
                 <Text color={"white"} fontWeight={"semibold"} fontSize={"sm"}>
-                  {user.username}
+                  {user.userName}
                 </Text>
-                <Avatar name={user.username} bg={"gray.100"} color={"black"} size={"sm"} />
+                <Avatar name={user.userName} bg={"gray.100"} color={"black"} size={"sm"} />
               </HStack>
             </MenuButton>
             <MenuList>
               <MenuItem>
                 <HStack>
-                  <Avatar name={user.username} bg={"primary.500"} />
+                  <Avatar name={user.userName} bg={"primary.500"} />
                   <Box>
-                    <Text fontSize={"sm"}>{user.username}</Text>
+                    <Text fontSize={"sm"}>{user.userName}</Text>
                     <Text fontSize={"sm"} color={"gray.500"}>
                       {user.email}
                     </Text>

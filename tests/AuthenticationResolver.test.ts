@@ -13,7 +13,7 @@ const LoginWithPasswordMutation = `
       errors { field, message }
       user {
         id
-        username
+        userName
         email
       }
     }
@@ -21,12 +21,12 @@ const LoginWithPasswordMutation = `
 `
 
 const CreateUserMutation = `
-  mutation($username: String!, $email: String!, $password: String!) {
-    createUser(username: $username, email: $email, password: $password) {
+  mutation($userName: String!, $email: String!, $password: String!) {
+    createUser(userName: $userName, email: $email, password: $password) {
       errors { field, message }
       user {
         id
-        username
+        userName
         email
       }
     }
@@ -49,14 +49,14 @@ const ResetPasswordMutation = `
 
 test.group('createUser', () => {
   test('should create user', async ({ expect, client }) => {
-    const username = faker.internet.userName()
+    const userName = faker.internet.userName()
     const email = faker.internet.exampleEmail()
     const password = faker.internet.password()
 
     const queryData = {
       query: CreateUserMutation,
       variables: {
-        username,
+        userName,
         email,
         password,
       }
@@ -67,14 +67,14 @@ test.group('createUser', () => {
 
     expect(data.createUser.errors).toBeNull()
     expect(data.createUser.user).toBeDefined()
-    expect(data.createUser.user).toMatchObject({ username, email })
+    expect(data.createUser.user).toMatchObject({ userName, email })
     expect(typeof data.createUser.user.id).toBe('number')
 
     const { id } = data.createUser.user
     const user = await UserRepository.findOneBy({ id })
 
     expect(user).toBeDefined()
-    expect(user).toMatchObject({ username, email })
+    expect(user).toMatchObject({ userName, email })
     expect(user.password).not.toBe(password)
 
     expect(response.cookie(SESSION_COOKIE)).toBeDefined()
@@ -82,14 +82,14 @@ test.group('createUser', () => {
   })
 
   test('should validate values', async ({ expect, client }) => {
-    const username = 'al'
+    const userName = 'al'
     const email = 'not an email'
     const password = '123'
 
     const queryData = {
       query: CreateUserMutation,
       variables: {
-        username,
+        userName,
         email,
         password,
       }
@@ -103,28 +103,22 @@ test.group('createUser', () => {
 
     expect(data.createUser.errors).toBeDefined()
     expect(data.createUser.errors).toHaveLength(3)
-    expect(data.createUser.errors).toContainEqual({ field: 'username', message: 'The username must contain at least 4 characters.' })
+    expect(data.createUser.errors).toContainEqual({ field: 'userName', message: 'The userName must contain at least 4 characters.' })
     expect(data.createUser.errors).toContainEqual({ field: 'email', message: 'Invalid email.' })
     expect(data.createUser.errors).toContainEqual({ field: 'password', message: 'The password must contain at least 4 characters.' })
   })
 
-  test('should prevent duplicate `username` and `email`', async ({ expect, client }) => {
-    const username = faker.internet.userName()
+  test('should prevent duplicate `userName` and `email`', async ({ expect, client }) => {
+    const userName = faker.internet.userName()
     const email = faker.internet.exampleEmail()
     const password = faker.internet.password()
 
-    const user = new User()
-
-    user.username = username
-    user.email = email
-    user.password = password
-
-    await UserRepository.save(user)
+    await UserFactory.create({ userName, email, password })
 
     const queryData = {
       query: CreateUserMutation,
       variables: {
-        username,
+        userName,
         email,
         password,
       }
@@ -138,7 +132,7 @@ test.group('createUser', () => {
 
     expect(data.createUser.errors).toBeDefined()
     expect(data.createUser.errors).toHaveLength(2)
-    expect(data.createUser.errors).toContainEqual({ field: 'username', message: 'This username already exists.' })
+    expect(data.createUser.errors).toContainEqual({ field: 'userName', message: 'This userName already exists.' })
     expect(data.createUser.errors).toContainEqual({ field: 'email', message: 'This email is already in use.' })
   })
 })
@@ -165,12 +159,12 @@ test.group('loginWithPassword', () => {
   })
 
   test('should return error if password is incorrect', async ({ expect, client }) => {
-    const username = faker.internet.userName()
+    const userName = faker.internet.userName()
     const email = faker.internet.exampleEmail()
     const password = faker.internet.password()
     const otherPassword = faker.internet.password()
 
-    await UserFactory.create({ username, email, password })
+    await UserFactory.create({ userName: userName, email, password })
 
 
     const queryData = {
@@ -204,11 +198,11 @@ test.group('loginWithPassword', () => {
   })
 
   test('should start session if valid data is given', async ({ expect, client }) => {
-    const username = faker.internet.userName()
+    const userName = faker.internet.userName()
     const email = faker.internet.exampleEmail()
     const password = faker.internet.password()
 
-    await UserFactory.create({ username, email, password })
+    await UserFactory.create({ userName: userName, email, password })
 
     const queryData = {
       query: LoginWithPasswordMutation,
@@ -220,7 +214,7 @@ test.group('loginWithPassword', () => {
 
     expect(data.loginWithPassword.errors).toBeNull()
     expect(data.loginWithPassword.user).toBeDefined()
-    expect(data.loginWithPassword.user).toMatchObject({ username, email })
+    expect(data.loginWithPassword.user).toMatchObject({ userName, email })
     expect(typeof data.loginWithPassword.user.id).toBe('number')
 
     expect(response.cookie(SESSION_COOKIE)).toBeDefined()
@@ -229,15 +223,15 @@ test.group('loginWithPassword', () => {
 
 
   test('can login with `userName` instead of `email`', async ({ expect, client }) => {
-    const username = faker.internet.userName()
+    const userName = faker.internet.userName()
     const email = faker.internet.exampleEmail()
     const password = faker.internet.password()
 
-    await UserFactory.create({ username, email, password })
+    await UserFactory.create({ userName: userName, email, password })
 
     const queryData = {
       query: LoginWithPasswordMutation,
-      variables: { email: username, password, }
+      variables: { email: userName, password, }
     }
 
     const response = await client.post('/').json(queryData)
@@ -245,7 +239,7 @@ test.group('loginWithPassword', () => {
 
     expect(data.loginWithPassword.errors).toBeNull()
     expect(data.loginWithPassword.user).toBeDefined()
-    expect(data.loginWithPassword.user).toMatchObject({ username, email })
+    expect(data.loginWithPassword.user).toMatchObject({ userName, email })
 
     expect(response.cookie(SESSION_COOKIE)).toBeDefined()
     expect(response.cookie(SESSION_COOKIE).value).not.toHaveLength(0)
@@ -253,11 +247,11 @@ test.group('loginWithPassword', () => {
   })
 
   test('`email` is case-insensitive', async ({ expect, client }) => {
-    const username = faker.internet.userName()
+    const userName = faker.internet.userName()
     const email = faker.internet.exampleEmail().toLowerCase()
     const password = faker.internet.password()
 
-    await UserFactory.create({ username, email, password })
+    await UserFactory.create({ userName: userName, email, password })
 
     const queryData = {
       query: LoginWithPasswordMutation,
@@ -272,15 +266,15 @@ test.group('loginWithPassword', () => {
   })
 
   test('`userName` is case-insensitive', async ({ expect, client }) => {
-    const username = faker.internet.userName().toLowerCase()
+    const userName = faker.internet.userName().toLowerCase()
     const email = faker.internet.exampleEmail()
     const password = faker.internet.password()
 
-    await UserFactory.create({ username, email, password })
+    await UserFactory.create({ userName: userName, email, password })
 
     const queryData = {
       query: LoginWithPasswordMutation,
-      variables: { email: username.toUpperCase(), password }
+      variables: { email: userName.toUpperCase(), password }
     }
 
     const response = await client.post('/').json(queryData)
@@ -387,7 +381,7 @@ test.group('logout', () => {
             errors { field, message }
             user {
               id
-              username
+              userName
               email
             }
           }

@@ -23,7 +23,7 @@ export const useAuth = () => {
     user: data?.currentUser,
     loginWithPassword: (email: string, password: string) => loginWithPassword({ email, password }).then(response => response?.data?.loginWithPassword),
     loginWithGoogle,
-    createUser: (username: string, email: string, password: string) => createUser({ username, email, password }).then(response => response?.data?.createUser),
+    createUser: (userName: string, email: string, password: string) => createUser({ userName, email, password }).then(response => response?.data?.createUser),
     logout,
     sendResertPasswordEmail,
     resetPassword: (token: string, newPassword: string) => resetPassword({ token, newPassword }).then(response => response?.data?.resetPassword),

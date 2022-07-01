@@ -19,7 +19,7 @@ const FindCardByIdQuery = `
       # TODO: Add createdBy field
       # createdBy {
       #   id
-      #   username
+      #   userName
       # }
     }
   }
@@ -89,7 +89,7 @@ test.group('findCardById', () => {
     expect(errors).toBeFalsy()
     expect(data.card).toBeTruthy()
     // expect(data.card.createdBy.id).toBe(user.id)
-    // expect(data.card.createdBy.username).toBe(user.username)
+    // expect(data.card.createdBy.userName).toBe(user.userName)
 
     expect(data.card).toMatchObject({
       id: card.id,
@@ -101,7 +101,7 @@ test.group('findCardById', () => {
       },
       // createdBy: {
       //   id: user.id,
-      //   username: user.username
+      //   userName: user.userName
       // }
     })
   })
