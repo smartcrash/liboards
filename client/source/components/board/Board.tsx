@@ -9,12 +9,23 @@ import {
   MenuItem,
   MenuList,
   Stack,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  AlertDialogCloseButton,
+  Button,
+  useDisclosure,
+  ButtonGroup,
 } from "@chakra-ui/react";
+import { useRef } from "react";
 import { DragDropContext, Draggable, DropResult } from "react-beautiful-dnd";
 import { NonEmptyEditable } from "../";
 import useRefState from "../../hooks/useRefState";
 import { DotsHorizontalIcon } from "../../icons";
-import { Card, Column } from "./components";
+import { Column, Card } from "./components";
 import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
 import { addCard, addColumn, changeColumn, moveCard, removeCard, removeColumn } from "./helpers";
@@ -40,6 +51,8 @@ export type CardDragEndHandler = (result: {
   toIndex: number;
 }) => void;
 
+const columnWidth = "2xs";
+
 interface BoardProps {
   children: BoardType;
   onColumnNew: ColumnNewHandler;
@@ -61,7 +74,9 @@ export const Board = ({
   onCardDragEnd,
   onCardClick,
 }: BoardProps) => {
-  const columnWidth = "2xs";
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  const columnRef = useRef<ColumnType | undefined>(undefined);
   const [boardRef, setBoardRef] = useRefState<BoardType>(() => {
     const board = structuredClone(initialBoard);
     board.columns.forEach((column) => column.cards.sort((a, b) => a.index - b.index));
@@ -134,69 +149,103 @@ export const Board = ({
   };
 
   return (
-    <HStack justifyContent={"flex-start"} alignItems={"start"}>
-      <DragDropContext onDragEnd={onDragEnd}>
-        {boardRef.current.columns.map((column, columnIndex) => {
-          return (
-            <Stack w={columnWidth} key={column.id}>
-              <Column
-                droppableId={`${column.id}`}
-                columnHeader={
-                  <NonEmptyEditable
-                    defaultValue={column.title}
-                    onSubmit={(nextValue) => handleColumnRename(column, nextValue)}
-                    fontSize={"md"}
-                    fontWeight={"semibold"}
-                  >
-                    <EditablePreview />
-                    <EditableInput />
-                  </NonEmptyEditable>
-                }
-                contextMenu={
-                  <Menu>
-                    <MenuButton
-                      as={IconButton}
-                      icon={<DotsHorizontalIcon fontSize={"xl"} color={"gray.500"} />}
-                      variant={"ghost"}
-                      size={"sm"}
-                      colorScheme={"gray"}
-                      aria-label={"More column actions"}
-                      title={"More column actions"}
-                    />
-                    <MenuList>
-                      <MenuItem data-testid={"remove-column"} onClick={() => handleColumnRemove(column)}>
-                        Delete this column
-                      </MenuItem>
-                    </MenuList>
-                  </Menu>
-                }
-                data-testid={`column-${columnIndex}`}
-              >
-                {column.cards.map((card, cardIndex) => (
-                  <Draggable draggableId={String(card.id)} index={cardIndex} key={card.id}>
-                    {({ innerRef, draggableProps, dragHandleProps }) => (
-                      <div ref={innerRef} {...draggableProps} {...dragHandleProps} data-testid={`card-${cardIndex}`}>
-                        {/* TODO: Add `renderCard` */}
-                        <Card
-                          id={card.id}
-                          onClick={() => onCardClick(card, column)}
-                          onRemove={() => handleCardRemove(column, card)}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-              </Column>
+    <>
+      <HStack justifyContent={"flex-start"} alignItems={"start"}>
+        <DragDropContext onDragEnd={onDragEnd}>
+          {boardRef.current.columns.map((column, columnIndex) => {
+            return (
+              <Stack w={columnWidth} key={column.id}>
+                <Column
+                  droppableId={`${column.id}`}
+                  columnHeader={
+                    <NonEmptyEditable
+                      defaultValue={column.title}
+                      onSubmit={(nextValue) => handleColumnRename(column, nextValue)}
+                      fontSize={"md"}
+                      fontWeight={"semibold"}
+                    >
+                      <EditablePreview />
+                      <EditableInput />
+                    </NonEmptyEditable>
+                  }
+                  contextMenu={
+                    <Menu>
+                      <MenuButton
+                        as={IconButton}
+                        icon={<DotsHorizontalIcon fontSize={"xl"} color={"gray.500"} />}
+                        variant={"ghost"}
+                        size={"sm"}
+                        colorScheme={"gray"}
+                        aria-label={"More column actions"}
+                        title={"More column actions"}
+                      />
+                      <MenuList>
+                        <MenuItem
+                          data-testid={"remove-column"}
+                          onClick={() => [(columnRef.current = column), onOpen()]}
+                        >
+                          Delete this column
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
+                  }
+                  data-testid={`column-${columnIndex}`}
+                >
+                  {column.cards.map((card, cardIndex) => (
+                    <Draggable draggableId={String(card.id)} index={cardIndex} key={card.id}>
+                      {({ innerRef, draggableProps, dragHandleProps }) => (
+                        <div ref={innerRef} {...draggableProps} {...dragHandleProps} data-testid={`card-${cardIndex}`}>
+                          {/* TODO: Add `renderCard` if needed */}
+                          <Card
+                            id={card.id}
+                            onClick={() => onCardClick(card, column)}
+                            onRemove={() => handleCardRemove(column, card)}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                </Column>
 
-              <CardAdder onConfirm={(title) => handleCardAdd(column, { title })} />
-            </Stack>
-          );
-        })}
+                <CardAdder onConfirm={(title) => handleCardAdd(column, { title })} />
+              </Stack>
+            );
+          })}
 
-        <Box w={columnWidth}>
-          <ColumnAdder onConfirm={handleColumnAdd} />
-        </Box>
-      </DragDropContext>
-    </HStack>
+          <Box w={columnWidth}>
+            <ColumnAdder onConfirm={handleColumnAdd} />
+          </Box>
+        </DragDropContext>
+      </HStack>
+
+      <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogCloseButton />
+
+            <AlertDialogHeader fontSize="lg" fontWeight="bold"></AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to delete <strong>{columnRef.current?.title}</strong> with its cards?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <ButtonGroup spacing={3} size={"sm"}>
+                <Button ref={cancelRef} onClick={onClose} variant={"ghost"} colorScheme={"gray"}>
+                  Cancel
+                </Button>
+                <Button
+                  colorScheme={"red"}
+                  onClick={() => [handleColumnRemove(columnRef.current!), onClose()]}
+                  data-testid={"confirm-remove-column"}
+                >
+                  Delete
+                </Button>
+              </ButtonGroup>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+    </>
   );
 };
