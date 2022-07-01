@@ -20,7 +20,7 @@ export const HeartButton = ({ defaultIsClick = false, onClick = () => {} }: Hear
   return (
     <IconButton
       onClick={onToggle}
-      icon={<Icon fontSize={"3xl"} fill={"red.500"} />}
+      icon={<Icon fontSize={"2xl"} fill={isClick ? "red.500" : "gray.400"} />}
       aria-label={ariaLabel}
       title={ariaLabel}
       colorScheme={"gray"}

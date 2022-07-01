@@ -134,7 +134,7 @@ export const ShowProject = () => {
 
       <Stack spacing={6}>
         <HStack justifyContent={"space-between"}>
-          <HStack alignItems={"flex-start"} spacing={3}>
+          <HStack alignItems={"center"} spacing={3}>
             <NonEmptyEditable defaultValue={title} onSubmit={onTitleUpdate} fontSize={"3xl"} fontWeight={"bold"}>
               <EditablePreview />
               <EditableInput data-testid={"title"} />
@@ -148,7 +148,7 @@ export const ShowProject = () => {
 
           <Popover>
             <PopoverTrigger>
-              <Button leftIcon={<TrashIcon mb={1} mr={1} />} colorScheme={"gray"} variant={"ghost"}>
+              <Button leftIcon={<TrashIcon mb={1} mr={1} />} colorScheme={"gray"} variant={"outline"}>
                 Delete project
               </Button>
             </PopoverTrigger>

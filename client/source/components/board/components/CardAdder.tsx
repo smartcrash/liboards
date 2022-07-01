@@ -20,6 +20,7 @@ export const CardAdder = ({ onConfirm }: CardAdderProps) => {
   ) : (
     <Button
       colorScheme={"gray"}
+      variant={"outline"}
       onClick={() => setAddingCard(true)}
       leftIcon={<AddIcon />}
       fontSize={"sm"}
