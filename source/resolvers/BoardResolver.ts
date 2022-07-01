@@ -8,6 +8,7 @@ import { AllowIf } from "../middlewares/AllowIf";
 import { Authenticate } from "../middlewares/Authenticate";
 import { BoardRepository, FavoritesRepository } from "../repository";
 import { ContextType } from '../types';
+import uniqueId from "../utils/uniqueId";
 
 @Resolver(Board)
 export class BoardResolver {
@@ -69,11 +70,14 @@ export class BoardResolver {
     const board = new Board()
 
     board.title = title
+    board.slug = uniqueId() // Create a temporary value, it must be unique
     board.createdById = user.id
 
     await BoardRepository.save(board)
 
-    return board
+    // Ensure to return the updated entity, with the correct slug and not the
+    // temporary one.
+    return BoardRepository.findOneBy({ id: board.id })
   }
 
   @UseMiddleware(Authenticate)

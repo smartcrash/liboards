@@ -2,19 +2,8 @@ import { faker } from "@faker-js/faker"
 import { ApiResponse } from "@japa/api-client"
 import { Expect } from "@japa/expect"
 import { test } from "@japa/runner"
-import { Board, Card, Column } from "../entity"
-import { BoardRepository, CardRepository, ColumnRepository } from "../repository"
-
-export const createRandomBoard = async (userId: number): Promise<Board> => {
-  const board = new Board()
-
-  board.title = faker.lorem.words()
-  board.createdById = userId
-
-  await BoardRepository.save(board)
-
-  return board
-}
+import { Card, Column } from "../entity"
+import { CardRepository, ColumnRepository } from "../repository"
 
 export const createRandomColumn = async (boardId: number, index = faker.datatype.number()): Promise<Column> => {
   const column = new Column()

@@ -2,8 +2,9 @@ import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import { In } from 'typeorm';
 import { SESSION_COOKIE } from '../source/constants';
+import { BoardFactory } from '../source/factories';
 import { CardRepository, ColumnRepository } from '../source/repository';
-import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from '../source/utils/testUtils';
+import { assertIsForbiddenExeption, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from '../source/utils/testUtils';
 
 const AddColumnMutation = `
   mutation AddColumn($boardId: Int!, $title: String!) {
@@ -41,7 +42,7 @@ test.group('addColumn', () => {
 
   test('should add column at index to existing board', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
     const title = faker.lorem.words()
 
     const queryData = {
@@ -71,7 +72,7 @@ test.group('addColumn', () => {
   test('can not add column to someone else\'s board', async ({ expect, client, createUser }) => {
     const [user] = await createUser(client)
     const [, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
 
     const queryData = {
       query: AddColumnMutation,
@@ -88,7 +89,7 @@ test.group('addColumn', () => {
 
   // test('assigns correct `index` by default', async ({ expect, client, createUser }) => {
   //   const [user, cookie] = await createUser(client)
-  //   const { id: boardId } = await createRandomBoard(user.id)
+  //   const { id: boardId } = await BoardFactory.create({createdBy: user})
 
   //   await createRandomColumn(boardId, 0)
   //   await createRandomColumn(boardId, 1)
@@ -120,7 +121,7 @@ test.group('updateColumn', () => {
   })
   test('should update column', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
     const { id } = await createRandomColumn(boardId)
 
     const title = faker.lorem.words()
@@ -151,7 +152,7 @@ test.group('updateColumn', () => {
     const [user] = await createUser(client)
     const [, cookie] = await createUser(client)
 
-    const { id: boardId } = await createRandomBoard(user.id)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
     const { id, title } = await createRandomColumn(boardId)
 
     const queryData = {
@@ -180,7 +181,7 @@ test.group('removeColumn', () => {
 
   test('should delete column', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
     const { id } = await createRandomColumn(boardId)
 
     const queryData = {
@@ -201,7 +202,7 @@ test.group('removeColumn', () => {
 
   // test('shift remaining columm\'s indexes to keep sequense', async ({ expect, client, createUser }) => {
   //   const [user, cookie] = await createUser(client)
-  //   const { id: boardId } = await createRandomBoard(user.id)
+  //   const { id: boardId } = await BoardFactory.create({createdBy: user})
   //   const column1 = await createRandomColumn(boardId, 0)
   //   const column2 = await createRandomColumn(boardId, 1)
   //   const column3 = await createRandomColumn(boardId, 2)
@@ -227,7 +228,7 @@ test.group('removeColumn', () => {
     const [user] = await createUser(client)
     const [, cookie] = await createUser(client)
 
-    const { id: boardId } = await createRandomBoard(user.id)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
     const { id } = await createRandomColumn(boardId)
 
     const queryData = {
@@ -246,7 +247,7 @@ test.group('removeColumn', () => {
 
   test('cascades and deletes all related cards', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
     const { id } = await createRandomColumn(boardId)
     const cardIds = [
       await createRandomCard(id),

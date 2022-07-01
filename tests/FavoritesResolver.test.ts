@@ -2,7 +2,7 @@ import { test } from "@japa/runner"
 import { SESSION_COOKIE } from "../source/constants"
 import { BoardFactory } from "../source/factories"
 import { BoardRepository, FavoritesRepository, UserRepository } from "../source/repository"
-import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from "../source/utils/testUtils"
+import { assertIsForbiddenExeption, testThrowsIfNotAuthenticated } from "../source/utils/testUtils"
 
 const AllFavoritesQuery = `
   query AllFavorites {
@@ -33,10 +33,7 @@ test.group('allFavorites', () => {
 
   test('get user\'s favorites list', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-
-    const board1 = await createRandomBoard(user.id)
-    const board2 = await createRandomBoard(user.id)
-    const board3 = await createRandomBoard(user.id)
+    const [board1, board2, board3] = await BoardFactory.createMany(3, { createdBy: user })
 
     await FavoritesRepository.insert([
       { userId: user.id, boardId: board2.id },
@@ -92,8 +89,8 @@ test.group('addToFavorites', () => {
   test('it add board to user\'s favorites', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
 
-    const { id } = await createRandomBoard(user.id)
-    await createRandomBoard(user.id)
+    const { id } = await BoardFactory.create({ createdBy: user })
+    await BoardFactory.create({ createdBy: user })
 
     const queryData = {
       query: AddToFavoritesMutation,
@@ -120,7 +117,7 @@ test.group('addToFavorites', () => {
     const [otherUser,] = await createUser(client)
     const [loggedUser, cookie] = await createUser(client)
 
-    const { id } = await createRandomBoard(otherUser.id)
+    const { id } = await BoardFactory.create({ createdBy: otherUser })
 
     await FavoritesRepository.insert({ userId: otherUser.id, boardId: id })
 
@@ -150,7 +147,7 @@ test.group('removeFromFavorites', () => {
 
   test('it removes board from user\'s favorites', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await createRandomBoard(user.id)
+    const board = await BoardFactory.create({ createdBy: user })
 
 
     const queryData = {

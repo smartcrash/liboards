@@ -16,6 +16,10 @@ export class Board {
   @Property()
   title: string;
 
+  @Field()
+  @Property({ unique: true })
+  slug: string;
+
   @Property()
   createdById: number
 
