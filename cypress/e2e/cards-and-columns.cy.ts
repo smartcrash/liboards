@@ -43,6 +43,7 @@ describe('Cards & columns CRUD operations', () => {
     cy.getByTestId('column-form').get('input[type="text"]').type(`${newColumn}{enter}`)
 
     cy.getByTestId('column-0').getByTestId('remove-column').click({ force: true })
+    cy.getByTestId('confirm-remove-column').click()
 
     cy.contains(newColumn).should('not.exist')
     cy.reload(true)
