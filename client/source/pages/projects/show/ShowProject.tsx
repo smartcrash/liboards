@@ -1,3 +1,4 @@
+import { StickyContainer, Sticky } from "react-sticky";
 import {
   Box,
   Button,
@@ -132,49 +133,72 @@ export const ShowProject = () => {
     <>
       <Helmet title={data.board.title} />
 
-      <Stack spacing={6}>
-        <HStack justifyContent={"space-between"}>
-          <HStack alignItems={"center"} spacing={3}>
-            <NonEmptyEditable defaultValue={title} onSubmit={onTitleUpdate} fontSize={"3xl"} fontWeight={"bold"}>
-              <EditablePreview />
-              <EditableInput data-testid={"title"} />
-            </NonEmptyEditable>
+      <Stack as={StickyContainer} spacing={6} h={"full"}>
+        <Sticky>
+          {({ style, isSticky }) => (
+            <HStack
+              px={{ base: 2, sm: 6, lg: 8 }}
+              justifyContent={"space-between"}
+              style={style}
+              bg={"white"}
+              zIndex={99999}
+              py={isSticky ? 2 : 0}
+              borderBottomWidth={isSticky ? 2 : 0}
+            >
+              <HStack alignItems={"center"} spacing={3}>
+                <NonEmptyEditable defaultValue={title} onSubmit={onTitleUpdate} fontSize={"3xl"} fontWeight={"bold"}>
+                  <EditablePreview />
+                  <EditableInput data-testid={"title"} />
+                </NonEmptyEditable>
 
-            <HeartButton
-              defaultIsClick={favorite}
-              onClick={(value) => (value ? addToFavorites({ id }) : removeFromFavorites({ id }))}
-            />
-          </HStack>
+                <HeartButton
+                  defaultIsClick={favorite}
+                  onClick={(value) => (value ? addToFavorites({ id }) : removeFromFavorites({ id }))}
+                />
+              </HStack>
 
-          <Popover>
-            <PopoverTrigger>
-              <Button leftIcon={<TrashIcon mb={1} mr={1} />} colorScheme={"gray"} variant={"outline"}>
-                Delete project
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent>
-              <PopoverArrow />
-              <PopoverCloseButton />
-              <PopoverHeader textAlign={"center"}>Delete project?</PopoverHeader>
-              <PopoverBody>
-                <VStack spacing={3}>
-                  <Text fontSize={"sm"} color={"gray.500"}>
-                    You can find and reopen closed boards at the bottom of{" "}
-                    <Link as={RouterLink} to={route("projects.list")} color={"gray.700"} textDecoration={"underline"}>
-                      your projects page
-                    </Link>
-                  </Text>
-
-                  <Button colorScheme={"red"} w={"full"} size={"sm"} onClick={onDelete} data-testid={"delete-project"}>
-                    Delete
+              <Popover>
+                <PopoverTrigger>
+                  <Button leftIcon={<TrashIcon mb={1} mr={1} />} colorScheme={"gray"} variant={"outline"}>
+                    Delete project
                   </Button>
-                </VStack>
-              </PopoverBody>
-            </PopoverContent>
-          </Popover>
-        </HStack>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <PopoverArrow />
+                  <PopoverCloseButton />
+                  <PopoverHeader textAlign={"center"}>Delete project?</PopoverHeader>
+                  <PopoverBody>
+                    <VStack spacing={3}>
+                      <Text fontSize={"sm"} color={"gray.500"}>
+                        You can find and reopen closed boards at the bottom of{" "}
+                        <Link
+                          as={RouterLink}
+                          to={route("projects.list")}
+                          color={"gray.700"}
+                          textDecoration={"underline"}
+                        >
+                          your projects page
+                        </Link>
+                      </Text>
 
-        <Box>
+                      <Button
+                        colorScheme={"red"}
+                        w={"full"}
+                        size={"sm"}
+                        onClick={onDelete}
+                        data-testid={"delete-project"}
+                      >
+                        Delete
+                      </Button>
+                    </VStack>
+                  </PopoverBody>
+                </PopoverContent>
+              </Popover>
+            </HStack>
+          )}
+        </Sticky>
+
+        <Box w={"full"} overflow={"scroll"} mx={-10} pb={10}>
           <Board
             renderCard={(card, { removeCard }) => (
               <Card id={card.id} onRemove={removeCard} onClick={() => onCardClick(card)} />

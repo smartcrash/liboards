@@ -142,7 +142,7 @@ export const Board = ({
         <DragDropContext onDragEnd={onDragEnd}>
           {boardRef.current.columns.map((column, columnIndex) => {
             return (
-              <Stack w={columnWidth} key={column.id}>
+              <Stack w={columnWidth} key={column.id} flexShrink={0}>
                 <Column
                   droppableId={`${column.id}`}
                   columnHeader={

@@ -1,15 +1,14 @@
-import { Stack } from "@chakra-ui/react";
+import { Box, Stack } from "@chakra-ui/react";
 import { Outlet } from "react-router-dom";
-import { Container } from "../../components";
 import NavBar from "../../components/NavBar";
 
 export const Dashboard = () => {
   return (
     <Stack h={"100vh"}>
       <NavBar />
-      <Container flexGrow={1} pt={6} as={"main"}>
+      <Box as={"main"} px={0} pt={3} flexGrow={1}>
         <Outlet />
-      </Container>
+      </Box>
     </Stack>
   );
 };
