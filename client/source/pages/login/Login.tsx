@@ -40,7 +40,7 @@ export const Login = () => {
         </Heading>
 
         <ButtonGroup flexDir={"column"} spacing={0} w={"full"} rowGap={4}>
-          <GoogleLoginButton onSuccess={({ tokenId }) => loginWithGoogle(tokenId)} />
+          <GoogleLoginButton onSuccess={(credential) => loginWithGoogle(credential)} />
         </ButtonGroup>
 
         <DividerWithText my={8}>Or</DividerWithText>
