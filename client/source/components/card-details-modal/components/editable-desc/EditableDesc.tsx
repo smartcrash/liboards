@@ -10,7 +10,7 @@ import {
   useMergeRefs,
 } from "@chakra-ui/react";
 import { KeyboardEventHandler, Ref, useRef, useState } from "react";
-import { AutoResizeTextarea } from "../../../";
+import { AutoResizeTextarea, Markdown } from "../../../";
 
 interface EditableDescProps {
   defaultValue: string;
@@ -59,7 +59,15 @@ export const EditableDesc = ({ defaultValue, onSubmit }: EditableDescProps) => {
 
   return (
     <Editable onChange={setValue} defaultValue={defaultValue} onSubmit={onSubmit} color={"gray.600"}>
-      {value && <EditablePreview data-testid={"preview"} whiteSpace={"pre-wrap"} w={"full"} lineHeight={"short"} />}
+      {value && (
+        <EditablePreview
+          as={Markdown}
+          data-testid={"preview"}
+          whiteSpace={"pre-wrap"}
+          w={"full"}
+          lineHeight={"short"}
+        />
+      )}
       <EditableTextarea as={AutoResizeTextarea} minRows={5} px={0} data-testid={"textarea"} onKeyDown={onKeyDown} />
       <EditableControls value={value} submitRef={submitRef} />
     </Editable>

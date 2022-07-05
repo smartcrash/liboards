@@ -99,16 +99,13 @@ export const Card = ({ id, onRemove, onClick }: CardProps) => {
           <Heading as={"h4"} fontSize={"md"} maxW={"full"} whiteSpace={"pre-wrap"} fontWeight={"medium"}>
             {title}
           </Heading>
-          <Text fontSize={"sm"} color={"gray.500"} hidden={!description} noOfLines={5}>
-            {description}
-          </Text>
 
           {metaTags.some(({ visible }) => visible) && (
             <HStack spacing={3} pt={2}>
               {metaTags
                 .filter(({ visible }) => visible)
                 .map(({ label, icon }) => (
-                  <HStack fontSize={"xs"} spacing={1} color={"gray.500"} _hover={{ color: "gray.900" }}>
+                  <HStack fontSize={"xs"} spacing={1} color={"gray.500"} _hover={{ color: "gray.900" }} key={label}>
                     {icon}
                     <Text aria-hidden>{label}</Text>
                   </HStack>

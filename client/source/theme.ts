@@ -1,3 +1,4 @@
+import { withProse } from '@nikolovlazar/chakra-ui-prose';
 import {
   extendTheme,
   ThemeConfig
@@ -29,6 +30,6 @@ const theme = extendTheme({
     Button: { defaultProps: { colorScheme: 'primary' } },
     FormLabel: { baseStyle: { fontWeight: 'bold' } }
   }
-});
+}, withProse());
 
 export default theme
