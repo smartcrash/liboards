@@ -1,0 +1,11 @@
+mutation LoginWithGoogle($token: String!) {
+  loginWithGoogle(token: $token) {
+    errors {
+      field
+      message
+    }
+    user {
+      ...UserFragment
+    }
+  }
+}

@@ -56,10 +56,10 @@ export const createUrqlClient = () => createClient({
             })
           },
 
-          loginWithToken(result: LoginWithTokenMutation, args, cache, info) {
+          loginWithGoogle(result: LoginWithTokenMutation, args, cache, info) {
             cache.updateQuery({ query: CurrentUserDocument }, (data: CurrentUserQuery | null) => {
-              if (result.loginWithToken.errors) return data;
-              else return { currentUser: result.loginWithToken.user };
+              if (result.loginWithGoogle.errors) return data;
+              else return { currentUser: result.loginWithGoogle.user };
             })
           },
 
