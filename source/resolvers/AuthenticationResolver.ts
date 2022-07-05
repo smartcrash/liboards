@@ -1,8 +1,9 @@
+import { OAuth2Client } from 'google-auth-library'
 import { verify } from 'argon2';
-import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import { v4 as uuid } from 'uuid';
 import { z, ZodError } from 'zod';
-import { CORS_ORIGIN, SESSION_COOKIE } from '../constants';
+import { CORS_ORIGIN, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SESSION_COOKIE } from '../constants';
 import { PasswordReset, User } from "../entity";
 import { UserRepository } from '../repository';
 import { PasswordResetRepository } from '../repository/PasswordResetRepository';
@@ -11,10 +12,15 @@ import { ContextType } from '../types';
 
 @ObjectType()
 class FieldError {
-  @Field()
-  field: string
-  @Field()
-  message: string
+  @Field() field: string
+  @Field() message: string
+}
+
+@InputType()
+class UserInfo {
+  @Field() email: string;
+  @Field() name: string;
+  @Field() picture: string;
 }
 
 @ObjectType()
@@ -38,7 +44,7 @@ export class AuthenticationResolver {
 
   @Mutation(() => AuthenticationResponse)
   async createUser(
-    @Arg('username') username: string,
+    @Arg('userName') userName: string,
     @Arg('email') email: string,
     @Arg('password') password: string,
     @Ctx() { req }: ContextType
@@ -47,10 +53,10 @@ export class AuthenticationResolver {
 
     try {
       await z.object({
-        username: z.string().min(4, 'The username must contain at least 4 characters.'),
+        userName: z.string().min(4, 'The userName must contain at least 4 characters.'),
         email: z.string().email('Invalid email.'),
         password: z.string().min(4, 'The password must contain at least 4 characters.')
-      }).parseAsync({ username, email, password })
+      }).parseAsync({ userName, email, password })
     } catch (error) {
       if (error instanceof ZodError) {
         return {
@@ -62,8 +68,8 @@ export class AuthenticationResolver {
       }
     }
 
-    if (await UserRepository.findOneBy({ username })) {
-      errors.push({ field: 'username', message: 'This username already exists.' })
+    if (await UserRepository.findOneBy({ userName: userName })) {
+      errors.push({ field: 'userName', message: 'This userName already exists.' })
     }
 
     if (await UserRepository.findOneBy({ email })) {
@@ -74,7 +80,7 @@ export class AuthenticationResolver {
 
     const user = new User()
 
-    user.username = username
+    user.userName = userName
     user.email = email
     user.password = password
 
@@ -91,7 +97,11 @@ export class AuthenticationResolver {
     @Arg('password') password: string,
     @Ctx() { req }: ContextType
   ): Promise<AuthenticationResponse> {
-    const user = await UserRepository.findOne({ where: [{ email }, { username: email }] })
+    const user = await UserRepository
+      .createQueryBuilder()
+      .where('LOWER("User"."email") = LOWER(:email)', { email })
+      .orWhere('LOWER("User"."userName") = LOWER(:userName)', { userName: email })
+      .getOne()
 
     if (!user) {
       return { errors: [{ field: 'email', message: "This user does\'nt exists." }] }
@@ -104,6 +114,36 @@ export class AuthenticationResolver {
     req.session.userId = user.id
 
     return { user }
+  }
+
+  @Mutation(() => AuthenticationResponse)
+  async loginWithGoogle(@Arg('token') token: string, @Ctx() { req }: ContextType): Promise<AuthenticationResponse> {
+    try {
+      const client = new OAuth2Client(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
+      const ticket = await client.verifyIdToken({ idToken: token });
+      const { name, email } = ticket.getPayload()
+
+      // TODO: Add random string to ensure uniqueness
+      // TODO: Use `slugify` to normalize and remove spacial chars
+      const userName = name.toLowerCase().replace(/\s+/g, '')
+
+      await UserRepository.upsert({ email, userName: userName }, ['email'])
+
+      const user = await UserRepository.findOneBy({ email })
+
+      req.session.userId = user.id
+
+      return { user }
+    } catch (error) {
+      console.error(error);
+
+      return {
+        errors: [{
+          field: 'token',
+          message: "Something went terribly wrong!"
+        }]
+      }
+    }
   }
 
   @Mutation(() => Boolean)

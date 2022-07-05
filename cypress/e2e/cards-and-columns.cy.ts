@@ -3,10 +3,8 @@ import Chance from "chance"
 const chance = new Chance()
 let user: [string, string]
 
-describe('Project View', () => {
-  before(() => {
-    cy.createUser().then(([email, pwd]) => user = [email, pwd])
-  })
+describe('Cards & columns CRUD operations', () => {
+  before(() => cy.createUser().then(([email, pwd]) => user = [email, pwd]))
 
   // Create a fresh project for each test
   beforeEach(() => {
@@ -15,16 +13,6 @@ describe('Project View', () => {
     cy.visit('/projects/new')
     cy.getByTestId('title').clear().type(chance.sentence({ words: 2 }))
     cy.getByTestId('submit').click()
-  })
-
-  it('should allow to edit the project\'s `title`', () => {
-    const title = chance.sentence({ words: 2 })
-
-    cy.getByTestId('title').parent().click().clear().type(`${title}{enter}`)
-
-    // Force reload the page to ensure that changes are persisted
-    cy.reload(true)
-    cy.contains(title)
   })
 
   it('can add a new column', () => {
@@ -55,6 +43,7 @@ describe('Project View', () => {
     cy.getByTestId('column-form').get('input[type="text"]').type(`${newColumn}{enter}`)
 
     cy.getByTestId('column-0').getByTestId('remove-column').click({ force: true })
+    cy.getByTestId('confirm-remove-column-alert-dialog').contains('Delete').click()
 
     cy.contains(newColumn).should('not.exist')
     cy.reload(true)
@@ -119,6 +108,7 @@ describe('Project View', () => {
       cy.wrap(column).getByTestId('add-card').click()
       cy.wrap(column).getByTestId('card-form').get('input[type="text"]').type(`${newCard}{enter}`)
       cy.wrap(column).getByTestId('card-0').getByTestId('remove-card').click({ force: true })
+      cy.getByTestId('confirm-remove-card-alert-dialog').contains('Delete').click()
     })
 
     cy.contains(newCard).should('not.exist')

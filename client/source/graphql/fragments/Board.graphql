@@ -1,6 +1,7 @@
 fragment BoardFragment on Board {
   id
   title
+  slug
   createdAt
   updatedAt
   favorite

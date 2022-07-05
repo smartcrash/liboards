@@ -1,3 +1,4 @@
+import { withProse } from '@nikolovlazar/chakra-ui-prose';
 import {
   extendTheme,
   ThemeConfig
@@ -12,31 +13,23 @@ const theme = extendTheme({
   config,
   colors: {
     primary: {
-      50: "#FFF5F5",
-      100: "#FED7D7",
-      200: "#FEB2B2",
-      300: "#FC8181",
-      400: "#F56565",
-      500: "#E53E3E",
-      600: "#C53030",
-      700: "#9B2C2C",
-      800: "#822727",
-      900: "#63171B",
+      50: "#F0FFF4",
+      100: "#C6F6D5",
+      200: "#9AE6B4",
+      300: "#68D391",
+      400: "#48BB78",
+      500: "#38A169",
+      600: "#2F855A",
+      700: "#276749",
+      800: "#22543D",
+      900: "#1C4532",
     },
   },
+
   components: {
-    Input: {
-      baseStyle: {
-        field: { borderColor: 'gray.100' }
-      },
-    },
-    Button: {
-      defaultProps: { colorScheme: 'primary' }
-    },
-    FormLabel: {
-      baseStyle: { fontWeight: 'bold' }
-    }
+    Button: { defaultProps: { colorScheme: 'primary' } },
+    FormLabel: { baseStyle: { fontWeight: 'bold' } }
   }
-});
+}, withProse());
 
 export default theme

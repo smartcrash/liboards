@@ -1,6 +1,6 @@
-import { Grid } from "@chakra-ui/react";
+import { BoxProps, Grid } from "@chakra-ui/react";
 
-export const BoardList = ({ children }: { children: any }) => {
+export const BoardList = ({ children, ...props }: BoxProps) => {
   return (
     <Grid
       templateColumns={{
@@ -8,6 +8,7 @@ export const BoardList = ({ children }: { children: any }) => {
         md: "repeat(auto-fit, minmax(100px, 240px))",
       }}
       gap={2}
+      {...props}
     >
       {children}
     </Grid>

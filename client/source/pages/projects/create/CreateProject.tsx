@@ -22,9 +22,9 @@ export const CreateProject = () => {
   const onSubmit = handleSubmit(async ({ title }) => {
     const { data, error } = await createBoard({ title });
 
-    if (data?.board.id) {
-      const id = data?.board.id;
-      navigate(route("projects.show", { id }));
+    if (data?.board) {
+      const { slug } = data.board;
+      navigate(route("projects.show", { slug }));
     } else {
       // Something went wrong! :O
       console.error("Error at `createBoard` muration", { data, error });

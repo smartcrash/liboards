@@ -9,12 +9,14 @@ import {
   MenuItem,
   MenuList,
   Stack,
+  useDisclosure,
 } from "@chakra-ui/react";
+import { ReactNode, useRef } from "react";
 import { DragDropContext, Draggable, DropResult } from "react-beautiful-dnd";
-import { NonEmptyEditable } from "../";
+import { ConfirmAlertDialog, NonEmptyEditable } from "../";
 import useRefState from "../../hooks/useRefState";
 import { DotsHorizontalIcon } from "../../icons";
-import { Card, Column } from "./components";
+import { Column } from "./components";
 import { CardAdder } from "./components/CardAdder";
 import { ColumnAdder } from "./components/ColumnAdder";
 import { addCard, addColumn, changeColumn, moveCard, removeCard, removeColumn } from "./helpers";
@@ -30,8 +32,6 @@ export type CardNewHandler = (newCard: { title: string; columnId: number }) => P
 
 export type CardRemoveHandler = (card: CardType) => void;
 
-export type CardClickHandler = (card: CardType, column: ColumnType) => void;
-
 export type CardDragEndHandler = (result: {
   cardId: number;
   fromColumnId: number;
@@ -40,28 +40,31 @@ export type CardDragEndHandler = (result: {
   toIndex: number;
 }) => void;
 
+const columnWidth = "2xs";
+
 interface BoardProps {
   children: BoardType;
+  renderCard: (card: CardType, actions: { removeCard: () => void }) => ReactNode;
   onColumnNew: ColumnNewHandler;
   onColumnRemove: ColumnRemoveHandler;
   onColumnRename: ColumnRenameHandler;
   onCardNew: CardNewHandler;
   onCardRemove: CardRemoveHandler;
   onCardDragEnd: CardDragEndHandler;
-  onCardClick: CardClickHandler;
 }
 
 export const Board = ({
   children: initialBoard,
+  renderCard,
   onColumnNew,
   onCardNew,
   onColumnRemove,
   onColumnRename,
   onCardRemove,
   onCardDragEnd,
-  onCardClick,
 }: BoardProps) => {
-  const columnWidth = "2xs";
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const columnRef = useRef<ColumnType | undefined>(undefined);
   const [boardRef, setBoardRef] = useRefState<BoardType>(() => {
     const board = structuredClone(initialBoard);
     board.columns.forEach((column) => column.cards.sort((a, b) => a.index - b.index));
@@ -134,69 +137,79 @@ export const Board = ({
   };
 
   return (
-    <HStack justifyContent={"flex-start"} alignItems={"start"}>
-      <DragDropContext onDragEnd={onDragEnd}>
-        {boardRef.current.columns.map((column, columnIndex) => {
-          return (
-            <Stack w={columnWidth} key={column.id}>
-              <Column
-                droppableId={`${column.id}`}
-                columnHeader={
-                  <NonEmptyEditable
-                    defaultValue={column.title}
-                    onSubmit={(nextValue) => handleColumnRename(column, nextValue)}
-                    fontSize={"md"}
-                    fontWeight={"semibold"}
-                  >
-                    <EditablePreview />
-                    <EditableInput />
-                  </NonEmptyEditable>
-                }
-                contextMenu={
-                  <Menu>
-                    <MenuButton
-                      as={IconButton}
-                      icon={<DotsHorizontalIcon fontSize={"xl"} color={"gray.500"} />}
-                      variant={"ghost"}
-                      size={"sm"}
-                      colorScheme={"gray"}
-                      aria-label={"More column actions"}
-                      title={"More column actions"}
-                    />
-                    <MenuList>
-                      <MenuItem data-testid={"remove-column"} onClick={() => handleColumnRemove(column)}>
-                        Delete this column
-                      </MenuItem>
-                    </MenuList>
-                  </Menu>
-                }
-                data-testid={`column-${columnIndex}`}
-              >
-                {column.cards.map((card, cardIndex) => (
-                  <Draggable draggableId={String(card.id)} index={cardIndex} key={card.id}>
-                    {({ innerRef, draggableProps, dragHandleProps }) => (
-                      <div ref={innerRef} {...draggableProps} {...dragHandleProps} data-testid={`card-${cardIndex}`}>
-                        {/* TODO: Add `renderCard` */}
-                        <Card
-                          id={card.id}
-                          onClick={() => onCardClick(card, column)}
-                          onRemove={() => handleCardRemove(column, card)}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-              </Column>
+    <>
+      <HStack justifyContent={"flex-start"} alignItems={"start"}>
+        <DragDropContext onDragEnd={onDragEnd}>
+          {boardRef.current.columns.map((column, columnIndex) => {
+            return (
+              <Stack w={columnWidth} key={column.id} flexShrink={0}>
+                <Column
+                  droppableId={`${column.id}`}
+                  columnHeader={
+                    <NonEmptyEditable
+                      defaultValue={column.title}
+                      onSubmit={(nextValue) => handleColumnRename(column, nextValue)}
+                      fontSize={"md"}
+                      fontWeight={"semibold"}
+                    >
+                      <EditablePreview />
+                      <EditableInput />
+                    </NonEmptyEditable>
+                  }
+                  contextMenu={
+                    <Menu>
+                      <MenuButton
+                        as={IconButton}
+                        icon={<DotsHorizontalIcon fontSize={"xl"} color={"gray.500"} />}
+                        variant={"ghost"}
+                        size={"sm"}
+                        colorScheme={"gray"}
+                        aria-label={"More column actions"}
+                        title={"More column actions"}
+                      />
+                      <MenuList>
+                        <MenuItem
+                          data-testid={"remove-column"}
+                          onClick={() => [(columnRef.current = column), onOpen()]}
+                        >
+                          Delete this column
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
+                  }
+                  data-testid={`column-${columnIndex}`}
+                >
+                  {column.cards.map((card, cardIndex) => (
+                    <Draggable draggableId={String(card.id)} index={cardIndex} key={card.id}>
+                      {({ innerRef, draggableProps, dragHandleProps }) => (
+                        <div ref={innerRef} {...draggableProps} {...dragHandleProps} data-testid={`card-${cardIndex}`}>
+                          {renderCard(card, { removeCard: () => handleCardRemove(column, card) })}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                </Column>
 
-              <CardAdder onConfirm={(title) => handleCardAdd(column, { title })} />
-            </Stack>
-          );
-        })}
+                <CardAdder onConfirm={(title) => handleCardAdd(column, { title })} />
+              </Stack>
+            );
+          })}
 
-        <Box w={columnWidth}>
-          <ColumnAdder onConfirm={handleColumnAdd} />
-        </Box>
-      </DragDropContext>
-    </HStack>
+          <Box w={columnWidth}>
+            <ColumnAdder onConfirm={handleColumnAdd} />
+          </Box>
+        </DragDropContext>
+      </HStack>
+
+      <ConfirmAlertDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={() => handleColumnRemove(columnRef.current!)}
+        confirmLabel={"Delete"}
+        contentProps={{ "data-testid": "confirm-remove-column-alert-dialog" } as any}
+      >
+        Are you sure you want to delete <strong>{columnRef.current?.title}</strong> with its cards?
+      </ConfirmAlertDialog>
+    </>
   );
 };

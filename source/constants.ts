@@ -34,3 +34,6 @@ export const MAIL_FROM_ADDRESS = process.env.MAIL_FROM_ADDRESS
 export const REDIS_HOST = process.env.REDIS_HOST
 export const REDIS_PORT = parseInt(process.env.REDIS_PORT)
 export const REDIS_URL = `redis://${REDIS_HOST}:${REDIS_PORT}`
+
+export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
+export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET

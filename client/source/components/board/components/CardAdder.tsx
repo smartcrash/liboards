@@ -10,16 +10,14 @@ interface CardAdderProps {
 export const CardAdder = ({ onConfirm }: CardAdderProps) => {
   const [isAddingCard, setAddingCard] = useState(false);
 
-  function confirmColumn(title: string) {
-    onConfirm(title);
-    setAddingCard(false);
-  }
+  const confirmColumn = (title: string) => onConfirm(title);
 
   return isAddingCard ? (
     <CardForm onConfirm={confirmColumn} onCancel={() => setAddingCard(false)} />
   ) : (
     <Button
       colorScheme={"gray"}
+      variant={"outline"}
       onClick={() => setAddingCard(true)}
       leftIcon={<AddIcon />}
       fontSize={"sm"}

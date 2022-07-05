@@ -10,15 +10,15 @@ import { User } from '../source/entity'
 import { createServer } from '../source/server'
 
 const authPlugin = (): PluginFn => (config, runner, { Test, TestContext, Group }) => {
-  TestContext.macro('createUser', async (client: ApiClient, username: string = faker.internet.userName(), email: string = faker.internet.email(), password: string = faker.internet.password()) => {
+  TestContext.macro('createUser', async (client: ApiClient, userName: string = faker.internet.userName(), email: string = faker.internet.email(), password: string = faker.internet.password()) => {
     const queryData = {
       query: `
-        mutation($username: String!, $email: String!, $password: String!) {
-          createUser(username: $username, email: $email, password: $password) {
+        mutation($userName: String!, $email: String!, $password: String!) {
+          createUser(userName: $userName, email: $email, password: $password) {
             errors { field, message }
             user {
               id
-              username
+              userName
               email
               createdAt
               updatedAt
@@ -27,7 +27,7 @@ const authPlugin = (): PluginFn => (config, runner, { Test, TestContext, Group }
         }
       `,
       variables: {
-        username,
+        userName,
         email,
         password,
       }
@@ -35,7 +35,7 @@ const authPlugin = (): PluginFn => (config, runner, { Test, TestContext, Group }
 
     const response = await client.post('/').json(queryData)
 
-    const { data } = response.body()
+    const { data, errors } = response.body()
 
     const user: User = data.createUser.user
     const cookie: string = response.cookie(SESSION_COOKIE)?.value

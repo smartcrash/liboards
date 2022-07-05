@@ -1,14 +1,17 @@
 import { faker } from '@faker-js/faker';
 import { test } from '@japa/runner';
 import { SESSION_COOKIE } from '../source/constants';
+import { BoardFactory, UserFactory } from '../source/factories';
 import { BoardRepository } from '../source/repository';
-import { assertIsForbiddenExeption, createRandomBoard, testThrowsIfNotAuthenticated } from '../source/utils/testUtils';
+import slug from '../source/utils/slug';
+import { assertIsForbiddenExeption, testThrowsIfNotAuthenticated } from '../source/utils/testUtils';
 
 const CreateBoardMutation = `
   mutation CreateBoard($title: String!) {
     board: createBoard(title: $title) {
       id
       title
+      slug
     }
   }
 `
@@ -45,6 +48,7 @@ const UpdateBoardMutation = `
     board: updateBoard(id: $id, title: $title) {
       id
       title
+      slug
     }
   }
 `
@@ -58,6 +62,12 @@ const DeleteBoardMutation = `
 const RestoreBoardMutation = `
   mutation RestoreBoard($id: Int!) {
     id: restoreBoard(id: $id)
+  }
+`
+
+const ForceDeleteBoardMutation = `
+  mutation ForceDeleteBoard($id: Int!) {
+    id: forceDeleteBoard(id: $id)
   }
 `
 
@@ -93,6 +103,25 @@ test.group('createBoard', () => {
     expect(board.title).toBe(title)
     expect(board.createdById).toBe(user.id)
   })
+
+  test('should generate board\'s slug correctly', async ({ expect, client, createUser }) => {
+    const [, cookie] = await createUser(client)
+
+    const title = faker.lorem.words()
+
+    const queryData = {
+      query: CreateBoardMutation,
+      variables: { title, }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data, errors } = response.body()
+
+    expect(errors).toBeFalsy()
+    expect(data).toBeTruthy()
+
+    expect(data.board.slug).toBe(slug(title, data.board.id))
+  })
 })
 
 test.group('allBoards', () => {
@@ -102,27 +131,27 @@ test.group('allBoards', () => {
   })
 
   test('should return only user\'s boards', async ({ expect, client, createUser }) => {
-    const [user1] = await createUser(client)
-    const [user2, cookie] = await createUser(client)
+    const otherUser = await UserFactory.create()
+    const [user, cookie] = await createUser(client)
 
-    const _ = await createRandomBoard(user1.id)
-    const board2 = await createRandomBoard(user2.id)
+    await BoardFactory.create({ createdBy: otherUser })
+    const board2 = await BoardFactory.create({ createdBy: user })
 
     const queryData = { query: AllBoardsQuery };
     const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
-    const { data, errors } = response.body()
+    const { data } = response.body()
 
     expect(data.boards).toHaveLength(1)
     expect(data.boards[0].id).toBe(board2.id)
-    expect(data.boards[0].createdBy.id).toBe(user2.id)
+    expect(data.boards[0].createdBy.id).toBe(user.id)
   })
 
   test('should omit deleted boards', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
 
-    await createRandomBoard(user.id)
-    await createRandomBoard(user.id)
-    const { id } = await createRandomBoard(user.id)
+    await BoardFactory.create({ createdBy: user })
+    await BoardFactory.create({ createdBy: user })
+    const { id } = await BoardFactory.create({ createdBy: user })
     await BoardRepository.softDelete({ id })
 
     const queryData = { query: AllBoardsQuery };
@@ -143,9 +172,9 @@ test.group('allDeletedBoards', () => {
   test('should only include deleted boards', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
 
-    await createRandomBoard(user.id)
-    await createRandomBoard(user.id)
-    const { id } = await createRandomBoard(user.id)
+    await BoardFactory.create({ createdBy: user })
+    await BoardFactory.create({ createdBy: user })
+    const { id } = await BoardFactory.create({ createdBy: user })
     await BoardRepository.softDelete({ id })
 
     const queryData = { query: AllDeletedBoardsQuery };
@@ -165,7 +194,7 @@ test.group('findBoardById', () => {
 
   test('should return single board', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id, title } = await createRandomBoard(user.id)
+    const { id, title } = await BoardFactory.create({ createdBy: user })
 
     const queryData = {
       query: FindBoardByIdQuery,
@@ -186,7 +215,7 @@ test.group('findBoardById', () => {
   test('should return `null` if it was not created by the user', async ({ expect, client, createUser }) => {
     const [user] = await createUser(client)
     const [cookie] = await createUser(client)
-    const { id } = await createRandomBoard(user.id)
+    const { id } = await BoardFactory.create({ createdBy: user })
 
     const queryData = {
       query: FindBoardByIdQuery,
@@ -208,7 +237,7 @@ test.group('updateBoard', () => {
 
   test('should update Board and return updated entity', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id } = await createRandomBoard(user.id)
+    const { id } = await BoardFactory.create({ createdBy: user })
     const title = faker.lorem.words()
 
     const queryData = {
@@ -226,11 +255,30 @@ test.group('updateBoard', () => {
     expect(data.board.title).toBe(title)
   })
 
+  test('should update Board\'s `slug` when `title` is changed', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const { id } = await BoardFactory.create({ createdBy: user })
+    const newTitle = faker.lorem.words()
+
+    const queryData = {
+      query: UpdateBoardMutation,
+      variables: {
+        id,
+        title: newTitle,
+      }
+    }
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.board.slug).toBe(slug(newTitle, id))
+  })
+
   test('should only be allowed to update if is owner', async ({ expect, client, createUser }) => {
     const [user1] = await createUser(client)
     const [, cookie] = await createUser(client)
 
-    const { id, title } = await createRandomBoard(user1.id)
+    const { id, title } = await BoardFactory.create({ createdBy: user1 })
 
     const queryData = {
       query: UpdateBoardMutation,
@@ -260,7 +308,7 @@ test.group('deletBoard', () => {
   test('should soft delete board', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
 
-    const { id } = await createRandomBoard(user.id)
+    const { id } = await BoardFactory.create({ createdBy: user })
 
     const queryData = {
       query: DeleteBoardMutation,
@@ -285,7 +333,7 @@ test.group('deletBoard', () => {
     const [user1] = await createUser(client)
     const [, cookie] = await createUser(client)
 
-    const { id } = await createRandomBoard(user1.id)
+    const { id } = await BoardFactory.create({ createdBy: user1 })
 
     const queryData = {
       query: DeleteBoardMutation,
@@ -312,7 +360,7 @@ test.group('restoreBoard', () => {
   test('should restore deleted board', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
 
-    const { id } = await createRandomBoard(user.id)
+    const { id } = await BoardFactory.create({ createdBy: user })
     await BoardRepository.softDelete({ id })
 
     // Ensure that is initialy deleted
@@ -342,10 +390,10 @@ test.group('restoreBoard', () => {
   })
 
   test('should only be able to restore owned boards', async ({ expect, client, createUser }) => {
-    const [user] = await createUser(client)
+    const otherUser = await UserFactory.create()
     const [, cookie] = await createUser(client)
 
-    const { id } = await createRandomBoard(user.id)
+    const { id } = await BoardFactory.create({ createdBy: otherUser })
     await BoardRepository.softDelete({ id })
 
     // Ensure that is initialy deleted
@@ -370,5 +418,53 @@ test.group('restoreBoard', () => {
 
     expect(board).not.toBeNull()
     expect(board.deletedAt).not.toBeNull()
+  })
+})
+
+test.group('forceDeletboard', () => {
+  testThrowsIfNotAuthenticated({
+    query: ForceDeleteBoardMutation,
+    variables: { id: -1 }
+  })
+
+  test('should delete (for real) the board', async ({ expect, client, createUser }) => {
+    const [user, cookie] = await createUser(client)
+    const { id } = await BoardFactory.create({ createdBy: user })
+
+    const queryData = {
+      query: ForceDeleteBoardMutation,
+      variables: { id }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+    const { data } = response.body()
+
+    expect(data.id).toBeDefined()
+    expect(data.id).toBe(id)
+
+    const board = await BoardRepository.findOne({ where: { id }, withDeleted: true })
+
+    expect(board).toBeFalsy()
+  })
+
+  test('should not be able to delete someone else\'s booard', async ({ expect, client, createUser }) => {
+    const otherUser = await UserFactory.create()
+    const [, cookie] = await createUser(client)
+
+    const { id } = await BoardFactory.create({ createdBy: otherUser })
+
+    const queryData = {
+      query: ForceDeleteBoardMutation,
+      variables: { id }
+    };
+
+    const response = await client.post('/').cookie(SESSION_COOKIE, cookie).json(queryData)
+
+    assertIsForbiddenExeption({ response, expect })
+
+    const board = await BoardRepository.findOne({ where: { id }, withDeleted: true })
+
+    expect(board).toBeDefined()
+    expect(board.deletedAt).toBeNull()
   })
 })

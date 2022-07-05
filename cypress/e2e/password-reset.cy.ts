@@ -7,12 +7,12 @@ const INBOX_ID = 1016655
 
 describe('Resetting passwords', () => {
   it('should send email with intructions to reset password and should be able to change password using the email\'s link', () => {
-    const username = chance.name()
+    const userName = chance.name()
     const email = chance.email()
     const password = chance.word({ length: 5 })
     const newPassword = chance.word({ length: 8 })
 
-    cy.createUser(username, email, password)
+    cy.createUser(userName, email, password)
     cy.logout()
     cy.location("pathname").should("equal", "/login");
 

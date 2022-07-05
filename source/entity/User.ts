@@ -15,13 +15,17 @@ export class User {
 
   @Field()
   @Column({ unique: true })
-  username: string;
+  userName: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  displayName: string;
 
   @Field()
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
   password: string;
 
   @BeforeInsert()

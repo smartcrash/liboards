@@ -1,5 +1,4 @@
-import { Helmet } from "react-helmet";
-import { DeleteIcon } from "@chakra-ui/icons";
+import { StickyContainer, Sticky } from "react-sticky";
 import {
   Box,
   Button,
@@ -20,10 +19,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useRef } from "react";
+import { Helmet } from "react-helmet";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import {
   Board,
-  CardClickHandler,
+  Card,
   CardDetailsModal,
   CardDragEndHandler,
   CardNewHandler,
@@ -34,6 +34,7 @@ import {
   HeartButton,
   NonEmptyEditable,
 } from "../../../components";
+import { CardType } from "../../../components/board/types";
 import {
   useAddCardMutation,
   useAddColumnMutation,
@@ -47,13 +48,13 @@ import {
   useUpdateBoardMutation,
   useUpdateColumnMutation,
 } from "../../../generated/graphql";
-import { route } from "../../../routes";
 import { TrashIcon } from "../../../icons";
+import { route } from "../../../routes";
 
 export const ShowProject = () => {
   const navigate = useNavigate();
-  const params = useParams<{ id: string }>();
-  const id = parseInt(params.id!);
+  const { slug = "" } = useParams<{ slug: string }>();
+  const id = parseInt(slug.slice(slug.lastIndexOf("-") + 1)); // Extract ID from slug
   const [{ data, fetching }] = useFindBoardByIdQuery({ variables: { id } });
   const [, updateBoard] = useUpdateBoardMutation();
   const [, addToFavorites] = useAddToFavoritesMutation();
@@ -73,6 +74,19 @@ export const ShowProject = () => {
   if (!data?.board) return <>Something went wrong! :O</>;
 
   const { title, favorite } = data.board;
+
+  const onTitleUpdate = async (title: string) => {
+    const result = await updateBoard({ id, title });
+
+    // Update the URL to show the new project's slug
+    if (result.data?.board) {
+      const newSlug = result.data.board.slug;
+      const newUrl = route("projects.show", { slug: newSlug });
+
+      // Change the url but don't a new add the entry to the browser history
+      history.replaceState({}, "", newUrl);
+    }
+  };
 
   const onDelete = async () => {
     await deleteBoard({ id });
@@ -110,7 +124,7 @@ export const ShowProject = () => {
     await moveCard({ id: cardId, toIndex, toColumnId });
   };
 
-  const onCardClick: CardClickHandler = (card) => {
+  const onCardClick = (card: CardType) => {
     cardIdRef.current = card.id;
     onOpen();
   };
@@ -119,62 +133,82 @@ export const ShowProject = () => {
     <>
       <Helmet title={data.board.title} />
 
-      <Stack spacing={6}>
-        <HStack justifyContent={"space-between"}>
-          <HStack alignItems={"flex-start"} spacing={3}>
-            <NonEmptyEditable
-              defaultValue={title}
-              onSubmit={(title) => updateBoard({ id, title })}
-              fontSize={"3xl"}
-              fontWeight={"bold"}
+      <Stack as={StickyContainer} spacing={6} h={"full"}>
+        <Sticky>
+          {({ style, isSticky }) => (
+            <HStack
+              px={{ base: 2, sm: 6, lg: 8 }}
+              justifyContent={"space-between"}
+              style={style}
+              bg={"white"}
+              zIndex={1000}
+              py={isSticky ? 2 : 0}
+              borderBottomWidth={isSticky ? 2 : 0}
             >
-              <EditablePreview />
-              <EditableInput data-testid={"title"} />
-            </NonEmptyEditable>
+              <HStack alignItems={"center"} spacing={3}>
+                <NonEmptyEditable defaultValue={title} onSubmit={onTitleUpdate} fontSize={"3xl"} fontWeight={"bold"}>
+                  <EditablePreview />
+                  <EditableInput data-testid={"title"} />
+                </NonEmptyEditable>
 
-            <HeartButton
-              defaultIsClick={favorite}
-              onClick={(value) => (value ? addToFavorites({ id }) : removeFromFavorites({ id }))}
-            />
-          </HStack>
+                <HeartButton
+                  defaultIsClick={favorite}
+                  onClick={(value) => (value ? addToFavorites({ id }) : removeFromFavorites({ id }))}
+                />
+              </HStack>
 
-          <Popover>
-            <PopoverTrigger>
-              <Button leftIcon={<TrashIcon mb={1} mr={1} />} colorScheme={"gray"} variant={"ghost"}>
-                Delete project
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent>
-              <PopoverArrow />
-              <PopoverCloseButton />
-              <PopoverHeader textAlign={"center"}>Delete project?</PopoverHeader>
-              <PopoverBody>
-                <VStack spacing={3}>
-                  <Text fontSize={"sm"} color={"gray.500"}>
-                    You can find and reopen closed boards at the bottom of{" "}
-                    <Link as={RouterLink} to={route("projects.list")} color={"gray.700"} textDecoration={"underline"}>
-                      your projects page
-                    </Link>
-                  </Text>
-
-                  <Button colorScheme={"red"} w={"full"} size={"sm"} onClick={onDelete} data-testid={"delete"}>
-                    Delete
+              <Popover>
+                <PopoverTrigger>
+                  <Button leftIcon={<TrashIcon mb={1} mr={1} />} colorScheme={"gray"} variant={"outline"}>
+                    Delete project
                   </Button>
-                </VStack>
-              </PopoverBody>
-            </PopoverContent>
-          </Popover>
-        </HStack>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <PopoverArrow />
+                  <PopoverCloseButton />
+                  <PopoverHeader textAlign={"center"}>Delete project?</PopoverHeader>
+                  <PopoverBody>
+                    <VStack spacing={3}>
+                      <Text fontSize={"sm"} color={"gray.500"}>
+                        You can find and reopen closed boards at the bottom of{" "}
+                        <Link
+                          as={RouterLink}
+                          to={route("projects.list")}
+                          color={"gray.700"}
+                          textDecoration={"underline"}
+                        >
+                          your projects page
+                        </Link>
+                      </Text>
 
-        <Box>
+                      <Button
+                        colorScheme={"red"}
+                        w={"full"}
+                        size={"sm"}
+                        onClick={onDelete}
+                        data-testid={"delete-project"}
+                      >
+                        Delete
+                      </Button>
+                    </VStack>
+                  </PopoverBody>
+                </PopoverContent>
+              </Popover>
+            </HStack>
+          )}
+        </Sticky>
+
+        <Box w={"full"} overflow={"auto"} mx={-10} pb={10} pt={1}>
           <Board
+            renderCard={(card, { removeCard }) => (
+              <Card id={card.id} onRemove={removeCard} onClick={() => onCardClick(card)} />
+            )}
             onColumnNew={onColumnNew}
             onColumnRemove={onColumnRemove}
             onColumnRename={onColumnRename}
             onCardNew={onCardNew}
             onCardRemove={onCardRemove}
             onCardDragEnd={onCardDragEnd}
-            onCardClick={onCardClick}
           >
             {data.board}
           </Board>

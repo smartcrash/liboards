@@ -29,7 +29,7 @@ export const CommentItem = ({ comment, onEdit, onRemove }: CommentItemProps) => 
           <>
             <HStack alignItems={"center"}>
               <Heading as="h6" size="xs" lineHeight={"shorter"}>
-                {user.username}
+                {user.userName}
               </Heading>
               <Text fontSize={"xs"} color={"gray.500"} lineHeight={"shorter"}>
                 {format(new Date(createdAt), "MMM d p")}

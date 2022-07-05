@@ -9,7 +9,7 @@ describe('User authentication flow', () => {
   })
 
   it("should allow visitor to create account, login with password, and logout", () => {
-    const username = chance.name()
+    const userName = chance.name()
     const email = chance.email()
     const password = chance.word({ length: 5 })
 
@@ -22,36 +22,24 @@ describe('User authentication flow', () => {
     cy.location("pathname").should("equal", "/signup");
 
 
-    cy.createUser(username, email, password)
+    cy.createUser(userName, email, password)
     cy.location("pathname").should("equal", "/projects");
-    cy.contains(username)
+    cy.contains(userName)
 
     cy.logout()
     cy.location("pathname").should("equal", "/login");
 
     cy.loginWithPassword(email, password)
     cy.location("pathname").should("equal", "/projects");
-    cy.contains(username)
-  })
-
-  it('can login with username instead of email', () => {
-    const username = chance.name()
-    const email = chance.email()
-    const password = chance.word({ length: 5 })
-
-    cy.createUser(username, email, password)
-    cy.logout()
-
-    cy.loginWithPassword(username, password)
-    cy.location("pathname").should("equal", "/projects");
+    cy.contains(userName)
   })
 
   it("should display login errors", () => {
-    const username = chance.name()
+    const userName = chance.name()
     const email = chance.email()
     const password = chance.word({ length: 5 })
 
-    cy.createUser(username, email, password)
+    cy.createUser(userName, email, password)
     cy.logout()
     cy.location("pathname").should("equal", "/login");
 
@@ -69,15 +57,15 @@ describe('User authentication flow', () => {
   });
 
   it("should display sign-up errors", () => {
-    const username = chance.name()
+    const userName = chance.name()
     const email = chance.email()
     const password = chance.word({ length: 5 })
 
-    cy.createUser(username, email, password)
+    cy.createUser(userName, email, password)
     cy.logout()
     cy.visit('/signup')
 
-    cy.getByTestId("username").clear().type('foo')
+    cy.getByTestId("userName").clear().type('foo')
     cy.getByTestId("email").clear().type('email@asd.com')
     cy.getByTestId("password").clear().type('123')
     cy.getByTestId("passwordConfirm").clear().type('1')
@@ -87,16 +75,16 @@ describe('User authentication flow', () => {
     cy.getByTestId("passwordConfirm").clear().type('123')
     cy.getByTestId('submit').click()
 
-    cy.contains('The username must contain at least 4 characters.')
+    cy.contains('The userName must contain at least 4 characters.')
     cy.contains('The password must contain at least 4 characters.')
 
-    cy.getByTestId("username").clear().type(username)
+    cy.getByTestId("userName").clear().type(userName)
     cy.getByTestId("email").clear().type(email)
     cy.getByTestId("password").clear().type(password)
     cy.getByTestId("passwordConfirm").clear().type(password)
     cy.getByTestId('submit').click()
 
-    cy.contains('This username already exists.')
+    cy.contains('This userName already exists.')
     cy.contains('This email is already in use.')
   });
 

@@ -3,7 +3,7 @@ fragment CommentFragment on Comment {
   content
   user {
     id
-    username
+    userName
   }
   canUpdate
   canDelete

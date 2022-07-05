@@ -5,7 +5,7 @@ import { Helmet } from "react-helmet";
 import { Provider as UrqlProvider } from "urql";
 import App from "./App";
 import { APP_NAME } from "./constants";
-import { createUrqlClient } from "./createUrqlClient";
+import { createUrqlClient } from "./lib/urql";
 import theme from "./theme";
 
 const client = createUrqlClient();

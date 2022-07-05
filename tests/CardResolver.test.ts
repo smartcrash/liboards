@@ -4,7 +4,7 @@ import { In } from "typeorm";
 import { SESSION_COOKIE } from "../source/constants";
 import { BoardFactory, CardFactory, ColumnFactory } from "../source/factories";
 import { CardRepository } from "../source/repository";
-import { assertIsForbiddenExeption, createRandomBoard, createRandomCard, createRandomColumn, testThrowsIfNotAuthenticated } from "../source/utils/testUtils";
+import { assertIsForbiddenExeption, testThrowsIfNotAuthenticated } from "../source/utils/testUtils";
 
 const FindCardByIdQuery = `
   query FindQueryById($id: Int!) {
@@ -19,7 +19,7 @@ const FindCardByIdQuery = `
       # TODO: Add createdBy field
       # createdBy {
       #   id
-      #   username
+      #   userName
       # }
     }
   }
@@ -73,9 +73,9 @@ test.group('findCardById', () => {
 
   test('should get card\'s details using it\'s `id`', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const board = await createRandomBoard(user.id)
-    const column = await createRandomColumn(board.id)
-    const card = await createRandomCard(column.id)
+    const board = await BoardFactory.create({ createdBy: user })
+    const column = await ColumnFactory.create({ boardId: board.id })
+    const card = await CardFactory.create({ columnId: column.id })
 
 
     const queryData = {
@@ -89,7 +89,7 @@ test.group('findCardById', () => {
     expect(errors).toBeFalsy()
     expect(data.card).toBeTruthy()
     // expect(data.card.createdBy.id).toBe(user.id)
-    // expect(data.card.createdBy.username).toBe(user.username)
+    // expect(data.card.createdBy.userName).toBe(user.userName)
 
     expect(data.card).toMatchObject({
       id: card.id,
@@ -101,7 +101,7 @@ test.group('findCardById', () => {
       },
       // createdBy: {
       //   id: user.id,
-      //   username: user.username
+      //   userName: user.userName
       // }
     })
   })
@@ -109,9 +109,9 @@ test.group('findCardById', () => {
   test('should not be able to see some else\'s card', async ({ expect, client, createUser }) => {
     const [user] = await createUser(client)
     const [, cookie] = await createUser(client)
-    const board = await createRandomBoard(user.id)
-    const column = await createRandomColumn(board.id)
-    const card = await createRandomCard(column.id)
+    const board = await BoardFactory.create({ createdBy: user })
+    const column = await ColumnFactory.create({ boardId: board.id })
+    const card = await CardFactory.create({ columnId: column.id })
 
     const queryData = {
       query: FindCardByIdQuery,
@@ -135,8 +135,8 @@ test.group('addCard', () => {
 
   test('should create card', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
-    const { id: columnId } = await createRandomColumn(boardId)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
+    const { id: columnId } = await ColumnFactory.create({ boardId: boardId })
 
     const title = faker.lorem.words()
     const description = faker.lorem.sentences()
@@ -193,8 +193,8 @@ test.group('addCard', () => {
   test('should not allow to create a card on someone else\'s board', async ({ expect, client, createUser }) => {
     const [user] = await createUser(client)
     const [, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
-    const { id: columnId } = await createRandomColumn(boardId)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
+    const { id: columnId } = await ColumnFactory.create({ boardId: boardId })
 
     const queryData = {
       query: AddCardMutation,
@@ -219,9 +219,9 @@ test.group('updateCard', () => {
 
   test('should update card', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
-    const { id: columnId } = await createRandomColumn(boardId)
-    const { id } = await createRandomCard(columnId)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
+    const { id: columnId } = await ColumnFactory.create({ boardId: boardId })
+    const { id } = await CardFactory.create({ columnId: columnId })
 
     const title = faker.lorem.words()
     const description = faker.lorem.sentences()
@@ -253,9 +253,9 @@ test.group('updateCard', () => {
   test('should not allow update someone else\'s card', async ({ expect, client, createUser }) => {
     const [user] = await createUser(client)
     const [, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
-    const { id: columnId } = await createRandomColumn(boardId)
-    const { id, title } = await createRandomCard(columnId)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
+    const { id: columnId } = await ColumnFactory.create({ boardId: boardId })
+    const { id, title } = await CardFactory.create({ columnId: columnId })
 
     const queryData = {
       query: UpdateCardMutation,
@@ -288,12 +288,12 @@ test.group('moveCard', () => {
 
   test('moves the card up to the specified position in same column', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
-    const { id: columnId } = await createRandomColumn(boardId)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
+    const { id: columnId } = await ColumnFactory.create({ boardId: boardId })
 
-    const card1 = await createRandomCard(columnId, 0, 'card-1')
-    const card2 = await createRandomCard(columnId, 1, 'card-2')
-    const card3 = await createRandomCard(columnId, 2, 'card-3')
+    const card1 = await CardFactory.create({ columnId: columnId, title: 'card-1', index: 0 })
+    const card2 = await CardFactory.create({ columnId: columnId, title: 'card-2', index: 1 })
+    const card3 = await CardFactory.create({ columnId: columnId, title: 'card-3', index: 2 })
 
     const toIndex = 2
     const toColumnId = columnId
@@ -325,12 +325,12 @@ test.group('moveCard', () => {
 
   test('moves the card down to the specified position in same column', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
-    const { id: columnId } = await createRandomColumn(boardId)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
+    const { id: columnId } = await ColumnFactory.create({ boardId: boardId })
 
-    const card1 = await createRandomCard(columnId, 0, 'card-1')
-    const card2 = await createRandomCard(columnId, 1, 'card-2')
-    const card3 = await createRandomCard(columnId, 2, 'card-3')
+    const card1 = await CardFactory.create({ columnId: columnId, title: 'card-1', index: 0 })
+    const card2 = await CardFactory.create({ columnId: columnId, title: 'card-2', index: 1 })
+    const card3 = await CardFactory.create({ columnId: columnId, title: 'card-3', index: 2 })
 
     const toIndex = 0
     const toColumnId = columnId
@@ -436,9 +436,9 @@ test.group('removeCard', () => {
 
   test('should delete card', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
-    const { id: columnId } = await createRandomColumn(boardId)
-    const { id } = await createRandomCard(columnId)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
+    const { id: columnId } = await ColumnFactory.create({ boardId: boardId })
+    const { id } = await CardFactory.create({ columnId: columnId })
 
     const queryData = {
       query: RemoveCardMutation,
@@ -458,12 +458,12 @@ test.group('removeCard', () => {
 
   test('shift remaining cards\'s indexes to keep sequense', async ({ expect, client, createUser }) => {
     const [user, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
-    const { id: columnId } = await createRandomColumn(boardId, 0)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
+    const { id: columnId } = await ColumnFactory.create({ boardId: boardId })
 
-    const card1 = await createRandomCard(columnId, 0)
-    const card2 = await createRandomCard(columnId, 1)
-    const card3 = await createRandomCard(columnId, 2)
+    const card1 = await CardFactory.create({ columnId: columnId, index: 0 })
+    const card2 = await CardFactory.create({ columnId: columnId, index: 1 })
+    const card3 = await CardFactory.create({ columnId: columnId, index: 2 })
 
     const queryData = {
       query: RemoveCardMutation,
@@ -485,9 +485,9 @@ test.group('removeCard', () => {
   test('should not allow delete someone else\'s card', async ({ expect, client, createUser }) => {
     const [user] = await createUser(client)
     const [, cookie] = await createUser(client)
-    const { id: boardId } = await createRandomBoard(user.id)
-    const { id: columnId } = await createRandomColumn(boardId)
-    const { id } = await createRandomCard(columnId)
+    const { id: boardId } = await BoardFactory.create({ createdBy: user })
+    const { id: columnId } = await ColumnFactory.create({ boardId: boardId })
+    const { id } = await CardFactory.create({ columnId: columnId })
 
     const queryData = {
       query: UpdateCardMutation,

@@ -7,10 +7,11 @@ export const routes = {
   signUp: '/signup',
   forgotPwd: '/forgot-password',
   resetPwd: '/reset-password/:token',
+  'oauth.callback': '/oauth/callback',
 
   'projects.list': '/projects',
   'projects.create': '/projects/new',
-  'projects.show': '/projects/:id',
+  'projects.show': '/projects/:slug',
 };
 
 export const route = (name: keyof typeof routes, params = {}) => {

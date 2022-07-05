@@ -1,5 +1,5 @@
-mutation CreateUser($password: String!, $email: String!, $username: String!) {
-  createUser(password: $password, email: $email, username: $username) {
+mutation CreateUser($password: String!, $email: String!, $userName: String!) {
+  createUser(password: $password, email: $email, userName: $userName) {
     errors {
       field
       message
