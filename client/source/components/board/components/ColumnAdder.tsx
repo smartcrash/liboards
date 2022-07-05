@@ -10,10 +10,7 @@ interface ColumnAdderProps {
 export const ColumnAdder = ({ onConfirm }: ColumnAdderProps) => {
   const [isAddingColumn, setAddingColumn] = useState(false);
 
-  function confirmColumn(title: string) {
-    onConfirm(title);
-    setAddingColumn(false);
-  }
+  const confirmColumn = (title: string) => onConfirm(title);
 
   return isAddingColumn ? (
     <ColumnForm onConfirm={confirmColumn} onCancel={() => setAddingColumn(false)} />

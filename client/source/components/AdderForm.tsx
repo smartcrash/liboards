@@ -24,8 +24,10 @@ export const AdderForm = ({
 
     const value = inputRef.current?.value;
 
-    if (value) onConfirm(value);
-    else inputRef.current?.focus();
+    if (value) {
+      onConfirm(value);
+      (event.target as HTMLFormElement).reset();
+    } else inputRef.current?.focus();
   };
 
   const onKeyDown: KeyboardEventHandler<HTMLInputElement> = (event) => {

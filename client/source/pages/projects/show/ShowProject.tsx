@@ -141,7 +141,7 @@ export const ShowProject = () => {
               justifyContent={"space-between"}
               style={style}
               bg={"white"}
-              zIndex={99999}
+              zIndex={1000}
               py={isSticky ? 2 : 0}
               borderBottomWidth={isSticky ? 2 : 0}
             >
@@ -198,7 +198,7 @@ export const ShowProject = () => {
           )}
         </Sticky>
 
-        <Box w={"full"} overflow={"scroll"} mx={-10} pb={10}>
+        <Box w={"full"} overflow={"auto"} mx={-10} pb={10} pt={1}>
           <Board
             renderCard={(card, { removeCard }) => (
               <Card id={card.id} onRemove={removeCard} onClick={() => onCardClick(card)} />
