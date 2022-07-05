@@ -42,7 +42,7 @@ export const Card = ({ id, onRemove, onClick }: CardProps) => {
     );
   if (!data || !data.card) return <>Error: Card not found :c</>; // TODO: Handle error
 
-  const { title, description, tasks, comments } = data.card;
+  const { title, tasks, comments } = data.card;
 
   const metaTags: { icon: JSX.Element; label: string | number; visible: boolean }[] = [
     {

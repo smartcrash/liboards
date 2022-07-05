@@ -10,10 +10,7 @@ interface TaskAdderProps {
 export const TaskAdder = ({ onConfirm }: TaskAdderProps) => {
   const [isAddingTask, setAddingTask] = useState(false);
 
-  function confirmColumn(content: string) {
-    onConfirm(content);
-    setAddingTask(false);
-  }
+  const confirmColumn = (content: string) => onConfirm(content);
 
   return isAddingTask ? (
     <TaskForm onConfirm={confirmColumn} onCancel={() => setAddingTask(false)} />
