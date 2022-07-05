@@ -29,8 +29,8 @@ import {
   FindCardByIdQuery,
   ForceDeleteBoardMutation,
   ForceDeleteBoardMutationVariables,
+  LoginWithGoogleMutation,
   LoginWithPasswordMutation,
-  LoginWithTokenMutation,
   LogoutMutation,
   RemoveCardMutationVariables,
   RemoveColumnMutation,
@@ -56,7 +56,7 @@ export const createUrqlClient = () => createClient({
             })
           },
 
-          loginWithGoogle(result: LoginWithTokenMutation, args, cache, info) {
+          loginWithGoogle(result: LoginWithGoogleMutation, args, cache, info) {
             cache.updateQuery({ query: CurrentUserDocument }, (data: CurrentUserQuery | null) => {
               if (result.loginWithGoogle.errors) return data;
               else return { currentUser: result.loginWithGoogle.user };
