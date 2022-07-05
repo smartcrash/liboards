@@ -1,10 +1,10 @@
+import { OAuth2Client } from 'google-auth-library'
 import { verify } from 'argon2';
 import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from "type-graphql";
 import { v4 as uuid } from 'uuid';
 import { z, ZodError } from 'zod';
-import { CORS_ORIGIN, SESSION_COOKIE } from '../constants';
+import { CORS_ORIGIN, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SESSION_COOKIE } from '../constants';
 import { PasswordReset, User } from "../entity";
-import { magic } from '../lib/magic';
 import { UserRepository } from '../repository';
 import { PasswordResetRepository } from '../repository/PasswordResetRepository';
 import { sendMail } from '../sendMail';
@@ -117,15 +117,12 @@ export class AuthenticationResolver {
   }
 
   @Mutation(() => AuthenticationResponse)
-  async loginWithToken(
-    @Arg('token') token: string,
-    @Arg('userInfo', () => UserInfo) userInfo: UserInfo,
-    @Ctx() { req }: ContextType
-  ): Promise<AuthenticationResponse> {
+  async loginWithGoogle(@Arg('token') token: string, @Ctx() { req }: ContextType): Promise<AuthenticationResponse> {
     try {
-      magic.token.validate(token)
+      const client = new OAuth2Client(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
+      const ticket = await client.verifyIdToken({ idToken: token });
+      const { name, email } = ticket.getPayload()
 
-      const { email, name } = userInfo
       // TODO: Add random string to ensure uniqueness
       // TODO: Use `slugify` to normalize and remove spacial chars
       const userName = name.toLowerCase().replace(/\s+/g, '')
