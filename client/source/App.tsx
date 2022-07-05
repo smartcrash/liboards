@@ -1,7 +1,11 @@
 import { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
 import { useCurrentUserQuery } from "./generated/graphql";
+import Dashboard from "./pages/dashboard";
 import Loading from "./pages/loading";
+import CreateProject from "./pages/projects/create";
+import ListProjects from "./pages/projects/list";
+import ShowProject from "./pages/projects/show";
 import { routes } from "./routes";
 
 const loadable = (factory: Parameters<typeof lazy>[0]) => () => {
@@ -18,11 +22,6 @@ const ForgotPassword = loadable(() => import("./pages/forgot-password"));
 const Login = loadable(() => import("./pages/login"));
 const ResetPassword = loadable(() => import("./pages/reset-password"));
 const SignUp = loadable(() => import("./pages/sign-up"));
-
-const Dashboard = loadable(() => import("./pages/dashboard"));
-const ListProjects = loadable(() => import("./pages/projects/list"));
-const CreateProject = loadable(() => import("./pages/projects/create"));
-const ShowProject = loadable(() => import("./pages/projects/show"));
 
 function App() {
   const [{ data, fetching }] = useCurrentUserQuery();
