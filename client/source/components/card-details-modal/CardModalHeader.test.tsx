@@ -1,12 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render } from "../../utils/testUtils";
-import { CardType } from "./CardModal";
+import { CardModalContextProvider, CardType } from "./CardModal";
 import { CardModalHeader } from "./CardModalHeader";
-
-const mockedUpdateCard = vi.fn();
-
-vi.mock("../../generated/graphql", () => ({ useUpdateCardMutation: () => [, mockedUpdateCard] }));
 
 const createMockCard = (): CardType => ({
   id: faker.datatype.number(),
@@ -20,9 +16,45 @@ const createMockCard = (): CardType => ({
   tasks: [],
 });
 
-const mockCard = createMockCard();
+const customRender = () => {
+  const card = createMockCard();
+  const updateCard = vi.fn();
+  const addTask = vi.fn();
+  const updateTask = vi.fn();
+  const removeTask = vi.fn();
+  const addComment = vi.fn();
+  const updateComment = vi.fn();
+  const removeComment = vi.fn();
 
-const customRender = () => render(<CardModalHeader card={mockCard} />);
+  const renderResult = render(
+    <CardModalContextProvider
+      value={{
+        card,
+        updateCard,
+        addTask,
+        updateTask,
+        removeTask,
+        addComment,
+        updateComment,
+        removeComment,
+      }}
+    >
+      <CardModalHeader />
+    </CardModalContextProvider>
+  );
+
+  return {
+    card,
+    updateCard,
+    addTask,
+    updateTask,
+    removeTask,
+    addComment,
+    updateComment,
+    removeComment,
+    ...renderResult,
+  };
+};
 
 describe("<CardModalHeader />", () => {
   it("renders", () => {
@@ -30,35 +62,35 @@ describe("<CardModalHeader />", () => {
   });
 
   it("shows card's title and description", () => {
-    const { getAllByText } = customRender();
+    const { getAllByText, card } = customRender();
 
-    expect(getAllByText(mockCard.title).length).toBeTruthy();
-    expect(getAllByText(mockCard.description).length).toBeTruthy();
+    expect(getAllByText(card.title).length).toBeTruthy();
+    expect(getAllByText(card.description).length).toBeTruthy();
   });
 
   it("updates card's title", () => {
     const nextValue = faker.lorem.words();
-    const { getByDisplayValue } = customRender();
+    const { getByDisplayValue, card, updateCard } = customRender();
 
-    const input = getByDisplayValue(mockCard.title);
+    const input = getByDisplayValue(card.title);
 
     fireEvent.change(input, { target: { value: nextValue } });
     fireEvent.blur(input);
 
-    expect(mockedUpdateCard).toHaveBeenCalled();
-    expect(mockedUpdateCard).toHaveBeenLastCalledWith({ id: mockCard.id, title: nextValue });
+    expect(updateCard).toHaveBeenCalled();
+    expect(updateCard).toHaveBeenLastCalledWith({ id: card.id, title: nextValue });
   });
 
   it("updates card's description", () => {
     const nextValue = faker.lorem.words();
-    const { getByDisplayValue } = customRender();
+    const { getByDisplayValue, card, updateCard } = customRender();
 
-    const input = getByDisplayValue(mockCard.description);
+    const input = getByDisplayValue(card.description);
 
     fireEvent.change(input, { target: { value: nextValue } });
     fireEvent.blur(input);
 
-    expect(mockedUpdateCard).toHaveBeenCalled();
-    expect(mockedUpdateCard).toHaveBeenLastCalledWith({ id: mockCard.id, description: nextValue });
+    expect(updateCard).toHaveBeenCalled();
+    expect(updateCard).toHaveBeenLastCalledWith({ id: card.id, description: nextValue });
   });
 });

@@ -1,17 +1,13 @@
 import { Box, EditablePreview, EditableTextarea, Heading, Spacer, Stack, Text } from "@chakra-ui/react";
 import { KeyboardEventHandler } from "react";
-import { useUpdateCardMutation } from "../../generated/graphql";
 import { AutoResizeTextarea } from "../AutoResizeTextarea";
 import { NonEmptyEditable } from "../non-empty-editable";
-import { CardType } from "./CardModal";
+import { useCardModalContext } from "./CardModal";
 import { EditableDesc } from "./components";
 
-export interface CardModalHeaderProps {
-  card: CardType;
-}
-
-export const CardModalHeader = ({ card: { id, description, title, column } }: CardModalHeaderProps) => {
-  const [, updateCard] = useUpdateCardMutation();
+export const CardModalHeader = () => {
+  const { card, updateCard } = useCardModalContext();
+  const { id, title, description, column } = card;
 
   const blurOnEnterKeyDown: KeyboardEventHandler = (event) => {
     if (event.key === "Enter") {
