@@ -1,15 +1,17 @@
 import { Modal, ModalCloseButton, ModalContent, ModalOverlay } from "@chakra-ui/react";
 import { Helmet } from "react-helmet";
-import { useFindCardByIdQuery } from "../../generated/graphql";
-import { CardDetailsModalContent } from "./CardDetailsModalContent";
+import { FindCardByIdQuery, useFindCardByIdQuery } from "../../generated/graphql";
+import { CardModalContent } from "./CardModalContent";
 
-interface CardDetailsModalProps {
+export type CardType = Exclude<FindCardByIdQuery["card"], null | undefined>;
+
+export interface CardModalProps {
   id?: number;
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export const CardDetailsModal = ({ id = -1, isOpen, onClose }: CardDetailsModalProps) => {
+export const CardModal = ({ id = -1, isOpen = false, onClose = () => {} }: CardModalProps) => {
   const [{ data, fetching }] = useFindCardByIdQuery({
     variables: { id },
     pause: id < 1,
@@ -26,7 +28,7 @@ export const CardDetailsModal = ({ id = -1, isOpen, onClose }: CardDetailsModalP
         <ModalContent>
           <ModalCloseButton />
           {fetching && <>Loading...</>}
-          {!!card && <CardDetailsModalContent card={card} />}
+          {!!card && <CardModalContent card={card} />}
         </ModalContent>
       </Modal>
     </>

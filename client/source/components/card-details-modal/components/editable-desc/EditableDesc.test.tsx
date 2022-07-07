@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, userEvent, waitFor } from "../../../../utils/testUtils";
 import { EditableDesc } from "./EditableDesc";
 
-describe("EditableDesc", () => {
+describe("<EditableDesc/>", () => {
   it("should show placeholder if `defaultValue` is empty", () => {
     const { getByTestId } = render(<EditableDesc defaultValue={""} onSubmit={() => {}} />);
 

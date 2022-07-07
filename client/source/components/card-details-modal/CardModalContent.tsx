@@ -1,44 +1,27 @@
-import {
-  Box,
-  Button,
-  Divider,
-  EditablePreview,
-  EditableTextarea,
-  Heading,
-  HStack,
-  ModalBody,
-  Progress,
-  Spacer,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Divider, Heading, HStack, ModalBody, Progress, Spacer, Stack, Text } from "@chakra-ui/react";
 import { orderBy } from "lodash";
 import {
-  FindCardByIdQuery,
   useAddCommentMutation,
   useAddTaskMutation,
   useRemoveCommentMutation,
   useRemoveTaskMutation,
-  useUpdateCardMutation,
   useUpdateCommentMutation,
   useUpdateTaskMutation,
 } from "../../generated/graphql";
 import { useToggle } from "../../hooks";
-import { AutoResizeTextarea } from "../AutoResizeTextarea";
-import { NonEmptyEditable } from "../non-empty-editable";
+import { CardType } from "./CardModal";
+import { CardModalHeader } from "./CardModalHeader";
 import { CommentAdder } from "./components/CommentAdder";
 import { CommentItem } from "./components/CommentItem";
-import { EditableDesc } from "./components/editable-desc";
 import { TaskAdder } from "./components/TaskAdder";
 import { TaskItem } from "./components/TaskItem";
 import { TaskList } from "./components/TaskList";
 
 interface CardModalContentProps {
-  card: Exclude<FindCardByIdQuery["card"], null | undefined>;
+  card: CardType;
 }
 
-export const CardDetailsModalContent = ({ card }: CardModalContentProps) => {
-  const [, updateCard] = useUpdateCardMutation();
+export const CardModalContent = ({ card }: CardModalContentProps) => {
   const [, addTask] = useAddTaskMutation();
   const [, updateTask] = useUpdateTaskMutation();
   const [, removeTask] = useRemoveTaskMutation();
@@ -46,50 +29,14 @@ export const CardDetailsModalContent = ({ card }: CardModalContentProps) => {
   const [, updateComment] = useUpdateCommentMutation();
   const [, removeComment] = useRemoveCommentMutation();
 
-  const { id, title, description, column, tasks, comments } = card;
+  const { id, tasks, comments } = card;
   const progress = (tasks.filter((task) => task.completed).length / tasks.length) * 100;
 
   const [showCompleted, toggleShowCompleted] = useToggle(true);
 
   return (
     <ModalBody pl={10} pr={20} pt={5} pb={10} minH={96}>
-      <Box>
-        <NonEmptyEditable
-          defaultValue={title}
-          onSubmit={(title) => updateCard({ id, title })}
-          fontSize={"3xl"}
-          fontWeight={"bold"}
-        >
-          <EditablePreview lineHeight={"short"} maxW={"full"} />
-          <EditableTextarea
-            as={AutoResizeTextarea}
-            px={0}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                (event.target as HTMLTextAreaElement).blur();
-              }
-            }}
-          />
-        </NonEmptyEditable>
-
-        <Text color={"gray.500"}>
-          In column{" "}
-          <Text as={"span"} textDecor={"underline"} fontWeight={"semibold"}>
-            {column.title}
-          </Text>
-        </Text>
-      </Box>
-
-      <Spacer h={10} />
-
-      <Stack spacing={3}>
-        <Heading as={"h5"} size={"sm"}>
-          Description
-        </Heading>
-
-        <EditableDesc defaultValue={description} onSubmit={(description) => updateCard({ id, description })} />
-      </Stack>
+      <CardModalHeader card={card} />
 
       <Divider my={3} />
 

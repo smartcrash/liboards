@@ -24,7 +24,7 @@ import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import {
   Board,
   Card,
-  CardDetailsModal,
+  CardModal,
   CardDragEndHandler,
   CardNewHandler,
   CardRemoveHandler,
@@ -215,7 +215,7 @@ export const ShowProject = () => {
         </Box>
       </Stack>
 
-      <CardDetailsModal id={cardIdRef.current} isOpen={isOpen} onClose={onClose} />
+      <CardModal id={cardIdRef.current} isOpen={isOpen} onClose={onClose} />
     </>
   );
 };
