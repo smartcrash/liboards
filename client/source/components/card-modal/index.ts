@@ -1,1 +1,1 @@
-export * from './CardModal'
+export { CardModal } from './src/CardModal'

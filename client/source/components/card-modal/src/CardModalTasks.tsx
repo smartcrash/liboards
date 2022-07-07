@@ -1,15 +1,16 @@
 import { Button, Heading, HStack, Progress, Spacer, Stack, Text } from "@chakra-ui/react";
-import { useToggle } from "../../hooks";
+import { useToggle } from "../../../hooks";
 import { useCardModalContext } from "./CardModal";
-import { TaskAdder, TaskItem, TaskList } from "./components";
+import { TaskAdder } from "./TaskAdder";
+import { TaskItem } from "./TaskItem";
+import { TaskList } from "./TaskList";
 
 export const CardModalTasks = () => {
+  const [showCompleted, toggleShowCompleted] = useToggle(true);
   const { card, addTask, updateTask, removeTask } = useCardModalContext();
   const { id, tasks } = card;
 
   const progress = (tasks.filter((task) => task.completed).length / tasks.length) * 100;
-
-  const [showCompleted, toggleShowCompleted] = useToggle(true);
 
   return (
     <>

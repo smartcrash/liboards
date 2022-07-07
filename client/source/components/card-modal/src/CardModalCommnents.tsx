@@ -1,8 +1,8 @@
 import { Heading, HStack, Spacer, Stack, Text } from "@chakra-ui/react";
 import { orderBy } from "lodash";
 import { useCardModalContext } from "./CardModal";
-import { CommentItem } from "./components";
-import { CommentAdder } from "./components/CommentAdder";
+import { CommentAdder } from "./CommentAdder";
+import { CommentItem } from "./CommentItem";
 
 export const CardModalCommnents = () => {
   const { card, addComment, updateComment, removeComment } = useCardModalContext();

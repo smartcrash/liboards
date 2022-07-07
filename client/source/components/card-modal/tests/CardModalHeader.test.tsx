@@ -1,8 +1,8 @@
 import { faker } from "@faker-js/faker";
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render } from "../../utils/testUtils";
-import { CardModalContextProvider, CardType } from "./CardModal";
-import { CardModalHeader } from "./CardModalHeader";
+import { fireEvent, render } from "../../../utils/testUtils";
+import { CardModalContextProvider, CardType } from "../src/CardModal";
+import { CardModalHeader } from "../src/CardModalHeader";
 
 const createMockCard = (): CardType => ({
   id: faker.datatype.number(),

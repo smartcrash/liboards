@@ -1,9 +1,9 @@
 import { Box, EditablePreview, EditableTextarea, Heading, Spacer, Stack, Text } from "@chakra-ui/react";
 import { KeyboardEventHandler } from "react";
-import { AutoResizeTextarea } from "../AutoResizeTextarea";
-import { NonEmptyEditable } from "../non-empty-editable";
+import { AutoResizeTextarea } from "../../AutoResizeTextarea";
+import { EditableMarkdown } from "../../editable-markdown";
+import { NonEmptyEditable } from "../../non-empty-editable";
 import { useCardModalContext } from "./CardModal";
-import { EditableMarkdown } from "./components";
 
 export const CardModalHeader = () => {
   const { card, updateCard } = useCardModalContext();

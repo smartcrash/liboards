@@ -11,7 +11,7 @@ import {
   useUpdateCardMutation,
   useUpdateCommentMutation,
   useUpdateTaskMutation,
-} from "../../generated/graphql";
+} from "../../../generated/graphql";
 import { CardModalContent } from "./CardModalContent";
 
 export type CardType = Exclude<FindCardByIdQuery["card"], null | undefined>;
