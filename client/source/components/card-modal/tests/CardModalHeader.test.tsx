@@ -1,68 +1,16 @@
 import { faker } from "@faker-js/faker";
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render } from "../../../utils/testUtils";
-import { CardModalContextProvider, CardType } from "../src/CardModal";
+import { describe, expect, it } from "vitest";
+import { fireEvent } from "../../../utils/testUtils";
 import { CardModalHeader } from "../src/CardModalHeader";
-
-const createMockCard = (): CardType => ({
-  id: faker.datatype.number(),
-  title: faker.lorem.words(),
-  description: faker.lorem.sentences(),
-  column: {
-    id: faker.datatype.number(),
-    title: faker.lorem.words(),
-  },
-  comments: [],
-  tasks: [],
-});
-
-const customRender = () => {
-  const card = createMockCard();
-  const updateCard = vi.fn();
-  const addTask = vi.fn();
-  const updateTask = vi.fn();
-  const removeTask = vi.fn();
-  const addComment = vi.fn();
-  const updateComment = vi.fn();
-  const removeComment = vi.fn();
-
-  const renderResult = render(
-    <CardModalContextProvider
-      value={{
-        card,
-        updateCard,
-        addTask,
-        updateTask,
-        removeTask,
-        addComment,
-        updateComment,
-        removeComment,
-      }}
-    >
-      <CardModalHeader />
-    </CardModalContextProvider>
-  );
-
-  return {
-    card,
-    updateCard,
-    addTask,
-    updateTask,
-    removeTask,
-    addComment,
-    updateComment,
-    removeComment,
-    ...renderResult,
-  };
-};
+import { customRender } from "../testUtils";
 
 describe("<CardModalHeader />", () => {
   it("renders", () => {
-    customRender();
+    customRender(<CardModalHeader />);
   });
 
   it("shows card's title and description", () => {
-    const { getAllByText, card } = customRender();
+    const { getAllByText, card } = customRender(<CardModalHeader />);
 
     expect(getAllByText(card.title).length).toBeTruthy();
     expect(getAllByText(card.description).length).toBeTruthy();
@@ -70,7 +18,7 @@ describe("<CardModalHeader />", () => {
 
   it("updates card's title", () => {
     const nextValue = faker.lorem.words();
-    const { getByDisplayValue, card, updateCard } = customRender();
+    const { getByDisplayValue, card, updateCard } = customRender(<CardModalHeader />);
 
     const input = getByDisplayValue(card.title);
 
@@ -83,7 +31,7 @@ describe("<CardModalHeader />", () => {
 
   it("updates card's description", () => {
     const nextValue = faker.lorem.words();
-    const { getByDisplayValue, card, updateCard } = customRender();
+    const { getByDisplayValue, card, updateCard } = customRender(<CardModalHeader />);
 
     const input = getByDisplayValue(card.description);
 
