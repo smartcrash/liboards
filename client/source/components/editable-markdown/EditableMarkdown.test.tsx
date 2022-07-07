@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, userEvent, waitFor } from "../../utils/testUtils";
+import { fireEvent, getByLabelText, render, userEvent, waitFor } from "../../utils/testUtils";
 import { EditableMarkdown } from "./EditableMarkdown";
 
 describe("<EditableMarkdown/>", () => {
@@ -115,5 +115,11 @@ describe("<EditableMarkdown/>", () => {
     expect(textarea.value).toBe(defaultValue);
   });
 
-  it("renders preview as markdown");
+  it("renders preview as markdown", () => {
+    const defaultValue = "# Hello world";
+
+    const { getByTestId } = render(<EditableMarkdown defaultValue={defaultValue} onSubmit={() => {}} />);
+
+    expect(getByTestId("preview").innerHTML).toContain("<h1>Hello world</h1>");
+  });
 });
