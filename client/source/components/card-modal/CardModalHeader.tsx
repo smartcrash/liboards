@@ -3,7 +3,7 @@ import { KeyboardEventHandler } from "react";
 import { AutoResizeTextarea } from "../AutoResizeTextarea";
 import { NonEmptyEditable } from "../non-empty-editable";
 import { useCardModalContext } from "./CardModal";
-import { EditableDesc } from "./components";
+import { EditableMarkdown } from "./components";
 
 export const CardModalHeader = () => {
   const { card, updateCard } = useCardModalContext();
@@ -44,7 +44,7 @@ export const CardModalHeader = () => {
           Description
         </Heading>
 
-        <EditableDesc defaultValue={description} onSubmit={(value) => updateCard({ id, description: value })} />
+        <EditableMarkdown defaultValue={description} onSubmit={(value) => updateCard({ id, description: value })} />
       </Stack>
     </>
   );

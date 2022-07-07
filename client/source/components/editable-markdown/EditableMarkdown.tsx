@@ -10,7 +10,7 @@ import {
   useMergeRefs,
 } from "@chakra-ui/react";
 import { KeyboardEventHandler, Ref, useRef, useState } from "react";
-import { AutoResizeTextarea, Markdown } from "../../..";
+import { AutoResizeTextarea, Markdown } from "..";
 
 interface EditableDescProps {
   defaultValue: string;
@@ -46,7 +46,7 @@ const EditableControls = ({ value, submitRef }: { value: string; submitRef?: Ref
   return null;
 };
 
-export const EditableDesc = ({ defaultValue, onSubmit }: EditableDescProps) => {
+export const EditableMarkdown = ({ defaultValue, onSubmit }: EditableDescProps) => {
   const submitRef = useRef<HTMLButtonElement>();
   const [value, setValue] = useState(defaultValue);
 

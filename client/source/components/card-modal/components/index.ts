@@ -1,4 +1,4 @@
-export * from './editable-desc'
+export * from '../../editable-markdown'
 export * from './TaskAdder'
 export * from './TaskList'
 export * from './TaskItem'
