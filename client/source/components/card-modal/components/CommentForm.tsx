@@ -1,6 +1,6 @@
 import { Button, ButtonGroup, Stack } from "@chakra-ui/react";
 import { FormEventHandler, KeyboardEventHandler, useRef } from "react";
-import { AutoResizeTextarea } from "../../";
+import { AutoResizeTextarea } from "../..";
 
 interface CommentFormProps {
   onConfirm: (content: string) => void;

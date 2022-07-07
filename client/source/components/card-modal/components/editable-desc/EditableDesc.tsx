@@ -10,7 +10,7 @@ import {
   useMergeRefs,
 } from "@chakra-ui/react";
 import { KeyboardEventHandler, Ref, useRef, useState } from "react";
-import { AutoResizeTextarea, Markdown } from "../../../";
+import { AutoResizeTextarea, Markdown } from "../../..";
 
 interface EditableDescProps {
   defaultValue: string;
