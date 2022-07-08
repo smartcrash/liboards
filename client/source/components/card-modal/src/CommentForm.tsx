@@ -31,7 +31,7 @@ export const CommentForm = ({ onConfirm }: CommentFormProps) => {
   };
 
   return (
-    <Stack as={"form"} onSubmit={handleSubmit} flexGrow={1}>
+    <Stack as={"form"} onSubmit={handleSubmit} flexGrow={1} data-testid={"comment-form"}>
       <AutoResizeTextarea
         ref={textAreaRef}
         size={"sm"}

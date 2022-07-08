@@ -10,12 +10,17 @@ interface CommentControlsProps {
 export const CommentControls = ({ canUpdate, canDelete, onEdit, onRemove }: CommentControlsProps) => {
   return (
     <ButtonGroup alignSelf={"flex-end"} size={"xs"} variant={"link"} colorScheme={"gray"}>
-      <Button fontWeight={"light"} hidden={!canUpdate} onClick={onEdit}>
-        Edit
-      </Button>
-      <Button fontWeight={"light"} hidden={!canDelete} onClick={onRemove}>
-        Delete
-      </Button>
+      {canUpdate && (
+        <Button fontWeight={"light"} onClick={onEdit} data-testid={"edit-comment"}>
+          Edit
+        </Button>
+      )}
+
+      {canDelete && (
+        <Button fontWeight={"light"} hidden={!canDelete} onClick={onRemove} data-testid={"delete-comment"}>
+          Delete
+        </Button>
+      )}
     </ButtonGroup>
   );
 };

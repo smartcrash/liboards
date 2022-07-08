@@ -23,12 +23,12 @@ export const CardModalCommnents = () => {
 
           <Spacer h={5} />
 
-          <Stack spacing={5}>
+          <Stack as={"ul"} spacing={5} data-testid={"comment-list"}>
             {orderBy(comments, ({ createdAt }) => new Date(createdAt), "desc").map((comment) => (
               <CommentItem
                 comment={comment}
-                onEdit={(content) => updateComment({ ...comment, content })}
-                onRemove={() => removeComment(comment)}
+                onEdit={(content) => updateComment({ id: comment.id, content })}
+                onRemove={() => removeComment({ id: comment.id })}
                 key={comment.id}
               />
             ))}
