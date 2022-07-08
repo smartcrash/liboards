@@ -1,4 +1,5 @@
 import { Button, Heading, HStack, Progress, Spacer, Stack, Text } from "@chakra-ui/react";
+import { orderBy } from "lodash";
 import { useToggle } from "../../../hooks";
 import { useCardModalContext } from "./CardModal";
 import { TaskAdder } from "./TaskAdder";
@@ -48,7 +49,7 @@ export const CardModalTasks = () => {
             </HStack>
 
             <TaskList>
-              {tasks
+              {orderBy(tasks, ({ createdAt }) => new Date(createdAt), "desc")
                 .filter((task) => (!showCompleted ? !task.completed : true))
                 .map((task) => (
                   <TaskItem

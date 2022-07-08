@@ -1,9 +1,10 @@
 import { faker } from "@faker-js/faker";
+import { subDays } from "date-fns";
 import { times } from "lodash";
 import { describe, expect, it } from "vitest";
+import { fireEvent, userEvent, waitFor, within } from "../../../utils/testUtils";
 import { CardModalTasks } from "../src/CardModalTasks";
 import { createMockCard, customRender } from "../testUtils";
-import { fireEvent, userEvent, within, waitFor, waitForElementToBeRemoved } from "../../../utils/testUtils";
 
 describe("<CardModalTasks />", () => {
   it("renders", () => {
@@ -15,6 +16,7 @@ describe("<CardModalTasks />", () => {
       id: faker.datatype.number(),
       content: faker.lorem.words(),
       completed: faker.datatype.boolean(),
+      createdAt: new Date(),
     }));
 
     const { getByTestId } = customRender(<CardModalTasks />, createMockCard({ tasks }));
@@ -32,7 +34,30 @@ describe("<CardModalTasks />", () => {
     });
   });
 
-  it("order tasks by descending creation date");
+  it("order tasks by descending creation date", async () => {
+    const [oldestTask, newerTask] = [
+      {
+        id: faker.datatype.number(),
+        content: faker.lorem.words(),
+        completed: true,
+        createdAt: subDays(new Date(), 1),
+      },
+      {
+        id: faker.datatype.number(),
+        content: faker.lorem.words(),
+        completed: false,
+        createdAt: new Date(),
+      },
+    ];
+
+    const { getByTestId } = customRender(<CardModalTasks />, createMockCard({ tasks: [oldestTask, newerTask] }));
+
+    const list = within(getByTestId("task-list"));
+    const items = list.getAllByRole("listitem");
+
+    expect(items[0].innerHTML).toContain(newerTask.content);
+    expect(items[1].innerHTML).toContain(oldestTask.content);
+  });
 
   it("can toggle show completed tasks", () => {
     const [completed, notCompleted] = [
@@ -40,11 +65,13 @@ describe("<CardModalTasks />", () => {
         id: faker.datatype.number(),
         content: faker.lorem.words(),
         completed: true,
+        createdAt: new Date(),
       },
       {
         id: faker.datatype.number(),
         content: faker.lorem.words(),
         completed: false,
+        createdAt: new Date(),
       },
     ];
 
@@ -82,6 +109,7 @@ describe("<CardModalTasks />", () => {
       id: faker.datatype.number(),
       content: faker.lorem.words(),
       completed: false,
+      createdAt: new Date(),
     };
 
     const { getByTestId, updateTask } = customRender(<CardModalTasks />, createMockCard({ tasks: [task] }));
@@ -91,7 +119,13 @@ describe("<CardModalTasks />", () => {
 
     fireEvent.click(checkbox);
 
-    await waitFor(() => expect(updateTask).toHaveBeenCalledWith({ ...task, completed: true }));
+    await waitFor(() =>
+      expect(updateTask).toHaveBeenCalledWith({
+        id: task.id,
+        content: task.content,
+        completed: true,
+      })
+    );
   });
 
   it("update existing task", async () => {
@@ -99,6 +133,7 @@ describe("<CardModalTasks />", () => {
       id: faker.datatype.number(),
       content: faker.lorem.words(),
       completed: false,
+      createdAt: new Date(),
     };
 
     const { getByTestId, updateTask } = customRender(<CardModalTasks />, createMockCard({ tasks: [task] }));
@@ -124,6 +159,7 @@ describe("<CardModalTasks />", () => {
       id: faker.datatype.number(),
       content: faker.lorem.words(),
       completed: false,
+      createdAt: new Date(),
     };
 
     const { getByTestId, removeTask } = customRender(<CardModalTasks />, createMockCard({ tasks: [task] }));
