@@ -1,4 +1,3 @@
-import { StickyContainer, Sticky } from "react-sticky";
 import {
   Box,
   Button,
@@ -21,11 +20,12 @@ import {
 import { useRef } from "react";
 import { Helmet } from "react-helmet";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
+import { Sticky, StickyContainer } from "react-sticky";
 import {
   Board,
   Card,
-  CardModal,
   CardDragEndHandler,
+  CardModal,
   CardNewHandler,
   CardRemoveHandler,
   ColumnNewHandler,

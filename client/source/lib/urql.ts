@@ -8,6 +8,10 @@ import {
 } from "urql";
 import { API_URL } from '../constants';
 import {
+  AddCardMutation,
+  AddCardMutationVariables,
+  AddColumnMutation,
+  AddColumnMutationVariables,
   AddCommentMutation,
   AddCommentMutationVariables,
   AddTaskMutation,
@@ -25,15 +29,17 @@ import {
   CurrentUserDocument,
   CurrentUserQuery,
   DeleteBoardMutation,
-  DeleteBoardMutationVariables, FindCardByIdDocument,
+  DeleteBoardMutationVariables, FindBoardByIdDocument, FindBoardByIdQuery, FindCardByIdDocument,
   FindCardByIdQuery,
   ForceDeleteBoardMutation,
   ForceDeleteBoardMutationVariables,
   LoginWithGoogleMutation,
   LoginWithPasswordMutation,
   LogoutMutation,
+  RemoveCardMutation,
   RemoveCardMutationVariables,
   RemoveColumnMutation,
+  RemoveColumnMutationVariables,
   RemoveFromFavoritesMutationVariables,
   RemoveTaskMutation,
   RemoveTaskMutationVariables,
@@ -224,6 +230,35 @@ export const createUrqlClient = () => createClient({
               __typename: 'Comment',
               id: args.id,
             });
+          },
+
+          addColumn(result: AddColumnMutation, args: AddColumnMutationVariables, cache, info) {
+            cache.updateQuery(
+              {
+                query: FindBoardByIdDocument,
+                variables: { id: args.boardId }
+              },
+              (data: FindBoardByIdQuery | null) => {
+                if (!result.column) return data
+                if (!data || !data.board) return data
+
+                data.board.columns.push(result.column)
+
+                return data
+              }
+            )
+          },
+
+          removeColumn(result: RemoveColumnMutation, args: RemoveColumnMutationVariables, cache, info) {
+            cache.invalidate({ __typename: 'Column', id: args.id })
+          },
+
+          addCard(result: AddCardMutation, args: AddCardMutationVariables, cache, info) {
+            cache.invalidate({ __typename: 'Column', id: args.columnId })
+          },
+
+          removeCard(result: RemoveCardMutation, args: RemoveCardMutationVariables, cache, info) {
+            cache.invalidate({ __typename: 'Card', id: args.id })
           }
         },
       },
