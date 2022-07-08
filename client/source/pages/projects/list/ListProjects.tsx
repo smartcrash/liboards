@@ -78,7 +78,7 @@ export const ListProjects = () => {
 
           <Box as={"section"} mt={8}>
             <Button onClick={onToggle} variant={"link"}>
-              View all deleted boards
+              View all deleted projects
             </Button>
 
             <Box display={isOpen ? "block" : "none"}>

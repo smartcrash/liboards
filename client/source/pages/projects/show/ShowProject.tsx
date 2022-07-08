@@ -170,7 +170,7 @@ export const ShowProject = () => {
                   <PopoverBody>
                     <VStack spacing={3}>
                       <Text fontSize={"sm"} color={"gray.500"}>
-                        You can find and reopen closed boards at the bottom of{" "}
+                        You can find and restore deleted projects at the bottom of{" "}
                         <Link
                           as={RouterLink}
                           to={route("projects.list")}
