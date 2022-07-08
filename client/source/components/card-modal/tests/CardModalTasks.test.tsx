@@ -4,7 +4,7 @@ import { times } from "lodash";
 import { describe, expect, it } from "vitest";
 import { fireEvent, userEvent, waitFor, within } from "../../../utils/testUtils";
 import { CardModalTasks } from "../src/CardModalTasks";
-import { createMockCard, customRender } from "../testUtils";
+import { createRandomCard, customRender } from "../testUtils";
 
 describe("<CardModalTasks />", () => {
   it("renders", () => {
@@ -19,7 +19,7 @@ describe("<CardModalTasks />", () => {
       createdAt: new Date(),
     }));
 
-    const { getByTestId } = customRender(<CardModalTasks />, createMockCard({ tasks }));
+    const { getByTestId } = customRender(<CardModalTasks />, createRandomCard({ tasks }));
 
     const list = within(getByTestId("task-list"));
 
@@ -50,7 +50,7 @@ describe("<CardModalTasks />", () => {
       },
     ];
 
-    const { getByTestId } = customRender(<CardModalTasks />, createMockCard({ tasks: [oldestTask, newerTask] }));
+    const { getByTestId } = customRender(<CardModalTasks />, createRandomCard({ tasks: [oldestTask, newerTask] }));
 
     const list = within(getByTestId("task-list"));
     const items = list.getAllByRole("listitem");
@@ -75,7 +75,7 @@ describe("<CardModalTasks />", () => {
       },
     ];
 
-    const { getByTestId } = customRender(<CardModalTasks />, createMockCard({ tasks: [completed, notCompleted] }));
+    const { getByTestId } = customRender(<CardModalTasks />, createRandomCard({ tasks: [completed, notCompleted] }));
 
     const list = within(getByTestId("task-list"));
 
@@ -91,7 +91,7 @@ describe("<CardModalTasks />", () => {
 
   it("add a new task", async () => {
     const content = faker.lorem.words();
-    const { getByTestId, addTask, card } = customRender(<CardModalTasks />, createMockCard({ tasks: [] }));
+    const { getByTestId, addTask, card } = customRender(<CardModalTasks />, createRandomCard({ tasks: [] }));
 
     expect(addTask).not.toHaveBeenCalled();
 
@@ -112,7 +112,7 @@ describe("<CardModalTasks />", () => {
       createdAt: new Date(),
     };
 
-    const { getByTestId, updateTask } = customRender(<CardModalTasks />, createMockCard({ tasks: [task] }));
+    const { getByTestId, updateTask } = customRender(<CardModalTasks />, createRandomCard({ tasks: [task] }));
 
     const container = within(getByTestId(`task-item:${task.id}`));
     const checkbox = container.getByRole("checkbox");
@@ -136,7 +136,7 @@ describe("<CardModalTasks />", () => {
       createdAt: new Date(),
     };
 
-    const { getByTestId, updateTask } = customRender(<CardModalTasks />, createMockCard({ tasks: [task] }));
+    const { getByTestId, updateTask } = customRender(<CardModalTasks />, createRandomCard({ tasks: [task] }));
 
     const nextValue = faker.lorem.words();
     const container = within(getByTestId(`task-item:${task.id}`));
@@ -162,7 +162,7 @@ describe("<CardModalTasks />", () => {
       createdAt: new Date(),
     };
 
-    const { getByTestId, removeTask } = customRender(<CardModalTasks />, createMockCard({ tasks: [task] }));
+    const { getByTestId, removeTask } = customRender(<CardModalTasks />, createRandomCard({ tasks: [task] }));
 
     const container = within(getByTestId(`task-item:${task.id}`));
     const button = container.getByTestId("remove-task");

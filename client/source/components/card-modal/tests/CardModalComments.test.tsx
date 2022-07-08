@@ -3,22 +3,8 @@ import { format, subDays } from "date-fns";
 import { times } from "lodash";
 import { describe, expect, it } from "vitest";
 import { fireEvent, userEvent, waitFor, within } from "../../../utils/testUtils";
-import { CardType } from "../src/CardModal";
 import { CardModalCommnents } from "../src/CardModalCommnents";
-import { createMockCard, customRender } from "../testUtils";
-
-type TComment = CardType["comments"][0];
-
-const createMockComment = (overrides: Partial<TComment> = {}): TComment => ({
-  id: faker.datatype.number(),
-  content: faker.lorem.words(),
-  user: { id: faker.datatype.number(), userName: faker.internet.userName() },
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  canDelete: true,
-  canUpdate: true,
-  ...overrides,
-});
+import { createRadomComment, createRandomCard, customRender } from "../testUtils";
 
 describe("<CardModalComments />", () => {
   it("renders", () => {
@@ -26,9 +12,9 @@ describe("<CardModalComments />", () => {
   });
 
   it("shows a list containing all card's comments", () => {
-    const comments = times(3, () => createMockComment());
+    const comments = times(3, () => createRadomComment());
 
-    const { getByTestId } = customRender(<CardModalCommnents />, createMockCard({ comments }));
+    const { getByTestId } = customRender(<CardModalCommnents />, createRandomCard({ comments }));
 
     const list = within(getByTestId("comment-list"));
 
@@ -45,11 +31,11 @@ describe("<CardModalComments />", () => {
 
   it("order comments by descending creation date", async () => {
     const comments = [
-      createMockComment({ createdAt: subDays(new Date(), 1) }),
-      createMockComment({ createdAt: new Date() }),
+      createRadomComment({ createdAt: subDays(new Date(), 1) }),
+      createRadomComment({ createdAt: new Date() }),
     ];
 
-    const { getByTestId } = customRender(<CardModalCommnents />, createMockCard({ comments }));
+    const { getByTestId } = customRender(<CardModalCommnents />, createRandomCard({ comments }));
 
     const [oldestComment, newestComment] = comments;
     const list = within(getByTestId("comment-list"));
@@ -61,7 +47,7 @@ describe("<CardModalComments />", () => {
 
   it("add a new comment", async () => {
     const content = faker.lorem.words();
-    const { getByTestId, addComment, card } = customRender(<CardModalCommnents />, createMockCard({ comments: [] }));
+    const { getByTestId, addComment, card } = customRender(<CardModalCommnents />, createRandomCard({ comments: [] }));
 
     expect(addComment).not.toHaveBeenCalled();
 
@@ -76,11 +62,11 @@ describe("<CardModalComments />", () => {
   });
 
   it("update existing comment", async () => {
-    const comment = createMockComment();
+    const comment = createRadomComment();
 
     const { getByTestId, updateComment } = customRender(
       <CardModalCommnents />,
-      createMockCard({ comments: [comment] })
+      createRandomCard({ comments: [comment] })
     );
 
     const nextValue = faker.lorem.words();
@@ -106,11 +92,11 @@ describe("<CardModalComments />", () => {
   });
 
   it("remove comment", async () => {
-    const comment = createMockComment();
+    const comment = createRadomComment();
 
     const { getByTestId, removeComment } = customRender(
       <CardModalCommnents />,
-      createMockCard({ comments: [comment] })
+      createRandomCard({ comments: [comment] })
     );
 
     const container = within(getByTestId(`comment-item:${comment.id}`));
@@ -122,9 +108,9 @@ describe("<CardModalComments />", () => {
   });
 
   it("should not show remove button if `canDelete` = false", async () => {
-    const comment = createMockComment({ canDelete: false });
+    const comment = createRadomComment({ canDelete: false });
 
-    const { getByTestId } = customRender(<CardModalCommnents />, createMockCard({ comments: [comment] }));
+    const { getByTestId } = customRender(<CardModalCommnents />, createRandomCard({ comments: [comment] }));
 
     const container = within(getByTestId(`comment-item:${comment.id}`));
     const button = container.queryByTestId("delete-comment");
@@ -133,9 +119,9 @@ describe("<CardModalComments />", () => {
   });
 
   it("should not show edit button if `canUpdate` = false", () => {
-    const comment = createMockComment({ canUpdate: false });
+    const comment = createRadomComment({ canUpdate: false });
 
-    const { getByTestId } = customRender(<CardModalCommnents />, createMockCard({ comments: [comment] }));
+    const { getByTestId } = customRender(<CardModalCommnents />, createRandomCard({ comments: [comment] }));
 
     const container = within(getByTestId(`comment-item:${comment.id}`));
     const button = container.queryByTestId("edit-comment");

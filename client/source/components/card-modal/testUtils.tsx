@@ -4,7 +4,9 @@ import { vi } from "vitest";
 import { render } from "../../utils/testUtils";
 import { CardModalContextProvider, CardType } from "./src/CardModal";
 
-export const createMockCard = (overrides: Partial<CardType> = {}): CardType => ({
+type TComment = CardType["comments"][0];
+
+export const createRandomCard = (overrides: Partial<CardType> = {}): CardType => ({
   id: faker.datatype.number(),
   title: faker.lorem.words(),
   description: faker.lorem.sentences(),
@@ -17,41 +19,36 @@ export const createMockCard = (overrides: Partial<CardType> = {}): CardType => (
   ...overrides,
 });
 
-export const customRender = (ui: ReactElement, card: CardType = createMockCard()) => {
-  const updateCard = vi.fn();
-  const addTask = vi.fn();
-  const updateTask = vi.fn();
-  const removeTask = vi.fn();
-  const addComment = vi.fn();
-  const updateComment = vi.fn();
-  const removeComment = vi.fn();
+export const createRadomComment = (overrides: Partial<TComment> = {}): TComment => ({
+  id: faker.datatype.number(),
+  content: faker.lorem.words(),
+  user: {
+    id: faker.datatype.number(),
+    userName: faker.internet.userName(),
+  },
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  canDelete: true,
+  canUpdate: true,
+  ...overrides,
+});
 
-  const renderResult = render(
-    <CardModalContextProvider
-      value={{
-        card,
-        updateCard,
-        addTask,
-        updateTask,
-        removeTask,
-        addComment,
-        updateComment,
-        removeComment,
-      }}
-    >
-      {ui}
-    </CardModalContextProvider>
-  );
+export const customRender = (ui: ReactElement, card: CardType = createRandomCard()) => {
+  const mutations = {
+    updateCard: vi.fn(),
+    addTask: vi.fn(),
+    updateTask: vi.fn(),
+    removeTask: vi.fn(),
+    addComment: vi.fn(),
+    updateComment: vi.fn(),
+    removeComment: vi.fn(),
+  };
+
+  const renderResult = render(<CardModalContextProvider value={{ card, ...mutations }}>{ui}</CardModalContextProvider>);
 
   return {
     card,
-    updateCard,
-    addTask,
-    updateTask,
-    removeTask,
-    addComment,
-    updateComment,
-    removeComment,
+    ...mutations,
     ...renderResult,
   };
 };
