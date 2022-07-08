@@ -22,7 +22,13 @@ export const CardModalTasks = () => {
                 Sub-tasks
               </Heading>
 
-              <Button colorScheme={"gray"} variant={"solid"} size={"xs"} onClick={toggleShowCompleted}>
+              <Button
+                colorScheme={"gray"}
+                variant={"solid"}
+                size={"xs"}
+                onClick={toggleShowCompleted}
+                data-testid={"toggle-show-completed"}
+              >
                 {showCompleted ? "Hide" : "Show"} completed
               </Button>
             </HStack>

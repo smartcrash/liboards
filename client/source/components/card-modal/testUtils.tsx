@@ -4,7 +4,7 @@ import { vi } from "vitest";
 import { render } from "../../utils/testUtils";
 import { CardModalContextProvider, CardType } from "./src/CardModal";
 
-export const createMockCard = (): CardType => ({
+export const createMockCard = (overrides: Partial<CardType> = {}): CardType => ({
   id: faker.datatype.number(),
   title: faker.lorem.words(),
   description: faker.lorem.sentences(),
@@ -14,10 +14,10 @@ export const createMockCard = (): CardType => ({
   },
   comments: [],
   tasks: [],
+  ...overrides,
 });
 
-export const customRender = (ui: ReactElement) => {
-  const card = createMockCard();
+export const customRender = (ui: ReactElement, card: CardType = createMockCard()) => {
   const updateCard = vi.fn();
   const addTask = vi.fn();
   const updateTask = vi.fn();
