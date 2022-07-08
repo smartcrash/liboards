@@ -1,4 +1,4 @@
-import { AdderForm } from "../../";
+import { AdderForm } from "../..";
 
 interface TaskFormProps {
   onConfirm: (title: string) => void;

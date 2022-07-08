@@ -31,7 +31,7 @@ export const CommentEditForm = ({ defaultValue, onConfirm, onCancel }: CommentEd
   };
 
   return (
-    <Stack as={"form"} onSubmit={handleSubmit} flexGrow={1} w={"full"}>
+    <Stack as={"form"} onSubmit={handleSubmit} flexGrow={1} w={"full"} data-testid={"edit-comment-form"}>
       <AutoResizeTextarea
         ref={textAreaRef}
         size={"sm"}

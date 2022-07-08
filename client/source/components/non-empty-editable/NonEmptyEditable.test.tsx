@@ -3,7 +3,7 @@ import { describe, it, vi, expect } from "vitest";
 import { render, userEvent, fireEvent } from "../../utils/testUtils";
 import { NonEmptyEditable } from "./NonEmptyEditable";
 
-describe("NonEmptyEditable", () => {
+describe("<NonEmptyEditable/>", () => {
   it.concurrent("should not invoce `onSubmit` when the input is left empty", async () => {
     const onSubmit = vi.fn();
     const defaultValue = "I'm awesome";

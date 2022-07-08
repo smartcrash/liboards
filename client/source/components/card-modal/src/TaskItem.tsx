@@ -13,11 +13,11 @@ interface TaskItemProps {
 }
 
 export const TaskItem = ({ task, onUpdate, onRemove }: TaskItemProps) => {
-  const hoverRef = useRef<HTMLDivElement>(null);
+  const hoverRef = useRef<HTMLLIElement>(null);
   const isHover = useHover(hoverRef);
 
   return (
-    <Box ref={hoverRef} pos={"relative"} pr={8}>
+    <Box as={"li"} ref={hoverRef as any} pos={"relative"} pr={8} data-testid={`task-item:${task.id}`}>
       <Checkbox
         pos={"absolute"}
         top={1}
@@ -62,6 +62,7 @@ export const TaskItem = ({ task, onUpdate, onRemove }: TaskItemProps) => {
             aria-label={"Delete this task"}
             title={"Delete this task"}
             onClick={() => onRemove(task)}
+            data-testid={"remove-task"}
           />
         </ButtonGroup>
       </Box>

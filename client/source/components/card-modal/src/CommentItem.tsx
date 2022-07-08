@@ -21,7 +21,7 @@ export const CommentItem = ({ comment, onEdit, onRemove }: CommentItemProps) => 
   };
 
   return (
-    <HStack alignItems={"flex-start"} spacing={4}>
+    <HStack as={"li"} alignItems={"flex-start"} spacing={4} data-testid={`comment-item:${comment.id}`}>
       <Avatar size={"sm"} />
 
       <VStack alignItems={"flex-start"} flexGrow={1} spacing={1}>

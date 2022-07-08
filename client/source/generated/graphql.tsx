@@ -301,7 +301,7 @@ export type ColumnFragmentFragment = { __typename?: 'Column', id: number, title:
 
 export type CommentFragmentFragment = { __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, userName: string } };
 
-export type TaskFragmentFragment = { __typename?: 'Task', id: number, content: string, completed: boolean };
+export type TaskFragmentFragment = { __typename?: 'Task', id: number, content: string, completed: boolean, createdAt: any };
 
 export type UserFragmentFragment = { __typename?: 'User', id: number, userName: string, email: string, createdAt: string, updatedAt: string };
 
@@ -336,7 +336,7 @@ export type AddTaskMutationVariables = Exact<{
 }>;
 
 
-export type AddTaskMutation = { __typename?: 'Mutation', task?: { __typename?: 'Task', id: number, content: string, completed: boolean } | null };
+export type AddTaskMutation = { __typename?: 'Mutation', task?: { __typename?: 'Task', id: number, content: string, completed: boolean, createdAt: any } | null };
 
 export type AddToFavoritesMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -506,7 +506,7 @@ export type UpdateTaskMutationVariables = Exact<{
 }>;
 
 
-export type UpdateTaskMutation = { __typename?: 'Mutation', task: { __typename?: 'Task', id: number, content: string, completed: boolean } };
+export type UpdateTaskMutation = { __typename?: 'Mutation', task: { __typename?: 'Task', id: number, content: string, completed: boolean, createdAt: any } };
 
 export type AllBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -535,7 +535,7 @@ export type FindCardByIdQueryVariables = Exact<{
 }>;
 
 
-export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string }, tasks: Array<{ __typename?: 'Task', id: number, content: string, completed: boolean }>, comments: Array<{ __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, userName: string } }> } | null };
+export type FindCardByIdQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: number, title: string, description: string, column: { __typename?: 'Column', id: number, title: string }, tasks: Array<{ __typename?: 'Task', id: number, content: string, completed: boolean, createdAt: any }>, comments: Array<{ __typename?: 'Comment', id: number, content: string, canUpdate: boolean, canDelete: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: number, userName: string } }> } | null };
 
 export const BoardFragmentFragmentDoc = gql`
     fragment BoardFragment on Board {
@@ -583,6 +583,7 @@ export const TaskFragmentFragmentDoc = gql`
   id
   content
   completed
+  createdAt
 }
     `;
 export const UserFragmentFragmentDoc = gql`

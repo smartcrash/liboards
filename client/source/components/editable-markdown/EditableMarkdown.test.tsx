@@ -1,16 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, userEvent, waitFor } from "../../../../utils/testUtils";
-import { EditableDesc } from "./EditableDesc";
+import { fireEvent, getByLabelText, render, userEvent, waitFor } from "../../utils/testUtils";
+import { EditableMarkdown } from "./EditableMarkdown";
 
-describe("EditableDesc", () => {
+describe("<EditableMarkdown/>", () => {
   it("should show placeholder if `defaultValue` is empty", () => {
-    const { getByTestId } = render(<EditableDesc defaultValue={""} onSubmit={() => {}} />);
+    const { getByTestId } = render(<EditableMarkdown defaultValue={""} onSubmit={() => {}} />);
 
     expect(getByTestId("placeholder")).toBeTruthy();
   });
 
   it("should enter edit mode when the placeholder is clicked", async () => {
-    const { getByTestId, queryByTestId } = render(<EditableDesc defaultValue={""} onSubmit={() => {}} />);
+    const { getByTestId, queryByTestId } = render(<EditableMarkdown defaultValue={""} onSubmit={() => {}} />);
 
     expect(queryByTestId("save")).toBeFalsy();
     expect(queryByTestId("cancel")).toBeFalsy();
@@ -25,7 +25,7 @@ describe("EditableDesc", () => {
 
   it("should to `defaultValue` as text if not empty", () => {
     const defaultValue = "[Some random description]";
-    const { queryByTestId, getByTestId } = render(<EditableDesc defaultValue={defaultValue} onSubmit={() => {}} />);
+    const { queryByTestId, getByTestId } = render(<EditableMarkdown defaultValue={defaultValue} onSubmit={() => {}} />);
 
     const preview = getByTestId("preview");
     const textarea = getByTestId("textarea") as HTMLTextAreaElement;
@@ -37,7 +37,7 @@ describe("EditableDesc", () => {
 
   it("should enter edit mode when the `defaultValue` is clicked", async () => {
     const defaultValue = "[Some random description]";
-    const { queryByTestId, getByTestId } = render(<EditableDesc defaultValue={defaultValue} onSubmit={() => {}} />);
+    const { queryByTestId, getByTestId } = render(<EditableMarkdown defaultValue={defaultValue} onSubmit={() => {}} />);
 
     expect(queryByTestId("save")).toBeFalsy();
     expect(queryByTestId("cancel")).toBeFalsy();
@@ -56,7 +56,7 @@ describe("EditableDesc", () => {
     const defaultValue = "[Some random description]";
     const onSubmit = vi.fn();
 
-    const { getByTestId } = render(<EditableDesc defaultValue={defaultValue} onSubmit={onSubmit} />);
+    const { getByTestId } = render(<EditableMarkdown defaultValue={defaultValue} onSubmit={onSubmit} />);
 
     userEvent.click(getByTestId("preview"));
 
@@ -78,7 +78,7 @@ describe("EditableDesc", () => {
     const defaultValue = "[Some random description]";
     const onSubmit = vi.fn();
 
-    const { getByTestId } = render(<EditableDesc defaultValue={defaultValue} onSubmit={onSubmit} />);
+    const { getByTestId } = render(<EditableMarkdown defaultValue={defaultValue} onSubmit={onSubmit} />);
 
     userEvent.click(getByTestId("preview"));
 
@@ -97,7 +97,7 @@ describe("EditableDesc", () => {
     const defaultValue = "[Some random description]";
     const onSubmit = vi.fn();
 
-    const { getByTestId } = render(<EditableDesc defaultValue={defaultValue} onSubmit={onSubmit} />);
+    const { getByTestId } = render(<EditableMarkdown defaultValue={defaultValue} onSubmit={onSubmit} />);
 
     userEvent.click(getByTestId("preview"));
 
@@ -113,5 +113,13 @@ describe("EditableDesc", () => {
 
     expect(onSubmit).not.toHaveBeenCalled();
     expect(textarea.value).toBe(defaultValue);
+  });
+
+  it("renders preview as markdown", () => {
+    const defaultValue = "# Hello world";
+
+    const { getByTestId } = render(<EditableMarkdown defaultValue={defaultValue} onSubmit={() => {}} />);
+
+    expect(getByTestId("preview").innerHTML).toContain("<h1>Hello world</h1>");
   });
 });

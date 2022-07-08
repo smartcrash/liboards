@@ -1,6 +1,6 @@
 import { Button, ButtonGroup, Stack } from "@chakra-ui/react";
 import { FormEventHandler, KeyboardEventHandler, useRef } from "react";
-import { AutoResizeTextarea } from "../../";
+import { AutoResizeTextarea } from "../..";
 
 interface CommentFormProps {
   onConfirm: (content: string) => void;
@@ -31,7 +31,7 @@ export const CommentForm = ({ onConfirm }: CommentFormProps) => {
   };
 
   return (
-    <Stack as={"form"} onSubmit={handleSubmit} flexGrow={1}>
+    <Stack as={"form"} onSubmit={handleSubmit} flexGrow={1} data-testid={"comment-form"}>
       <AutoResizeTextarea
         ref={textAreaRef}
         size={"sm"}

@@ -1,4 +1,3 @@
-import { StickyContainer, Sticky } from "react-sticky";
 import {
   Box,
   Button,
@@ -21,11 +20,12 @@ import {
 import { useRef } from "react";
 import { Helmet } from "react-helmet";
 import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
+import { Sticky, StickyContainer } from "react-sticky";
 import {
   Board,
   Card,
-  CardDetailsModal,
   CardDragEndHandler,
+  CardModal,
   CardNewHandler,
   CardRemoveHandler,
   ColumnNewHandler,
@@ -215,7 +215,7 @@ export const ShowProject = () => {
         </Box>
       </Stack>
 
-      <CardDetailsModal id={cardIdRef.current} isOpen={isOpen} onClose={onClose} />
+      <CardModal id={cardIdRef.current} isOpen={isOpen} onClose={onClose} />
     </>
   );
 };
